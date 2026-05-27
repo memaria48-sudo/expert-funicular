@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Archiv · Strategic Opportunity Radar</title>
+  <link rel="icon" type="image/png" href="sor-logo.png" />
+  <link rel="apple-touch-icon" href="sor-logo.png" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --ink: #101826;
+      --muted: #5f6f82;
+      --line: #dce4ec;
+      --navy: #071426;
+      --navy-2: #0d2238;
+      --gold: #f4b51e;
+      --gold-soft: #fff7df;
+      --blue-soft: #f4f8fc;
+      --shadow: 0 14px 34px rgba(7, 20, 38, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .site-header {
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+      color: white;
+      border-bottom: 4px solid var(--gold);
+    }
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 18px;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      color: inherit;
+      text-decoration: none;
+    }
+    .brand img {
+      width: 150px;
+      height: 54px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: #06101e;
+    }
+    .brand-title { min-width: 0; }
+    .brand-title strong {
+      display: block;
+      font-size: 1.15rem;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    .brand-title span {
+      display: block;
+      color: rgba(255,255,255,.72);
+      font-size: .86rem;
+      margin-top: 2px;
+    }
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: .9rem;
+      font-weight: 750;
+    }
+    nav a.active, nav a:hover {
+      color: var(--navy);
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 18px 70px;
+    }
+    .page-intro {
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: 0;
+      color: var(--navy);
+    }
+    .subtitle {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-weight: 650;
+      line-height: 1.45;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+    .analysis {
+      max-width: 920px;
+    }
+    .analysis p {
+      font-size: 1.07rem;
+      line-height: 1.76;
+      margin: 0 0 18px;
+    }
+    .analysis h2, .analysis h3 {
+      margin: 24px 0 10px;
+      color: var(--navy);
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .stat { background: var(--gold-soft); border: 1px solid #f2d784; border-radius: 8px; padding: 12px; }
+    .stat b { display: block; font-size: 1.55rem; color: var(--navy); }
+    .stat span { color: var(--muted); font-size: .82rem; font-weight: 800; text-transform: uppercase; }
+    h2 { margin: 0 0 14px; font-size: 1.18rem; color: var(--navy); }
+    h3 { color: var(--navy); }
+    .section-row { margin: 10px 0; }
+    .section-top { display: flex; justify-content: space-between; gap: 12px; font-size: .9rem; color: var(--muted); }
+    .bar { height: 8px; background: #edf1f5; border-radius: 999px; overflow: hidden; margin-top: 5px; }
+    .bar span { display: block; height: 100%; background: var(--gold); }
+    .event-chip { border-top: 1px solid var(--line); padding: 12px 0; }
+    .event-chip:first-child { border-top: 0; }
+    .event-chip a { color: var(--ink); text-decoration: none; font-weight: 760; }
+    .event-chip small { display: block; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    .term-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .term { background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: .86rem; }
+    .members { color: var(--muted); line-height: 1.58; font-size: .94rem; }
+    .history-card, .scip-card { border-top: 1px solid var(--line); padding: 18px 0; }
+    .history-card:first-child, .scip-card:first-child { border-top: 0; }
+    .history-card h3, .scip-card h3 { margin: 0 0 5px; font-size: 1.02rem; }
+    .history-card p, .scip-card p { color: var(--muted); margin: 8px 0 0; line-height: 1.58; }
+    .artifact-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .artifact-row a, .button-link {
+      border: 1px solid #f0cf6e;
+      background: var(--gold-soft);
+      border-radius: 999px;
+      padding: 7px 10px;
+      text-decoration: none;
+      color: var(--navy);
+      font-weight: 800;
+      font-size: .84rem;
+    }
+    details { margin-top: 10px; }
+    summary { cursor: pointer; color: var(--navy); font-weight: 800; }
+    .meeting-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .meeting-head > div { min-width: 0; }
+    .meeting-head p { margin: 6px 0 0; color: var(--muted); line-height: 1.45; }
+    .radar-filter-note { font-size: .9rem; }
+    .meeting-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .meeting-card { border: 1px solid var(--line); border-radius: 8px; padding: 15px; background: #fbfcfe; }
+    .meeting-card h3 { margin: 0 0 6px; font-size: 1rem; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .meeting-card h3 .meeting-title { min-width: 0; }
+    .meeting-card h3 .points-chip { color: var(--muted); font-size: .86rem; font-weight: 900; white-space: nowrap; background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; }
+    .meeting-card p, .meeting-card li { color: var(--muted); line-height: 1.5; font-size: .92rem; }
+    .meeting-card li strong { color: var(--navy); }
+    .meeting-card ul { margin: 6px 0 10px 18px; padding: 0; }
+    .role-list { list-style: none; margin-left: 0 !important; display: grid; gap: 6px; }
+    .role-list li { margin: 0; }
+    .scip-label { color: var(--gold); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: .76rem; margin-bottom: 5px; }
+    .scip-hypothesis { color: var(--navy) !important; font-weight: 750; }
+    .scip-status-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+    .scip-status-row span { background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; color: var(--navy); font-size: .76rem; font-weight: 800; }
+    .opportunity-line {
+      border: 1px solid #dfe7ef;
+      background: white;
+      border-radius: 8px;
+      padding: 9px 10px;
+      margin: 10px 0;
+      display: grid;
+      gap: 5px;
+    }
+    .opportunity-line strong {
+      color: var(--navy);
+      font-size: .84rem;
+    }
+    .opportunity-line > span {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.45;
+    }
+    .opportunity-line.rising { border-left: 4px solid #2f9e44; }
+    .opportunity-line.falling { border-left: 4px solid #d9480f; }
+    .opportunity-line.stable { border-left: 4px solid var(--gold); }
+    .timeline-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .timeline-chips span {
+      background: var(--blue-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 7px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 750;
+    }
+    .feedback-box {
+      border-top: 1px solid var(--line);
+      margin-top: 12px;
+      padding-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+    .feedback-box span {
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 800;
+      margin-right: 3px;
+    }
+    .feedback-box button {
+      border: 1px solid #d6e0ea;
+      background: white;
+      color: var(--navy);
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: .78rem;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .feedback-box button:hover { border-color: var(--gold); background: var(--gold-soft); }
+    .feedback-comment-box {
+      flex-basis: 100%;
+      display: grid;
+      gap: 7px;
+      margin-top: 6px;
+    }
+    .feedback-comment-box[hidden] { display: none; }
+    .feedback-comment-box label {
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 850;
+    }
+    .feedback-comment-box textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d6e0ea;
+      border-radius: 8px;
+      padding: 8px 9px;
+      font: inherit;
+      resize: vertical;
+      color: var(--ink);
+      background: white;
+    }
+    .feedback-status {
+      color: var(--muted);
+      font-size: .78rem;
+      margin-left: 2px;
+    }
+    .site-footer {
+      background: var(--navy);
+      color: rgba(255,255,255,.72);
+      border-top: 4px solid var(--gold);
+    }
+    .footer-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: .88rem;
+    }
+    .footer-inner strong { color: white; }
+    @media (max-width: 900px) {
+      .header-inner { display: block; }
+      nav { justify-content: flex-start; margin-top: 14px; }
+      .two-col { grid-template-columns: 1fr; }
+      .meeting-head { display: block; }
+      .meeting-head .button-link { display: inline-block; margin-top: 10px; }
+      .meeting-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="zirp_dashboard.html">
+        <img src="sor-logo.png" alt="SOR Strategic Opportunity Radar Logo" />
+        <span class="brand-title">
+          <strong>Strategic Opportunity Radar</strong>
+          <span>Detect signals. Connect actors. Act in time.</span>
+        </span>
+      </a>
+      <nav><a class="" href="zirp_dashboard.html">Wochenanalyse</a>
+<a class="" href="signals.html">Signale &amp; Begriffe</a>
+<a class="" href="scip_archive.html">SCIP Matchings</a>
+<a class="active" href="archive.html">Archiv</a></nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="page-intro">
+      <h1>Archiv</h1>
+      <p class="subtitle">Alle gespeicherten Wochenanalysen mit Word-Bericht, Ereignisdateien und Rohdaten.</p>
+    </section>
+    <section class="card"><h2>Archivierte Wochenanalysen</h2><div class="history-card"><h3>21.05.2026 bis 27.05.2026</h3><small>101 Mitglieder geprüft · 8 Mitglieder mit priorisierten Funden · 13 belastbare Signale · Zeitraum 21.05.2026 bis 27.05.2026 · erstellt 27.05.2026, 02:17:46</small><p>Wochenanalyse Die Auswertung der letzten 7 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Ein wichtiger Bezugspunkt ist die Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;, das vom DAAD und dem Bundesministerium für Forschung gefördert wird. Dieses Signal weist über reine Kommunikation hinaus auf Kooperation, Transfer und anwendungsnahe Vernetzun...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-27_02-17.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-27_02-17.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-27_02-17.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-27_02-17.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Auswertung der letzten 7 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Ein wichtiger Bezugspunkt ist die Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;, das vom DAAD und dem Bundesministerium für Forschung gefördert wird. Dieses Signal weist über reine Kommunikation hinaus auf Kooperation, Transfer und anwendungsnahe Vernetzung hin. Ein weiterer wichtiger Bezugspunkt ist die Handwerkskammern Rheinland-Pfalz mit der &quot;Softwaremesse Handwerk&quot;, die die Digitalisierung im Handwerk vorantreiben soll.</p>
+<p>Die Analyse der Signale zeigt, dass es um Kooperationen mit anderen Unternehmen und Partnern sowie um die Wirtschaftslage und -entwicklung geht. Die Signale von IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH, wie &quot;1. InnovationTalk@IQIB&quot; und &quot;Neue Publikation: Die Flutkatastrophe 2021 – vom Wiederaufbau zur Klimaresilienz&quot;, unterstreichen die Bedeutung von Resilienz und Klimaresilienz. Die Signale von Zahnen Technik GmbH, wie &quot;Wave Cloud by zahnen&quot;, zeigen die Bedeutung von digitaler Transformation und Automatisierung.</p>
+<p>Die unterstützenden Kontexte, wie die &quot;Softwaremesse Handwerk&quot; von Handwerkskammern Rheinland-Pfalz und die &quot;Studie schlägt in RLP Alarm: Versorgung in RLP-Kommunen nur mangelhaft&quot; von SWR – Südwestrundfunk, verdichten die Analyse und zeigen, dass es um die Wirtschaftslage und -entwicklung sowie um die Versorgung und das Gesundheitssystem geht.</p>
+<p>Was ZIRP daraus machen könnte: ZIRP könnte die Signale und unterstützenden Kontexte nutzen, um Kooperationen mit anderen Unternehmen und Partnern zu fördern und die Wirtschaftslage und -entwicklung zu unterstützen. Durch die Analyse der Signale und Kontexte kann ZIRP besser verstehen, wie digitale Werkzeuge und Technologien in der Region eingesetzt werden können, um die Wirtschaft und die Gesellschaft zu stärken. ZIRP könnte auch die Bedeutung von Resilienz und Klimaresilienz berücksichtigen und Maßnahmen ergreifen, um diese in der Region zu fördern. Durch die Förderung von Kooperationen und der Unterstützung von digitaler Transformation und Automatisierung kann ZIRP dazu beitragen, die Wirtschaft und die Gesellschaft in der Region zu stärken.</p></div></details></div>
+<div class="history-card"><h3>14.05.2026 bis 27.05.2026</h3><small>101 Mitglieder geprüft · 8 Mitglieder mit priorisierten Funden · 13 belastbare Signale · Zeitraum 14.05.2026 bis 27.05.2026 · erstellt 27.05.2026, 00:07:03</small><p>Wochenanalyse Die Auswertung der letzten 14 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Ein besonders relevantes Signal ist die Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;, das im International Office angesiedelt ist und vom DAAD sowie dem Bundesministerium für Forschung, Technologie und Raumfahrt gefördert wird. Dieses Projekt weist über...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-27_00-06.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-27_00-06.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-27_00-06.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-27_00-06.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Auswertung der letzten 14 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Ein besonders relevantes Signal ist die Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;, das im International Office angesiedelt ist und vom DAAD sowie dem Bundesministerium für Forschung, Technologie und Raumfahrt gefördert wird. Dieses Projekt weist über reine Kommunikation hinaus auf Kooperation, Transfer und anwendungsnahe Vernetzung hin. Ein weiterer wichtiger Bezugspunkt ist die Handwerkskammer Rheinland-Pfalz mit der &quot;Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt&quot;, die die Digitalisierung im Handwerk vorantreiben soll.</p>
+<p>Die Analyse der letzten 14 Tage zeigt auch, dass es neben diesen beiden Signalen weitere relevante Ereignisse gibt, die für die ZIRP von Interesse sein könnten. So hat das IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH ein Projekt zur Stärkung der Resilienz von Kommunen durch Kooperation zwischen Forschung, Politik, Hilfsorganisationen und Bevölkerung initiiert. Ebenso hat die Zahnen Technik GmbH ein digitales Produkt namens &quot;Wave Cloud by zahnen&quot; entwickelt, das Expertenwissen digitalisiert und Prozesse automatisiert. Diese Ereignisse zeigen, dass es in der Region eine Vielzahl von Aktivitäten gibt, die auf die Stärkung der Wirtschaft und der Gesellschaft abzielen.</p>
+<p>Die ZIRP sollte sich auf die Identifizierung von Chancen und Herausforderungen konzentrieren, die sich aus diesen Ereignissen ergeben. So könnte die ZIRP beispielsweise mit der Hochschule Mainz und der Handwerkskammer Rheinland-Pfalz zusammenarbeiten, um die Digitalisierung im Handwerk voranzutreiben und die Resilienz von Kommunen zu stärken. Ebenso könnte die ZIRP mit dem IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH und der Zahnen Technik GmbH zusammenarbeiten, um die Entwicklung von digitalen Produkten und Lösungen zu unterstützen, die die Lebensqualität in der Region verbessern.</p>
+<p>Was ZIRP daraus machen könnte: Die ZIRP sollte die identifizierten Signale und Ereignisse nutzen, um konkrete Handlungs- oder Transferchancen für die Region zu entwickeln. Dazu könnte die ZIRP beispielsweise mit den genannten Partnern zusammenarbeiten, um die Digitalisierung im Handwerk voranzutreiben, die Resilienz von Kommunen zu stärken und die Entwicklung von digitalen Produkten und Lösungen zu unterstützen. Durch diese Zusammenarbeit könnte die ZIRP einen wichtigen Beitrag zur Stärkung der Wirtschaft und der Gesellschaft in der Region leisten.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>101 Mitglieder geprüft · 9 Mitglieder mit priorisierten Funden · 13 belastbare Signale · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 23:54:45</small><p>Die Auswertung der letzten 14 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Kooperationen mit anderen Unternehmen / Partnern, Soziales Engagement und Wirtschaftslage und -entwicklung konkrete Handlungs- oder Transferchancen für ZIRP entstehen. Besonders relevant ist Hochschule Mainz mit...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_23-54.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_23-54.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_23-54.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_23-54.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Die Auswertung der letzten 14 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Kooperationen mit anderen Unternehmen / Partnern, Soziales Engagement und Wirtschaftslage und -entwicklung konkrete Handlungs- oder Transferchancen für ZIRP entstehen.</p>
+<p>Besonders relevant ist Hochschule Mainz mit &#x27;Die Welt zu Gast auf dem Campus&#x27; (Das Projekt GOAL (Global Outreach through Action and Leadership) ist im International Office angesiedelt und wird vom DAAD sowie...). Das Signal weist über reine Kommunikation hinaus auf Kooperation, Transfer und anwendungsnahe Vernetzung. Ein weiterer wichtiger Bezugspunkt ist Handwerkskammern Rheinland-Pfalz mit &#x27;Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt&#x27; (Die Digitalisierung im Handwerk soll vor allem eins: den Alltag leichter machen – im Büro, auf der Baustelle und unterwegs. Genau...). Damit wird eine zweite Linie sichtbar, die an Standortbedingungen, Investitionsanreize und Transformationsdruck anschließt.</p>
+<p>Für den Radar zählen vor allem Hinweise, die institutionelle Entscheidungen, umsetzbare Programme, Partnerschaften oder regionalen Kompetenzaufbau erkennen lassen. Schwächere PR- oder Nachwuchssignale werden deshalb nicht als eigener Trend gelesen, sondern nur als Umfeldrauschen. In diese Kategorie fällt auch IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH mit &#x27;„1. InnovationTalk@IQIB“: Resilienz neu denken&#x27; (Wie kann die Resilienz von Kommunen gestärkt werden? Der Schlüssel liegt in der engen Kooperation zwischen Forschung, Politik,...), weil es auf kommunale Resilienz, Wissenstransfer und Umsetzungsfragen verweist.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>ZIRP könnte mit Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH prüfen, ob aus den stärksten Signalen ein kleines Sondierungsformat entsteht. Im Mittelpunkt sollte nicht eine allgemeine Trenddiskussion stehen, sondern die Frage, wo sich aus den aktuellen Signalen konkrete Transfer-, Umsetzungs- oder Gesprächschancen ergeben. Weiter beobachtet werden sollten vor allem Linien, bei denen neue Partner, Finanzierung, Programme oder praktische Umsetzungsschritte hinzukommen.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>101 Mitglieder geprüft · 9 Mitglieder mit priorisierten Funden · 13 belastbare Signale · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 23:34:22</small><p>Wochenanalyse Die Auswertung der letzten 14 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Kooperationen mit anderen Unternehmen oder Partnern, Sozialem Engagement und Wirtschaftslage und -entwicklung konkrete Handlungs- oder Transferchancen für ZIRP entstehen. Besonders relevant ist die...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_23-34.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_23-34.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_23-34.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_23-34.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Auswertung der letzten 14 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Kooperationen mit anderen Unternehmen oder Partnern, Sozialem Engagement und Wirtschaftslage und -entwicklung konkrete Handlungs- oder Transferchancen für ZIRP entstehen. Besonders relevant ist die Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;, das im International Office angesiedelt ist und vom DAAD sowie dem Bundesministerium für Forschung gefördert wird. Ein weiterer wichtiger Bezugspunkt ist die Handwerkskammer Rheinland-Pfalz mit der &quot;Softwaremesse Handwerk&quot;, die die Digitalisierung im Handwerk vorantreiben soll.</p>
+<p>Die Analyse zeigt, dass die Signale nicht nur auf die Menge der Meldungen beschränkt sind, sondern auch auf die Qualität und Relevanz der Informationen. Die Hochschule Mainz und die Handwerkskammer Rheinland-Pfalz sind zwei Beispiele für Institutionen, die konkrete Projekte und Initiativen umsetzen, die für die ZIRP von Interesse sind. Darüber hinaus gibt es auch Signale von anderen Mitgliedern, wie dem IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH, das sich mit der Resilienz von Kommunen beschäftigt, und der Landesbank Baden-Württemberg, die den internationalen Stromhandel thematisiert.</p>
+<p>Die Signale und Informationen aus den letzten 14 Tagen zeigen, dass es eine Vielzahl von Themen und Projekten gibt, die für die ZIRP von Interesse sind. Die Hochschule Mainz, die Handwerkskammer Rheinland-Pfalz, das IQIB und die Landesbank Baden-Württemberg sind nur einige Beispiele für Institutionen, die konkrete Initiativen und Projekte umsetzen, die für die ZIRP relevant sind. Die Analyse zeigt auch, dass es wichtig ist, die Signale und Informationen sorgfältig auszuwerten und zu bewerten, um die richtigen Schlüsse zu ziehen und die richtigen Entscheidungen zu treffen.</p>
+<p>Was ZIRP daraus machen könnte: ZIRP könnte die Signale und Informationen aus den letzten 14 Tagen nutzen, um konkrete Handlungs- oder Transferchancen zu identifizieren und umzusetzen. Dazu gehören die Kontaktaufnahme mit den relevanten Institutionen, wie der Hochschule Mainz und der Handwerkskammer Rheinland-Pfalz, um weitere Informationen und Details über die Projekte und Initiativen zu erhalten. ZIRP könnte auch die Signale und Informationen nutzen, um eigene Projekte und Initiativen zu entwickeln und umzusetzen, die auf die Bedürfnisse und Interessen der ZIRP abgestimmt sind. Durch die sorgfältige Auswertung und Bewertung der Signale und Informationen kann ZIRP die richtigen Entscheidungen treffen und nächste Schritte ableiten, um die Ziele und Interessen der ZIRP zu erreichen.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>101 Mitglieder geprüft · 9 Mitglieder mit priorisierten Funden · 13 belastbare Signale · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 23:14:49</small><p>Wochenanalyse Die Auswertung der letzten 14 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Kooperationen mit anderen Unternehmen, Sozialem Engagement und Wirtschaftslage und -entwicklung konkrete Handlungs- oder Transferchancen für ZIRP entstehen. Besonders relevant ist die Hochschule Mai...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_23-14.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_23-14.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_23-14.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_23-14.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Auswertung der letzten 14 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Kooperationen mit anderen Unternehmen, Sozialem Engagement und Wirtschaftslage und -entwicklung konkrete Handlungs- oder Transferchancen für ZIRP entstehen. Besonders relevant ist die Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;, das im International Office angesiedelt ist und vom DAAD sowie dem Bundesministerium für Forschung, Technologie und Raumfahrt gefördert wird. Dieses Projekt weist über reine Kommunikation hinaus auf Kooperation, Transfer und anwendungsnahe Vernetzung.</p>
+<p>Ein weiterer wichtiger Bezugspunkt ist die Handwerkskammer Rheinland-Pfalz mit der &quot;Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt&quot;. Diese Messe soll die Digitalisierung im Handwerk vorantreiben und den Alltag leichter machen. Damit wird eine zweite Linie sichtbar, die an Standortbedingungen, Investitionsanreize und Transformationsdruck anschließt. Für den Radar zählen vor allem Hinweise, die institutionelle Entscheidungen, umsetzbare Programme, Partnerschaften oder regionalen Kompetenzaufbau erkennen lassen. Schwächere PR- oder Nachwuchssignale werden deshalb nicht als eigener Trend gelesen, sondern nur als Umfeldrauschen.</p>
+<p>Die Analyse der Fakten zeigt, dass es einige interessante Entwicklungen gibt, die ZIRP beachten sollte. So hat das IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH ein Projekt zur Resilienz von Kommunen gestartet, das eng mit Forschung, Politik und Wirtschaft zusammenarbeitet. Auch die Landesbank Baden-Württemberg (LBBW) hat ein interessantes Projekt zum internationalen Stromhandel, das für die EU von hoher Priorität ist. Diese Entwicklungen zeigen, dass es viele Möglichkeiten gibt, an denen ZIRP sich beteiligen kann, um die Wirtschaft und die Gesellschaft zu stärken.</p>
+<p>Was ZIRP daraus machen könnte: ZIRP sollte die identifizierten Signale und Entwicklungen nutzen, um konkrete Handlungs- oder Transferchancen zu entwickeln. Dazu gehören die Förderung von Kooperationen mit anderen Unternehmen, die Unterstützung von Sozialem Engagement und die Analyse der Wirtschaftslage und -entwicklung. Durch die enge Zusammenarbeit mit den identifizierten Partnern kann ZIRP die Chancen für die Wirtschaft und die Gesellschaft maximieren und gleichzeitig die Risiken minimieren. Es ist wichtig, dass ZIRP die Signale und Entwicklungen kontinuierlich überwacht und analysiert, um immer auf dem neuesten Stand zu sein und die besten Entscheidungen treffen zu können. Durch die Kombination von SCIP und Crawler-Funden kann ZIRP ein umfassendes Bild der aktuellen Entwicklungen erhalten und die richtigen Schritte unternehmen, um die Ziele zu erreichen.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>9 Mitglieder mit priorisierten Funden · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 22:59:19</small><p>Wochenanalyse In der letzten Woche zeigten fünf belastbare Signale bei vier Mitgliedern. Diese Aktivitäten deuten auf Kooperationen mit anderen Unternehmen oder Partnern, Soziales Engagement und Wirtschaftslage und -entwicklung hin. Der Kern der Aktivitäten liegt in den Handlungen, die aus diesen Bereichen konkrete Handlungs- oder Transferchancen für ZIRP erzeugen könnten. Die Hochschule Mainz mit dem Projekt GOAL...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_22-59.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_22-59.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_22-59.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_22-59.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>In der letzten Woche zeigten fünf belastbare Signale bei vier Mitgliedern. Diese Aktivitäten deuten auf Kooperationen mit anderen Unternehmen oder Partnern, Soziales Engagement und Wirtschaftslage und -entwicklung hin. Der Kern der Aktivitäten liegt in den Handlungen, die aus diesen Bereichen konkrete Handlungs- oder Transferchancen für ZIRP erzeugen könnten.</p>
+<p>Die Hochschule Mainz mit dem Projekt GOAL (Global Outreach through Action and Leadership) und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH mit der Veranstaltung „1. InnovationTalk@IQIB“ sind die stärksten Anker, da sie eine institutionelle Entscheidung oder ein umsetzbares Programm erkennen lassen.</p>
+<p>Hochschule Mainz veranstaltet das Projekt GOAL (Global Outreach through Action and Leadership), das im International... Das bedeutet, dass es potenziell zu wertvollen Kooperationen mit internationalen Partnern führen kann. IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH hingegen organisiert die Veranstaltung „1. InnovationTalk@IQIB“, die auf Resilienz neu denken... Dieser Fokus könnte zu innovativen Lösungen in der Wirtschaft führen.</p>
+<p>Handwerkskammern Rheinland-Pfalz hat einen starken Bezugspunkt durch ihre Softwaremesse Handwerk, die den Fokus auf die digitalen Herausforderungen und Chancen im Handwerk legt. Diese Veranstaltung zeigt an, dass digitale Innovationen in der Praxis umgesetzt werden können.</p>
+<p>Basierend darauf könnten wir folgende Schritte unternehmen:</p>
+<p>DO: Mit Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH prüfen, ob aus den stärksten Signalien ein kleines, konkretes Projekt entstehen kann. Dies würde eine praxisnahe Umsetzung der digitalen Innovationen ermöglichen.</p>
+<p>WATCH: Die Aktivitäten der SWR – Südwestrundfunk und Universität Trier zu Cyberresilienz und kritischer Infrastruktur sorgfältig beobachten, da sie potenzielle neue Felder eröffnen könnten. Diese Bereiche könnten zukünftige Partnerschaften oder Projekte bereichern.</p>
+<p>MAYBE: Mit Zahnen Technik GmbH und Handwerkskammern Rheinland-Pfalz ein Sondierungsgespräch führen, um digitale Werkzeuge für den praktischen Einsatz in der Industrie zu beschleunigen. Dies könnte zu schnelleren Innovationen und besseren Lösungen im Bereich der digitalen Transformation führen.</p>
+<p>Diese Strategie bietet einen konsolidierten Ansatz, um aus den bestehenden Signalien konkrete Projekte oder Partnerschaften zu entwickeln, die ZIRP voranbringen können.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>101 Mitglieder geprüft · 6 Mitglieder mit priorisierten Funden · 8 belastbare Signale · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 22:38:38</small><p>Wochenanalyse In den letzten 14 Tagen wurden 101 Mitglieder geprüft, bei denen 5 belastbare Signale identifiziert wurden. Die Analyse fokussierte sich auf Kooperationen mit anderen Unternehmen oder Partnern sowie die Wirtschaftslage und -entwicklung. Besonders relevant sind Kooperationen und Vernetzungen, die an praxisnahen Umsetzungen und Transformationstaktiken anschließen. Das Hauptsignal kommt von der Hochschu...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_22-38.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_22-38.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_22-38.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_22-38.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>In den letzten 14 Tagen wurden 101 Mitglieder geprüft, bei denen 5 belastbare Signale identifiziert wurden. Die Analyse fokussierte sich auf Kooperationen mit anderen Unternehmen oder Partnern sowie die Wirtschaftslage und -entwicklung. Besonders relevant sind Kooperationen und Vernetzungen, die an praxisnahen Umsetzungen und Transformationstaktiken anschließen.</p>
+<p>Das Hauptsignal kommt von der Hochschule Mainz im Projekt GOAL (Global Outreach through Action and Leadership). Dieses Projekt umfasst kooperative Anstrengungen mit dem DAAD sowie dem Bundesministerium für Forschung, Technologie und Raumfahrt. Diese Kooperationen deuten auf konkrete Handlungs- oder Transferchancen hin, die ZIRP nutzen kann.</p>
+<p>Ein weiteres wichtiges Signal stammt von der Handwerkskammern Rheinland-Pfalz mit der Softwaremesse Handwerk. Die Messe legt den Fokus auf die Digitalisierung im Handwerk und ihre praktische Umsetzung in den Alltag. Dies deutet darauf hin, dass Standortbedingungen und Investitionsanreize eine wichtige Rolle spielen.</p>
+<p>Ein weiteres relevantes Signal ist das IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH mit dem InnovationTalk@IQIB. Dieser Talk konzentriert sich auf die Stärkung der Resilienz von Kommunen, wobei ein Zusammenhang zwischen Forschung, Politik und Umsetzung hervorgehoben wird.</p>
+<p>Was ZIRP daraus machen könnte: ZIRP könnte mit den genannten Mitgliedern Sondierungsgespräche führen. Ziel ist es, konkrete Handlungsweisen in der Kooperation, Digitalisierung und Resilienz zu erarbeiten. Diese Strategie zielt darauf ab, innovative Lösungen für die praktische Anwendung von Technologie und Forschung in der Wirtschaft und der Verwaltung zu finden.</p>
+<p>ZIRP sollte den Fokus auf praxisnahe Umsetzungen legen und potenzielle Transferchancen identifizieren. Die Kooperation mit der Hochschule Mainz könnte zum Beispiel im Bereich globaler Netzwerke und internationalem Wissenfluss weiterentwickelt werden. Die Handwerkskammern Rheinland-Pfalz bieten einen Einblick in die Herausforderungen und Anpassungsmöglichkeiten des digitalisierten Handwerks, die für ZIRP wertvoll sein könnten.</p>
+<p>Das IQIB bietet eine Plattform zur Diskussion der Resilienz von Kommunen. Hier könnte ZIRP strategische Partnerschaften aufbauen, um innovative Lösungen in die Praxis zu bringen und den Widerstandsfähigkeit kommunaler Strukturen zu stärken. Diese Kooperationsweisen könnten zukünftig als Grundlage für Joint-Projects und Innovationstransfers dienen.</p>
+<p>Insgesamt bietet diese Analyse eine breite Palette an Möglichkeiten, um ZIRP in praxisnahen Umgebungen aktiv zu beteiligen und innovative Lösungen voranzutreiben.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 22:29:03</small><p>Wochenanalyse Die Auswertung der letzten 14 Tage zeigte, dass fünf belastbare Signale bei fünf Mitgliedern identifiziert wurden. Die Analyse konzentriert sich nicht auf die Menge der Meldungen, sondern auf Kooperationen mit anderen Unternehmen, Wirtschaftslage und -entwicklung, um Handlungs- oder Transferchancen für ZIRP zu erkennen. Hochschule Mainz, Handwerkskammern Rheinland-Pfalz sowie IQIB – Institut für qual...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_22-28.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_22-28.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_22-28.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_22-28.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Auswertung der letzten 14 Tage zeigte, dass fünf belastbare Signale bei fünf Mitgliedern identifiziert wurden. Die Analyse konzentriert sich nicht auf die Menge der Meldungen, sondern auf Kooperationen mit anderen Unternehmen, Wirtschaftslage und -entwicklung, um Handlungs- oder Transferchancen für ZIRP zu erkennen. Hochschule Mainz, Handwerkskammern Rheinland-Pfalz sowie IQIB – Institut für qualifizierende Innovationsforschung und -beratung GmbH tragen den Hauptanteil der belastbaren Signale bei.</p>
+<p>Hochschule Mainz mit dem Projekt GOAL (Global Outreach through Action and Leadership) im International Office, gefördert von DAAD und dem Bundesministerium für Forschung, Technologie und Raumfahrt, deutet auf reine Kommunikation hinaus zu Kooperationen und anwendungsnahe Vernetzungen. Dieses Projekt zielt darauf ab, internationale Netzwerke für das Handeln und Führen in der globalen Welt aufzubauen.</p>
+<p>Handwerkskammern Rheinland-Pfalz vermittelt die Notwendigkeit der Digitalisierung im Handwerk, um den Alltag leichter zu machen – im Büro, auf der Baustelle und unterwegs. Die Kammern betonen, dass digitale Werkzeuge und Tools den Tagesablauf vereinfachen und effizienter gestalten können.</p>
+<p>IQIB – Institut für qualifizierende Innovationsforschung und -beratung GmbH legt den Fokus auf die Stärkung der Resilienz von Kommunen durch eine engere Kooperation zwischen Forschung und Politik. Der Schlüssel liegt in der Verbindung von wissenschaftlicher Expertise mit politischer Entscheidungsfindung, um die Widerstandsfähigkeit kommunaler Einrichtungen zu verbessern.</p>
+<p>Was ZIRP daraus machen könnte: DO</p>
+<p>Mit Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB – Institut für qualifizierende Innovationsforschung und -beratung GmbH prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat entwickelt werden kann. Dieses Format könnte als Pilotprojekt dienen, um die praktische Umsetzung digitaler Werkzeuge für mittelständische Unternehmen zu testen und optimieren.</p>
+<p>WATCH</p>
+<p>Auf weitere Entwicklungen in der Kooperation zwischen Forschung, Wirtschaft und Kommunen achten, insbesondere im Bereich Cyberresilienz und kritischer Infrastruktur. ZIRP sollte die praktische Umsetzung digitaler Werkzeuge für mittelständische Unternehmen beobachten und eventuelle Chancen aus diesen Entwicklungen nutzen.</p>
+<p>MAYBE</p>
+<p>Die möglichen Handlungs- oder Transferchancen aus den belastbaren Signalen sorgfältig prüfen, um konkrete Vorschläge zur Verbesserung der Digitalisierung und Produktivität im Mittelstand zu erstellen. Dies könnte durch die Erstellung von Leitlinien und Richtlinien für mittelständische Unternehmen und Kommunen erfolgen.</p>
+<p>ZIRP sollte diese Anforderungen als Grundlage für zukünftige Projekte und Maßnahmen nutzen, um sowohl in der Forschung als auch im Handwerk und den</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 21:49:22</small><p>Wochenanalyse Die Analyse der letzten 14 Tage hat insgesamt fünf belastbare Signale bei fünf Mitgliedern erbracht. Die wichtigsten Trends beziehen sich auf Kooperationen mit anderen Unternehmen, die Wirtschaftslage sowie die Entwicklung digitaler Lösungen. Zu den stärksten Ankeuren zählen: - Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;. Dieses Signal ist besonders relevant, da es eine tiefer...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_21-49.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_21-49.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_21-49.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_21-49.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Analyse der letzten 14 Tage hat insgesamt fünf belastbare Signale bei fünf Mitgliedern erbracht. Die wichtigsten Trends beziehen sich auf Kooperationen mit anderen Unternehmen, die Wirtschaftslage sowie die Entwicklung digitaler Lösungen. Zu den stärksten Ankeuren zählen:</p>
+<ul><li>Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;. Dieses Signal ist besonders relevant, da es eine tiefer gehende Zusammenarbeit im Bereich Global Outreach durch Leadership und Wissenschaft vermittelt.</li></ul>
+<ul><li>Handwerkskammern Rheinland-Pfalz haben mit der Softwaremesse Handwerk einen zweiten Bezugspunkt zur Digitalisierung im Handwerk hervorgehoben. Dieser Kontext zeigt auf, dass digitale Lösungen den Alltag des Handwerks erleichtern sollen.</li></ul>
+<ul><li>IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH präsentiert mit &quot;„1. InnovationTalk@IQIB“: Resilienz neu denken&quot; einen weiteren Bezugspunkt zur Wirtschaftslage, insbesondere zur Stärkung der Resilienz von Kommunen.</li></ul>
+<p>Diese Signale deuten auf konkrete Handlungs- oder Transferchancen hin, die ZIRP in Betracht ziehen sollte.</p>
+<p>DO: Mit Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat entwickelt werden kann.</p>
+<p>Wozu:</p>
+<p>Dieser Vorschlag zielt darauf ab, die Kooperationen zu vertiefen und praktische Ergebnisse zu erzielen. Durch das Sondierungsformat können ZIRP und ihre Partner konkrete Ideen austauschen und gemeinsam umsetzbarere Projekte entwickeln.</p>
+<p>WATCH: Die weiteren Aktivitäten der genannten Mitglieder beobachten, insbesondere die Umsetzung von Kooperationen und die praktische Anwendung digitaler Werkzeuge in verschiedenen Branchen.</p>
+<p>Wozu:</p>
+<p>Die Beobachtung dieser Aktivitäten ermöglicht es ZIRP, Trends zu identifizieren und potentielle Handlungsweisen zu planen. Es kann sichergehen, dass digitale Lösungen tatsächlich den gewünschten Effekt haben und die Praxis positiv beeinflussen.</p>
+<p>MAYBE: Ein Sondierungsgespräch mit IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH und SWR – Südwestrundfunk zur Frage &quot;Wo kann digitale Umsetzung in Bau, Industrie oder Verwaltung konkret beschleunigt werden?&quot; prüfen.</p>
+<p>Wozu:</p>
+<p>Ein solches Gespräch könnte neue Perspektiven eröffnen und innovative Lösungen finden, die ZIRP in verschiedenen Sektoren fördern können. Es bietet auch die Möglichkeit, Best Practices zu sammeln und diese weiterzuleiten.</p>
+<p>Zusammenfassung</p>
+<p>Die Analyse der letzten 14 Tage hat klare Trends und Signale hervorgebracht, die sich auf Kooperationen, Wirtschaftslage und digitale Lösungen konzentrieren. ZIRP sollte daher aktiv werden, um aus diesen Signal</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 21:04:48</small><p>Wochenanalyse In den letzten 14 Tagen haben wir insgesamt fünf belastbare Signale in fünf Mitgliedern identifiziert. Die Analyse konzentriert sich nicht auf die Menge der Nachrichten, sondern auf den potenziellen Nutzen für Kooperationen und Handlungschancen. Das Hauptanker-Signal stammt von Hochschule Mainz mit dem Projekt GOAL (Global Outreach through Action and Leadership), das im International Office angesiede...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_21-04.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_21-04.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_21-04.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_21-04.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>In den letzten 14 Tagen haben wir insgesamt fünf belastbare Signale in fünf Mitgliedern identifiziert. Die Analyse konzentriert sich nicht auf die Menge der Nachrichten, sondern auf den potenziellen Nutzen für Kooperationen und Handlungschancen.</p>
+<p>Das Hauptanker-Signal stammt von Hochschule Mainz mit dem Projekt GOAL (Global Outreach through Action and Leadership), das im International Office angesiedelt ist. Dieses Projekt wird vom DAAD sowie vom Bundesministerium gefördert. Das deutet auf konkrete Kooperationen, Transferchancen und anwendungsnahe Vernetzungen hin.</p>
+<p>Handwerkskammern Rheinland-Pfalz setzt hingegen mit der Softwaremesse Handwerk auf die Digitalisierung im Handwerk und den Alltag leichter machen. IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH präsentiert ebenfalls einen starken Trend durch das InnovationTalk@IQIB, das sich auf die Stärkung der Resilienz von Kommunen konzentriert.</p>
+<p>DO:</p>
+<p>Mit Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH prüfen, ob aus den starken Signalen ein kleines, konkretes Sondierungsformat entwickelt werden kann. Dieser Ansatz könnte zu konkreten Kooperationen und praktischen Umsetzungen führen.</p>
+<p>WATCH:</p>
+<p>Beobachten, wie das GOAL-Projekt die Kooperation zwischen Wirtschaft und Hochschule voranbringt und ob es zu umsetzbaren Programmen führt. Das Projekt hat den potenziellen Raum, eine Brücke zwischen akademischem Wissen und praktischer Anwendung in der Industrie zu bauen.</p>
+<p>MAYBE:</p>
+<p>Die Softwaremesse Handwerk bietet eine Gelegenheit, konkrete Lösungen für digitale Umsetzungen in verschiedenen Branchen zu präsentieren und umzusetzen. Diese Messe könnte als Plattform dienen, um digitale Innovationen im Handwerk zu teilen und praktische Anwendungen zu entwickeln.</p>
+<p>Diese Analyse basiert auf den verfügbaren Signalen und zeigt deutlich, dass Kooperationen und praktische Umsetzungen von besonderer Bedeutung sind. Es ist wichtig, diese Chancen zu nutzen, um gemeinsam innovative Lösungen zu finden und zu implementieren.</p>
+<p>Die weiteren Mitglieder wie Zahnen Technik GmbH mit dem Projekt Wave Cloud by zahnen (ehemals ISO by zahnen) digitalisieren Ihr Expertenwissen und stellen innovative Lösungen zur Verfügung. Diese Aktivitäten erweitern den Horizont für potenzielle Kooperationen und Handlungschancen.</p>
+<p>Zusammenfassend lässt sich sagen, dass das Fokus auf konkrete Projekte und ihre praktische Umsetzung wichtig ist. Hierbei bieten Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH eine hervorragende Basis für gemeinsame Initiativen.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 20:38:23</small><p>Wochenanalyse Die Auswertung der letzten 14 Tage liefert 5 belastbare Signale bei 5 Mitgliedern, die auf konkrete Handlungs- oder Transferchancen für ZIRP hinweisen. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Kooperationen mit anderen Unternehmen oder Partnern und Wirtschaftslage und -entwicklung konkrete Chancen entstehen. Ein besonderes Augenmerk liegt auf dem Projekt GOAL (Glo...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_20-38.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_20-38.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_20-38.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_20-38.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Auswertung der letzten 14 Tage liefert 5 belastbare Signale bei 5 Mitgliedern, die auf konkrete Handlungs- oder Transferchancen für ZIRP hinweisen. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Kooperationen mit anderen Unternehmen oder Partnern und Wirtschaftslage und -entwicklung konkrete Chancen entstehen. Ein besonderes Augenmerk liegt auf dem Projekt GOAL (Global Outreach through Action and Leadership) der Hochschule Mainz, das im International Office angesiedelt ist und vom DAAD sowie dem Bundesministerium für Forschung, Technologie und Raumfahrt gefördert wird. Dieses Signal ist relevant, weil es über reine Kommunikation hinaus auf Kooperation, Transfer und anwendungsnahe Vernetzung verweist.</p>
+<p>Ein weiterer wichtiger Bezugspunkt ist die Softwaremesse Handwerk der Handwerkskammern Rheinland-Pfalz, die die Digitalisierung im Handwerk in den Vordergrund stellt und nach Lösungen sucht, die den Alltag von Handwerksbetrieben leichter machen. Daneben gibt es auch Signale von IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH, die auf die Bedeutung der Resilienz von Kommunen hinweisen und nach Wegen suchen, diese zu stärken. Diese Signale werden als besonders relevant angesehen, weil sie auf institutionelle Entscheidungen, umsetzbare Programme, Partnerschaften oder regionale Kompetenzaufbauten hinweisen.</p>
+<p>Die Analyse der Fakten zeigt, dass es einige wichtige Akteure gibt, die in den Bereichen Kooperationen, Wirtschaftslage und -entwicklung aktiv sind. Die Hochschule Mainz, die Handwerkskammern Rheinland-Pfalz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH sind einige der wichtigsten Akteure, die in diesen Bereichen tätig sind. Die Signale, die von diesen Akteuren ausgehen, sind besonders relevant, weil sie auf konkrete Handlungs- oder Transferchancen für ZIRP hinweisen.</p>
+<p>Was ZIRP daraus machen könnte: ZIRP könnte mit Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat entwickelt werden kann, um die Chancen für Kooperationen und Transfer zu erkunden. ZIRP könnte auch WATCH, um weitere Signale von anderen Akteuren zu beobachten und MAYBE, um neue Chancen für Kooperationen und Transfer zu identifizieren.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 20:11:09</small><p>Wochenanalyse: Die Auswertung der letzten 14 Tage hat gezeigt, dass fünf belastbare Signale bei fünf Mitgliedern identifiziert wurden. Diese Signale sind weniger in der Menge der Nachrichten begründet, sondern eher in den Beziehungen und Kooperationen zwischen Unternehmen sowie in Hinblick auf die Wirtschaftslage und -entwicklung. Der Hauptfokus liegt auf Kooperationen mit anderen Unternehmen oder Partnern, was be...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_20-11.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_20-11.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_20-11.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_20-11.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse:</p>
+<p>Die Auswertung der letzten 14 Tage hat gezeigt, dass fünf belastbare Signale bei fünf Mitgliedern identifiziert wurden. Diese Signale sind weniger in der Menge der Nachrichten begründet, sondern eher in den Beziehungen und Kooperationen zwischen Unternehmen sowie in Hinblick auf die Wirtschaftslage und -entwicklung.</p>
+<p>Der Hauptfokus liegt auf Kooperationen mit anderen Unternehmen oder Partnern, was bedeutet, dass Handlungs- oder Transferchancen für ZIRP entstehen können. Hochschule Mainz hat das belastbarste Anker-Signal durch das Projekt GOAL (Global Outreach through Action and Leadership) erzielt. Dieses Programm wird vom DAAD und dem Bundesministerium für Forschung, Technologie und Raumfahrt unterstützt.</p>
+<p>ZIRP könnte daher folgende Schritte unternehmen:</p>
+<p>DO: Mit Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat entwickelt werden kann. Dies könnte eine gemeinsame Initiative sein, die auf den Erfolgen von GOAL basiert.</p>
+<p>WATCH: Auf weiteren Entwicklungen bei diesen Mitgliedern achten und mögliche Kooperationen in der Digitalisierung und Wirtschafts-Entwicklung verfolgen. IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH hat ebenfalls ein starkes Signal durch das Programm „1. InnovationTalk@IQIB“: Resilienz neu denken“ erzielt, bei dem es um die Stärkung der Resilienz von Kommunen geht.</p>
+<p>Zahnen Technik GmbH hat mit Wave Cloud by zahnen (ehemals ISO by zahnen) ein anderes starkes Signal. Dieses Programm digitalisiert Expertenwissen und bietet innovative Lösungen im Bereich Industrie 4.0, was für ZIRP eine interessante Transferchance darstellt.</p>
+<p>MAYBE: Mit Universitäten und Handwerkskammern über digitale Umsetzungen im Bau und anderen Bereichen sprechen, um konkrete Projekte zu beschleunigen. Die Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt, deuten auf konkrete Handlungs- oder Transferchancen hin und könnten für ZIRP relevant sein.</p>
+<p>Diese Analyse zeigt, dass Kooperationen und Partnerschaften zwischen verschiedenen Mitgliedern eine wichtige Rolle spielen. Durch sorgfältiges Aufspüren solcher Chancen kann ZIRP nicht nur neue Projekte initiieren, sondern auch bestehende Beziehungen weiter ausbauen.</p>
+<p>ZIRP sollte daher aktiv sein, um diese Chancen zu nutzen und gleichzeitig auf weitere Entwicklungen bei den Mitgliedern zu achten.</p></div></details></div>
+<div class="history-card"><h3>13.05.2026 bis 26.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 13.05.2026 bis 26.05.2026 · erstellt 26.05.2026, 19:55:48</small><p>Wochenanalyse Die letzte Woche zeigte sich eine konzentrierte Anzahl von belastbaren Signalen, insgesamt fünf, bei fünf verschiedenen Mitgliedern. Diese Signale fokussieren sich auf Kooperationen mit anderen Unternehmen und Partnerschaften sowie auf die Wirtschaftslage und -entwicklung. Das Hauptthema liegt in der Frage, wo aus diesen Beziehungen und Trends konkrete Handlungs- oder Transferchancen entstehen könnte...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-26_19-55.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-26_19-55.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-26_19-55.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-26_19-55.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die letzte Woche zeigte sich eine konzentrierte Anzahl von belastbaren Signalen, insgesamt fünf, bei fünf verschiedenen Mitgliedern. Diese Signale fokussieren sich auf Kooperationen mit anderen Unternehmen und Partnerschaften sowie auf die Wirtschaftslage und -entwicklung. Das Hauptthema liegt in der Frage, wo aus diesen Beziehungen und Trends konkrete Handlungs- oder Transferchancen entstehen könnten.</p>
+<p>Hochschule Mainz hat das belastbarste Signal durch ihre Beteiligung an dem Projekt GOAL (Global Outreach through Action and Leadership) mit dem International Office. Dieses Programm wird vom DAAD sowie dem Bundesministerium für Forschung, Technologie und Raumfahrt unterstützt. Es verweist nicht nur auf reine Kommunikation, sondern auch auf Kooperationen, Transfer und anwendungsnahe Vernetzungen.</p>
+<p>Handwerkskammern Rheinland-Pfalz setzt mit der Softwaremesse Handwerk einen weiteren Bezugspunkt. Die Veranstaltung soll die Digitalisierung im Handwerk vor allem erleichtern – sowohl im Büro, auf der Baustelle als auch unterwegs. Dieses Signal wird in den Kontext der Wirtschaftslage und -entwicklung gestellt.</p>
+<p>IQIB - Institut für qualifizierende Innovationsforschung und Beratung GmbH präsentiert ebenfalls ein starkes Signal durch das Programm &quot;1. InnovationTalk@IQIB&quot;, bei dem die Resilienz von Kommunen stärken soll, indem Forschung und Politik eng zusammenarbeiten.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Mit Handwerkskammern Rheinland-Pfalz, Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und Beratung GmbH prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat entstehen kann.</p>
+<p>WATCH: Die Entwicklung der Softwaremesse Handwerk beobachten, um zu sehen, inwiefern digitale Werkzeuge im Handwerk praktisch implementiert werden können.</p>
+<p>MAYBE: Mit IQIB - Institut für qualifizierende Innovationsforschung und Beratung GmbH und SWR – Südwestrundfunk ein Sondierungsgespräch zur Frage starten, wo digitale Umsetzungen in Bau, Industrie oder Verwaltung konkret beschleunigt werden können.</p></div></details></div>
+<div class="history-card"><h3>07.05.2026 bis 20.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 07.05.2026 bis 20.05.2026 · erstellt 20.05.2026, 17:28:41</small><p>Wochenanalyse In den letzten 14 Tagen liegen fünf belastbare Signale bei drei Mitgliedern vor. Der Hauptaugenmerk liegt auf der Frage, wo aus Soziales Engagement, Versorgung und Gesundheitssystem sowie Wirtschaftslage und -entwicklung konkrete Handlungs- oder Transferchancen für ZIRP entstehen. Universität Trier Das Institut für Angewandte Ethik, das neu eröffnet wurde, anspricht digitale Herausforderungen wie Dig...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-20_17-28.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-20_17-28.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-20_17-28.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-20_17-28.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>In den letzten 14 Tagen liegen fünf belastbare Signale bei drei Mitgliedern vor. Der Hauptaugenmerk liegt auf der Frage, wo aus Soziales Engagement, Versorgung und Gesundheitssystem sowie Wirtschaftslage und -entwicklung konkrete Handlungs- oder Transferchancen für ZIRP entstehen.</p>
+<p>Universität Trier</p>
+<p>Das Institut für Angewandte Ethik, das neu eröffnet wurde, anspricht digitale Herausforderungen wie Digitalisierung und Nachhaltigkeit. Der Studiengang Klinische Pflege B.Sc., der attraktive Karrierechancen im Gesundheitswesen bietet, ist ein weiterer wichtiger Anker.</p>
+<p>IQIB – Institut für qualifizierende Innovationsforschung und -beratung GmbH</p>
+<p>IQIB hat eine umfassende Publikation über die Flutkatastrophe 2021 veröffentlicht. Diese Publikation liefert Resilienzschlüssel für den Wiederaufbau und die Zukunftsentwicklung.</p>
+<p>Landesbank Baden-Württemberg (LBBW)</p>
+<p>Die LBBW hat eine Analyse über EU-Emissionshandel vorgelegt, bei der es um die Korrekturen geht, die Klimaschutzinvestitionen attraktiver machen. Obwohl dies nicht als eigene Trends gelesen werden kann, deuten diese Signale auf regionale Handlungsfähigkeit hin.</p>
+<p>DO: Mit IQIB – Institut für qualifizierende Innovationsforschung und -beratung GmbH und Universität Trier prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat erarbeitet werden kann.</p>
+<p>Das neue Institut für Angewandte Ethik bei der Universität Trier bietet eine Vielzahl von Themen an, die mit IQIBs Forschung und Beratung überlappen könnten. Zusammenarbeiten könnte dabei ein effektives Format sein.</p>
+<p>WATCH: Die Zusammenarbeit zwischen Universität Trier und IQIB im Bereich der Resilienzschlüssel für die Zukunftsentwicklung beobachten.</p>
+<p>Die Zusammenarbeit zwischen den beiden Institutionen ist von besonderem Interesse, da sie direkt auf die Herausforderungen aus der Flutkatastrophe 2021 antwortet.</p>
+<p>MAYBE: Mit 1. FSV Mainz 05 e.V. ein Sondierungsgespräch zur Frage „Wo kann digitale Umsetzung in Bau, Industrie oder Verwaltung konkret beschleunigt werden?“ prüfen.</p>
+<p>FSV Mainz 05 e.V. hat bisher nicht direkt an den genannten Signalen beteiligt gewesen, aber es bietet eine interessante Perspektive für die weitere Analyse und mögliche Zusammenarbeit.</p>
+<p>Die Kernaussagen der</p>
+<p>Wochenanalyse</p>
+<p>sind klar und präzise, und sie deuten auf regionale Handlungs- oder Transferchancen hin. Die Vorschläge für Aktionen und Überwachungen sind konkrete Schritte, die aus den belastbaren Signalen resultieren.</p></div></details></div>
+<div class="history-card"><h3>07.05.2026 bis 20.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 07.05.2026 bis 20.05.2026 · erstellt 20.05.2026, 16:54:43</small><p>Wochenanalyse Die Auswertung der letzten 14 Tage liefert fünf belastbare Signale bei drei Mitgliedern. Die Signale sind aus verschiedenen Bereichen stammend, darunter Soziales Engagement, Versorgung und Gesundheitssystem sowie Wirtschaftslage und -entwicklung. Der Kern dieser Analysen liegt in den Handlungs- oder Transferchancen, die sich aus diesen Themen ergeben. Der belastbarste Anker ist die Universität Trier...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-20_16-54.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-20_16-54.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-20_16-54.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-20_16-54.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Auswertung der letzten 14 Tage liefert fünf belastbare Signale bei drei Mitgliedern. Die Signale sind aus verschiedenen Bereichen stammend, darunter Soziales Engagement, Versorgung und Gesundheitssystem sowie Wirtschaftslage und -entwicklung.</p>
+<p>Der Kern dieser Analysen liegt in den Handlungs- oder Transferchancen, die sich aus diesen Themen ergeben. Der belastbarste Anker ist die Universität Trier mit dem Signal &quot;Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik&quot;. Dieses Thema umfasst digitale Herausforderungen und bietet einen Ansatzpunkt für regionale Handlungsfähigkeit. Zudem setzt die Universität mit dem Studiengang Klinische Pflege B.Sc. auf konkrete Karrierechancen in der Gesundheitsversorgung, was ein weiteres relevantes Signal darstellt.</p>
+<p>Zusätzlich bietet das IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH durch seine neue Publikation &quot;Die Flutkatastrophe 2021 – vom Wiederaufbau zur Klimaresilienz&quot; einen umsetzbaren Beitrag zum Thema Nachhaltigkeit.</p>
+<p>DO:</p>
+<p>Mit IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH und Universität Trier prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat entstehen kann. Dieser Ansatz würde es uns ermöglichen, konkrete Handlungen auf der Basis der aktuellen Herausforderungen zu initiieren.</p>
+<p>WATCH:</p>
+<p>Beobachten, wie die Universität Trier ihre Anwendung des Studiengangs Klinische Pflege B.Sc. in der Praxis umsetzt und welche Karrierechancen daraus resultieren. Dieser Vorgang ist entscheidend, um das Potenzial dieses Studienganges präzise zu bewerten.</p>
+<p>MAYBE:</p>
+<p>Mit IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH zusammenarbeiten, um die Empfehlungen aus der Flutkatastrophe 2021 in konkrete Maßnahmen zu verwandeln. Diese Zusammenarbeit könnte uns helfen, aus den Erfahrungen der Katastrophe praktische Lösungen zu entwickeln, die sowohl für die Region als auch für das gesamte Klimaschutzspektrum relevant sind.</p>
+<p>Ein weiterer wichtiger Aspekt ist das Signal von Landesbank Baden-Württemberg (LBBW) mit der Analyse &quot;EU-Emissionshandel: Korrekturen machen Klimaschutzinvestitionen attraktiver&quot;. Diese Nachricht deutet darauf hin, dass viele Klimaschutzmaßnahmen noch nicht lohnen. Es ist also wichtig, die Investitionsbereitschaft in diesem Bereich zu fördern und Kritikpunkte zu korrigieren.</p>
+<p>Insgesamt bietet diese Analyse eine breite Palette an Handlungs- und Transfermöglichkeiten, die es uns ermöglichen, konkrete Schritte auf verschiedenen Ebenen einzuleiten.</p></div></details></div>
+<div class="history-card"><h3>07.05.2026 bis 20.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 07.05.2026 bis 20.05.2026 · erstellt 20.05.2026, 16:03:00</small><p>Wochenanalyse Die Analyse der letzten 14 Tage zeigte 5 belastbare Signale bei drei Mitgliedern, die auf regionale Handlungs- und Transferchancen im Bereich Soziales Engagement, Versorgung und Gesundheitssystem sowie Wirtschaftslage und -entwicklung hinweisen. Viele aktuelle Herausforderungen – wie Digitalisierung, Gesundheitsversorgung oder Nachhaltigkeit – lassen sich hier nur noch durch konkrete Maßnahmen lösen....</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-20_16-02.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-20_16-02.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-20_16-02.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-20_16-02.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Analyse der letzten 14 Tage zeigte 5 belastbare Signale bei drei Mitgliedern, die auf regionale Handlungs- und Transferchancen im Bereich Soziales Engagement, Versorgung und Gesundheitssystem sowie Wirtschaftslage und -entwicklung hinweisen. Viele aktuelle Herausforderungen – wie Digitalisierung, Gesundheitsversorgung oder Nachhaltigkeit – lassen sich hier nur noch durch konkrete Maßnahmen lösen.</p>
+<p>Universität Trier steht heraus mit dem Institut für Angewandte Ethik und dem Studiengang Klinische Pflege B.Sc. Diese Signale sind relevant, da sie auf mögliche Ansatzpunkte für regionale Handlungsfaehigkeit verweisen.</p>
+<p>IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt eine neue Publikation zur Flutkatastrophe 2021. Die Publikation „Die Flutkatastrophe 2021 – vom Wiederaufbau zur Klimaresilienz“ bietet wertvolle Erkenntnisse und lernfähige Strukturen, die in Zukunft für regionale Widerstandsfähigkeit nutzen können.</p>
+<p>DO: Mit IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH und Universität Trier prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat entwickelt werden kann. Dieser Ansatz könnte eine effektive Methode zur Umsetzung von lernfähigen Strukturen und regionalem Handeln bieten.</p>
+<p>WATCH: Beobachten, wie Hochschule Mainz und Technische Hochschule Bingen gemeinsam digitale Umsetzung in Bau, Industrie oder Verwaltung beschleunigen können. Die Zusammenarbeit könnte zu schnellen Ergebnissen führen und als Vorbild für regionale digitaler Innovation dienen.</p>
+<p>MAYBE: Die EU-Emissionshandel ist ein weiteres Thema, das auf der Radarliste steht. LBBW-Analyse zeigt, dass Korrekturen Klimaschutzinvestitionen attraktiver machen könnten. Obwohl dies nicht direkt in den Fokus unserer aktuellen Analysen fällt, lohnt es sich, diesen Bereich weiter zu beobachten und auf mögliche Handlungschancen zu reagieren.</p>
+<p>Diese Anmerkungen basieren auf der aktuell verfügbaren Information und bleiben offen für weitere Entwicklungen.</p></div></details></div>
+<div class="history-card"><h3>07.05.2026 bis 20.05.2026</h3><small>4 Mitglieder mit priorisierten Funden · Zeitraum 07.05.2026 bis 20.05.2026 · erstellt 20.05.2026, 00:40:34</small><p>Wochenanalyse Die Auswertung der letzten 14 Tage hat fünf belastbare Signale bei drei Mitgliedern ergeben. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Sozialem Engagement und Versorgung und Gesundheitssystem konkrete Handlungs- oder Transferchancen für ZIRP entstehen. Der belastbarste Anker ist IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH mit dem The...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-20_00-40.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-20_00-40.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-20_00-40.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-20_00-40.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Auswertung der letzten 14 Tage hat fünf belastbare Signale bei drei Mitgliedern ergeben. Der Kern liegt nicht in der Menge der Meldungen, sondern in der Frage, wo aus Sozialem Engagement und Versorgung und Gesundheitssystem konkrete Handlungs- oder Transferchancen für ZIRP entstehen. Der belastbarste Anker ist IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH mit dem Thema &quot;Resilienz neu denken&quot;, das sich auf die Stärkung der Resilienz von Kommunen konzentriert. Dieses Signal ist relevant, weil es über reine Kommunikation hinaus auf kommunale Resilienz, Wissenstransfer und Umsetzungsfragen verweist.</p>
+<p>Ein weiterer wichtiger Bezugspunkt ist die Universität Trier, die mit dem neuen Institut für Angewandte Ethik und dem Studiengang Klinische Pflege B.Sc. zwei relevante Signale setzt. Das Institut für Angewandte Ethik wird sich mit aktuellen Herausforderungen wie Digitalisierung, Gesundheitsversorgung und Nachhaltigkeit befassen, während der Studiengang Klinische Pflege B.Sc. Absolventen attraktive Karrierechancen in der Gesundheitsversorgung bietet. Diese Signale sind wichtig, weil sie auf institutionelle Entscheidungen, umsetzbare Programme und regionale Kompetenzaufbau hinweisen.</p>
+<p>Die Analyse der Signale zeigt, dass die meisten Meldungen auf Soziales Engagement und Versorgung und Gesundheitssystem konzentriert sind. Die Universität Trier und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH sind die wichtigsten Akteure in diesem Kontext. Die Signale sind jedoch nicht immer eindeutig und bedürfen einer sorgfältigen Prüfung, um ihre Relevanz für ZIRP zu bestimmen.</p>
+<p>Die Zusatzlinse SCIP bestätigt die Bedeutung von Hochschule-Wirtschaft-Transfer und Wissenstransfer in der Region. Die Empfehlung, ein Sondierungsgespräch mit Hochschule Mainz und IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH zu führen, ist daher nachvollziehbar. Die Frage, wie Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte kommen können, ist von zentraler Bedeutung für die Region.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Mit IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH und Universität Trier prüfen, ob aus den stärksten Signalen ein kleines, konkretes Sondierungsformat entstehen kann.</p></div></details></div>
+<div class="history-card"><h3>06.05.2026 bis 19.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 06.05.2026 bis 19.05.2026 · erstellt 19.05.2026, 23:13:42</small><p>Die vorliegende Auswertung der letzten 14 Tage zeigt 8 verwertbare Signale bei 5 Mitgliedern. Im Vordergrund stehen Soziales Engagement, Versorgung und Gesundheitssystem und Wirtschaftslage und -entwicklung. Auffällig ist weniger die einzelne Meldung als die Verdichtung mehrerer Hinweise auf strukturelle Veränderungen im ZIRP-Umfeld. Im gesellschaftlichen Bereich treten Verantwortung, Weiterbildung und regionale B...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-19_23-13.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-19_23-13.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-19_23-13.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-19_23-13.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Die vorliegende Auswertung der letzten 14 Tage zeigt 8 verwertbare Signale bei 5 Mitgliedern. Im Vordergrund stehen Soziales Engagement, Versorgung und Gesundheitssystem und Wirtschaftslage und -entwicklung. Auffällig ist weniger die einzelne Meldung als die Verdichtung mehrerer Hinweise auf strukturelle Veränderungen im ZIRP-Umfeld.</p>
+<p>Im gesellschaftlichen Bereich treten Verantwortung, Weiterbildung und regionale Bindung als wiederkehrende Motive hervor; besonders sichtbar wird dies bei 1. FSV Mainz 05 e.V., IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH, Technische Hochschule Bingen und Universität Trier. Bei Technische Hochschule Bingen ist vor allem &#x27;Zukunft MINT: 33 Mädchen erobern die TH Bingen&#x27; relevant: Am Girls’ Day öffnete die Technische Hochschule (TH) Bingen ihre Türen für 33 technikbegeisterte Schülerinnen der Klassenstufen 5 bis 9. Organisiert.... Bei IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH ist vor allem &#x27;„1. InnovationTalk@IQIB“: Resilienz neu denken&#x27; relevant: Wie kann die Resilienz von Kommunen gestärkt werden? Der Schlüssel liegt in der engen Kooperation zwischen Forschung, Politik, Hilfsorganisationen.... Der strategische Wert liegt dort, wo gesellschaftliche Verantwortung mit regionaler Handlungsfähigkeit oder Qualifizierung verbunden wird.</p>
+<p>Im Bereich Versorgung und Gesundheit entsteht ein verdichtetes Bild aus Ausbildungs-, Weiterbildungs- und Strukturfragen; sichtbar wird dies vor allem bei Universität Trier. Bei Universität Trier ist vor allem &#x27;Klinische Pflege B.Sc.&#x27; relevant: Der Studiengang Klinische Pflege B.Sc. eröffnet Absolvent*innen attraktive und zukunftssichere Karrierechancen in der Patientenversorgung und im.... Für die ZIRP ist das relevant, weil sich daran Fachkräftesicherung, Versorgungskapazität und institutionelle Verantwortung bündeln.</p>
+<p>Wirtschaftlich relevant sind vor allem Signale, in denen Standortentwicklung, Digitalisierung oder neue Werkzeuge konkrete Anpassungsprozesse anzeigen; Beispiele liefern Landesbank Baden-Württemberg (LBBW). Bei Landesbank Baden-Württemberg (LBBW) ist vor allem &#x27;EU-Emissionshandel: Korrekturen machen Klimaschutzinvestitionen attraktiver&#x27; relevant: LBBW-Analyse: Für Europas Industrie lohnen sich viele Klimaschutzmaßnahmen noch nicht. Die Autoren plädieren für gezielte, branchenspezifische.... Diese Funde sind vor allem als Hinweise auf Wettbewerbsfähigkeit, regulatorische Anpassung und digitale Modernisierung lesbar.</p>
+<p>Insgesamt ergibt sich daraus ein Bild, das stärker nach Themenclustern als nach Einzelmeldungen gelesen werden sollte. Für die weitere ZIRP-Beobachtung sind vor allem jene Entwicklungen relevant, bei denen Versorgung, Standortfragen, Transfer, Digitalisierung oder institutionelle Kooperation nicht nur kommunikativ auftauchen, sondern in konkrete Programme, Werkzeuge, Studienangebote oder Partnerschaften übersetzt werden.</p></div></details></div>
+<div class="history-card"><h3>06.05.2026 bis 19.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 06.05.2026 bis 19.05.2026 · erstellt 19.05.2026, 22:34:41</small><p>Die vorliegende Auswertung der letzten 14 Tage zeigt 8 verwertbare Signale bei 6 Mitgliedern. Im Vordergrund stehen Soziales Engagement, Kooperationen mit anderen Unternehmen / Partnern, Versorgung und Gesundheitssystem und Wirtschaftslage und -entwicklung. Auffällig ist weniger die einzelne Meldung als die Verdichtung mehrerer Hinweise auf strukturelle Veränderungen im ZIRP-Umfeld. Im gesellschaftlichen Bereich t...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-19_22-34.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-19_22-34.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-19_22-34.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-19_22-34.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Die vorliegende Auswertung der letzten 14 Tage zeigt 8 verwertbare Signale bei 6 Mitgliedern. Im Vordergrund stehen Soziales Engagement, Kooperationen mit anderen Unternehmen / Partnern, Versorgung und Gesundheitssystem und Wirtschaftslage und -entwicklung. Auffällig ist weniger die einzelne Meldung als die Verdichtung mehrerer Hinweise auf strukturelle Veränderungen im ZIRP-Umfeld.</p>
+<p>Im gesellschaftlichen Bereich treten Verantwortung, Weiterbildung und regionale Bindung als wiederkehrende Motive hervor; besonders sichtbar wird dies bei</p>
+<p>1. FSV Mainz 05 e.V., IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH, Technische Hochschule Bingen und Universität Trier. IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH verweist mit „Neue Publikation: „Die Flutkatastrophe 2021“ auf diesen Zusammenhang: Ein neues Buch bündelt die Ergebnisse und Empfehlungen des Projekts „Klima-Anpassung, Hochwasser, Resilienz“ (KAHR). Darin gibt IQIB spannende Einblicke zum Wissenstransfer im Rahmen seiner Rolle als Projektbüro für.... Technische Hochschule Bingen verweist mit „Zukunft MINT: 33 Mädchen erobern die TH Bingen“ auf diesen Zusammenhang: Der Girls’ Day war ein voller Erfolg. Doch darauf ruhen wir uns nicht aus. Die Förderung junger Frauen in MINT-Berufen geht an der TH Bingen kontinuierlich weiter. Das Ada-Lovelace-Projekt plant bereits die nächsten.... Universität Trier verweist mit „Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik“ auf diesen Zusammenhang: TRIANE bündelt seine Arbeit in drei thematischen Schwerpunkten: Ethik für Pflege und Gesundheitsförderung, Ethik der Digitalisierung sowie den Bereich Ethik und Nachhaltigkeit.. IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH verweist mit „„1. InnovationTalk@IQIB“: Resilienz neu denken“ auf diesen Zusammenhang: Wie kann die Resilienz von Kommunen gestärkt werden? Der Schlüssel liegt in der engen Kooperation zwischen Forschung, Politik, Hilfsorganisationen und Bevölkerung.. Der strategische Wert liegt dort, wo gesellschaftliche Verantwortung mit regionaler Handlungsfähigkeit oder Qualifizierung verbunden wird.</p>
+<p>Der zweite Strang liegt in Kooperation und Transfer: Mehrere Meldungen zeigen, dass Vernetzung zunehmend als Umsetzungsinstrument eingesetzt wird, unter anderem bei Hochschule Mainz. Hochschule Mainz verweist mit „FLORA: Wenn aus Wurzeln Wunder wachsen“ auf diesen Zusammenhang: Welche Rolle spielt jahrhundertealtes Wissen über Heilpflanzen in unserer modernen Welt – etwa für Medizin, Gesellschaft und Umwelt? Die aktuelle Ausstellung „FLORA – Wenn aus Wurzeln Wunder wachsen“ nähert sich dieser.... Der gemeinsame Nenner ist nicht die Kooperation als Schlagwort, sondern die Frage, welche Partnerschaften tatsächlich neue Lern-, Transfer- oder Umsetzungsmöglichkeiten eröffnen.</p>
+<p>Im Bereich Versorgung und Gesundheit entsteht ein verdichtetes Bild aus Ausbildungs-, Weiterbildungs- und Strukturfragen; sichtbar wird dies vor allem bei Universität Trier. Universität Trier verweist mit „Klinische Pflege B.Sc.“ auf diesen Zusammenhang: Der Studiengang Klinische Pflege B.Sc. eröffnet Absolvent*innen attraktive und zukunftssichere Karrierechancen in der Patientenversorgung und im gesamten Gesundheitswesen. Der Abschluss Bachelor of Science ist.... Für die ZIRP ist das relevant, weil sich daran Fachkräftesicherung, Versorgungskapazität und institutionelle Verantwortung bündeln.</p>
+<p>Wirtschaftlich relevant sind vor allem Signale, in denen Standortentwicklung, Digitalisierung oder neue Werkzeuge konkrete Anpassungsprozesse anzeigen; Beispiele liefern Landesbank Baden-Württemberg (LBBW). Landesbank Baden-Württemberg (LBBW) verweist mit „EU-Emissionshandel: Korrekturen machen Klimaschutzinvestitionen attraktiver“ auf diesen Zusammenhang: LBBW-Analyse: Für Europas Industrie lohnen sich viele Klimaschutzmaßnahmen noch nicht. Die Autoren plädieren für gezielte, branchenspezifische Anpassungen.. Diese Funde sind vor allem als Hinweise auf Wettbewerbsfähigkeit, regulatorische Anpassung und digitale Modernisierung lesbar.</p>
+<p>Insgesamt ergibt sich daraus ein Bild, das stärker nach Themenclustern als nach Einzelmeldungen gelesen werden sollte. Für die weitere ZIRP-Beobachtung sind vor allem jene Entwicklungen relevant, bei denen Versorgung, Standortfragen, Transfer, Digitalisierung oder institutionelle Kooperation nicht nur kommunikativ auftauchen, sondern in konkrete Programme, Werkzeuge, Studienangebote oder Partnerschaften übersetzt werden.</p></div></details></div>
+<div class="history-card"><h3>06.05.2026 bis 19.05.2026</h3><small>4 Mitglieder mit priorisierten Funden · Zeitraum 06.05.2026 bis 19.05.2026 · erstellt 19.05.2026, 10:48:39</small><p>Die vorliegende Auswertung der letzten 14 Tage zeigt 7 verwertbare Signale bei 4 Mitgliedern. Im Vordergrund stehen Soziales Engagement, Wirtschaftslage und -entwicklung und Versorgung und Gesundheitssystem. Auffällig ist weniger die einzelne Meldung als die Verdichtung mehrerer Hinweise auf strukturelle Veränderungen im ZIRP-Umfeld. Im gesellschaftlichen Bereich treten Verantwortung, Weiterbildung und regionale B...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-19_10-48.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-19_10-48.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-19_10-48.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-19_10-48.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Die vorliegende Auswertung der letzten 14 Tage zeigt 7 verwertbare Signale bei 4 Mitgliedern. Im Vordergrund stehen Soziales Engagement, Wirtschaftslage und -entwicklung und Versorgung und Gesundheitssystem. Auffällig ist weniger die einzelne Meldung als die Verdichtung mehrerer Hinweise auf strukturelle Veränderungen im ZIRP-Umfeld.</p>
+<p>Im gesellschaftlichen Bereich treten Verantwortung, Weiterbildung und regionale Bindung als wiederkehrende Motive hervor; besonders sichtbar wird dies bei</p>
+<p>1. FSV Mainz 05 e.V., Technische Hochschule Bingen und Universität Trier. Technische Hochschule Bingen verweist mit „Zukunft MINT: 33 Mädchen erobern die TH Bingen“ auf diesen Zusammenhang: Der Girls’ Day war ein voller Erfolg. Doch darauf ruhen wir uns nicht aus. Die Förderung junger Frauen in MINT-Berufen geht an der TH Bingen kontinuierlich weiter. Das Ada-Lovelace-Projekt plant bereits die nächsten.... Universität Trier verweist mit „Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik“ auf diesen Zusammenhang: TRIANE bündelt seine Arbeit in drei thematischen Schwerpunkten: Ethik für Pflege und Gesundheitsförderung, Ethik der Digitalisierung sowie den Bereich Ethik und Nachhaltigkeit.. Universität Trier verweist mit „Internationaler Jura-Bachelor an der Vorreiter-Universität“ auf diesen Zusammenhang: Ab Herbst bietet die Universität Trier einen neuen Studiengang, der Kenntnisse im deutschen Recht und in (mindestens) einem von sechs ausländischen Rechtssystemen vermittelt..</p>
+<p>1. FSV Mainz 05 e.V. verweist mit „Spendenlauf rund um die MEWA ARENA“ auf diesen Zusammenhang: Die Erlöse des Spendenlaufs fließen in Gesundheits- und Bildungsprojekte in Ruanda und Uganda und unterstützen damit konkrete Maßnahmen im Bereich Kinderschutz und nachhaltige Entwicklung. Ergänzend zum Lauf konnten die.... Der strategische Wert liegt dort, wo gesellschaftliche Verantwortung mit regionaler Handlungsfähigkeit oder Qualifizierung verbunden wird.</p>
+<p>Wirtschaftlich relevant sind vor allem Signale, in denen Standortentwicklung, Digitalisierung oder neue Werkzeuge konkrete Anpassungsprozesse anzeigen; Beispiele liefern Landesbank Baden-Württemberg (LBBW). Landesbank Baden-Württemberg (LBBW) verweist mit „EU-Emissionshandel: Korrekturen machen Klimaschutzinvestitionen attraktiver“ auf diesen Zusammenhang: LBBW-Analyse: Für Europas Industrie lohnen sich viele Klimaschutzmaßnahmen noch nicht. Die Autoren plädieren für gezielte, branchenspezifische Anpassungen.. Landesbank Baden-Württemberg (LBBW) verweist mit „Emissionshandel verteuert Heizen für Geringverdiener stärker als für Reiche“ auf diesen Zusammenhang: Steigende CO2-Preise im Emissionshandel verteuern Erdgas, Benzin und Heizöl. Haushalte mit geringem Einkommen werden beim Heizen finanziell stärker belastet.. Diese Funde sind vor allem als Hinweise auf Wettbewerbsfähigkeit, regulatorische Anpassung und digitale Modernisierung lesbar.</p>
+<p>Im Bereich Versorgung und Gesundheit entsteht ein verdichtetes Bild aus Ausbildungs-, Weiterbildungs- und Strukturfragen; sichtbar wird dies vor allem bei Universität Trier. Universität Trier verweist mit „Klinische Pflege B.Sc.“ auf diesen Zusammenhang: Der Studiengang Klinische Pflege B.Sc. eröffnet Absolvent*innen attraktive und zukunftssichere Karrierechancen in der Patientenversorgung und im gesamten Gesundheitswesen. Der Abschluss Bachelor of Science ist.... Für die ZIRP ist das relevant, weil sich daran Fachkräftesicherung, Versorgungskapazität und institutionelle Verantwortung bündeln.</p>
+<p>Insgesamt ergibt sich daraus ein Bild, das stärker nach Themenclustern als nach Einzelmeldungen gelesen werden sollte. Für die weitere ZIRP-Beobachtung sind vor allem jene Entwicklungen relevant, bei denen Versorgung, Standortfragen, Transfer, Digitalisierung oder institutionelle Kooperation nicht nur kommunikativ auftauchen, sondern in konkrete Programme, Werkzeuge, Studienangebote oder Partnerschaften übersetzt werden.</p></div></details></div>
+<div class="history-card"><h3>06.05.2026 bis 19.05.2026</h3><small>0 Mitglieder mit priorisierten Funden · Zeitraum 06.05.2026 bis 19.05.2026 · erstellt 19.05.2026, 10:15:54</small><p>Für den Zeitraum vom 06.05.2026 bis 19.05.2026 wurden keine priorisierten Funde identifiziert.</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-19_10-15.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-19_10-15.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-19_10-15.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-19_10-15.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Für den Zeitraum vom 06.05.2026 bis 19.05.2026 wurden keine priorisierten Funde identifiziert.</p></div></details></div>
+<div class="history-card"><h3>05.05.2026 bis 18.05.2026</h3><small>4 Mitglieder mit priorisierten Funden · Zeitraum 05.05.2026 bis 18.05.2026 · erstellt 18.05.2026, 12:54:35</small><p>Die vorliegende Auswertung der letzten 14 Tage zeigt 5 verwertbare Signale bei 4 Mitgliedern. Im Vordergrund stehen Soziales Engagement, Führungswechsel, Kooperationen mit anderen Unternehmen / Partnern und Wirtschaftslage und -entwicklung. Auffällig ist weniger die einzelne Meldung als die Verdichtung mehrerer Hinweise auf strukturelle Veränderungen im ZIRP-Umfeld. Im gesellschaftlichen Bereich treten Verantwortu...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-18_12-54.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-18_12-54.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-18_12-54.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-18_12-54.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Die vorliegende Auswertung der letzten 14 Tage zeigt 5 verwertbare Signale bei 4 Mitgliedern. Im Vordergrund stehen Soziales Engagement, Führungswechsel, Kooperationen mit anderen Unternehmen / Partnern und Wirtschaftslage und -entwicklung. Auffällig ist weniger die einzelne Meldung als die Verdichtung mehrerer Hinweise auf strukturelle Veränderungen im ZIRP-Umfeld.</p>
+<p>Im gesellschaftlichen Bereich treten Verantwortung, Weiterbildung und regionale Bindung als wiederkehrende Motive hervor; besonders sichtbar wird dies bei Technische Hochschule Bingen und Universität Trier. Technische Hochschule Bingen verweist mit „Zukunft MINT: 33 Mädchen erobern die TH Bingen“ auf diesen Zusammenhang: Der Girls’ Day war ein voller Erfolg. Doch darauf ruhen wir uns nicht aus. Die Förderung junger Frauen in MINT-Berufen geht an der TH Bingen kontinuierlich weiter. Das Ada-Lovelace-Projekt plant bereits die nächsten.... Universität Trier verweist mit „Internationaler Jura-Bachelor an der Vorreiter-Universität“ auf diesen Zusammenhang: Ab Herbst bietet die Universität Trier einen neuen Studiengang, der Kenntnisse im deutschen Recht und in (mindestens) einem von sechs ausländischen Rechtssystemen vermittelt.. Der strategische Wert liegt dort, wo gesellschaftliche Verantwortung mit regionaler Handlungsfähigkeit oder Qualifizierung verbunden wird.</p>
+<p>Bei Führungs- und Personalthemen geht es weniger um Einzelpersonalien als um mögliche Verschiebungen institutioneller Prioritäten; einschlägig sind hier Landesbank Baden-Württemberg (LBBW). Landesbank Baden-Württemberg (LBBW) verweist mit „USA: Trump droht Iran mit neuen Attacken“ auf diesen Zusammenhang: Kapitalmärkte Daily | Inmitten der festgefahrenen diplomatischen Bemühungen droht US-Präsident Donald Trump dem Iran erneut mit Zerstörung.. Beobachtungswürdig sind solche Signale vor allem dann, wenn sie neue Ansprechpartner, Prioritäten oder strategische Akzente erwarten lassen.</p>
+<p>Der zweite Strang liegt in Kooperation und Transfer: Mehrere Meldungen zeigen, dass Vernetzung zunehmend als Umsetzungsinstrument eingesetzt wird, unter anderem bei Hochschule Mainz. Hochschule Mainz verweist mit „Abschlussveranstaltung von SpaGAT“ auf diesen Zusammenhang: Um ein gemeinsames Fazit zu ziehen, trafen sich die Projektteilnehmenden zum Abschluß des Projekts SpaGAT an der Hochschule Mainz.. Der gemeinsame Nenner ist nicht die Kooperation als Schlagwort, sondern die Frage, welche Partnerschaften tatsächlich neue Lern-, Transfer- oder Umsetzungsmöglichkeiten eröffnen.</p>
+<p>Wirtschaftlich relevant sind vor allem Signale, in denen Standortentwicklung, Digitalisierung oder neue Werkzeuge konkrete Anpassungsprozesse anzeigen; Beispiele liefern Universität Trier. Universität Trier verweist mit „CHE-Ranking: Bestnoten für Rechtswissenschaften an der Uni Trier“ auf diesen Zusammenhang: Insbesondere im Bereich der Unterstützung am Studienanfang erreichen die Rechtswissenschaften und die Volkswirtschaftslehre sehr hohe Punktzahlen. Die Universität Trier schneidet insbesondere beim Kompetenzaufbau, also.... Diese Funde sind vor allem als Hinweise auf Wettbewerbsfähigkeit, regulatorische Anpassung und digitale Modernisierung lesbar.</p>
+<p>Insgesamt ergibt sich daraus ein Bild, das stärker nach Themenclustern als nach Einzelmeldungen gelesen werden sollte. Für die weitere ZIRP-Beobachtung sind vor allem jene Entwicklungen relevant, bei denen Versorgung, Standortfragen, Transfer, Digitalisierung oder institutionelle Kooperation nicht nur kommunikativ auftauchen, sondern in konkrete Programme, Werkzeuge, Studienangebote oder Partnerschaften übersetzt werden.</p></div></details></div>
+<div class="history-card"><h3>05.05.2026 bis 18.05.2026</h3><small>4 Mitglieder mit priorisierten Funden · Zeitraum 05.05.2026 bis 18.05.2026 · erstellt 18.05.2026, 12:31:44</small><p>Wochenanalyse In dieser Woche zeichnet sich ein klarer Fokus auf Kooperationen zwischen Hochschulen und Wirtschaft sowie auf die Stärkung von MINT-Bildung ab. Die Vernetzung zwischen Forschung, Unternehmen und öffentlichen Akteuren wird in mehreren Projekten konkret umgesetzt, während die Hochschulen gleichzeitig ihre Rolle als Ankerpunkte für Nachwuchsförderung und internationale Ausrichtung betonen. Die zentrale...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-18_12-31.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-18_12-31.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-18_12-31.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-18_12-31.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>In dieser Woche zeichnet sich ein klarer Fokus auf Kooperationen zwischen Hochschulen und Wirtschaft sowie auf die Stärkung von MINT-Bildung ab. Die Vernetzung zwischen Forschung, Unternehmen und öffentlichen Akteuren wird in mehreren Projekten konkret umgesetzt, während die Hochschulen gleichzeitig ihre Rolle als Ankerpunkte für Nachwuchsförderung und internationale Ausrichtung betonen.</p>
+<p>Die zentrale Beobachtung aus den Crawler-Funden ist die zunehmende Verknüpfung von akademischen Projekten mit praxisnahen Anwendungsfeldern. Die Abschlussveranstaltung von SpaGAT an der Hochschule Mainz unterstreicht den Erfolg von Wissenstransfer-Initiativen, während die Technische Hochschule Bingen mit ihrer MINT-Förderung ein klares Signal für die langfristige Verpflichtung zur Nachwuchsgewinnung setzt. Gleichzeitig zeigt die Uni Trier durch ihre hervorragenden CHE-Bewertungen in Rechtswissenschaften und Volkswirtschaftslehre, wie sich akademische Qualität als Schlüssel für regionale Attraktivität und Kooperationspotenziale entpuppen kann.</p>
+<p>Für ZIRP ist dies ein relevanter Impuls, da die Hochschulen nicht nur als Bildungsorte, sondern als aktive Partner für Wirtschafts- und Technologieentwicklung agieren. Die Verbindung von Forschungsergebnissen aus SpaGAT mit der Praxis und die kontinuierliche Förderung von MINT-Talente an der TH Bingen könnten als Vorbilder für ähnliche Initiativen in Rheinland-Pfalz dienen. Besonders auffällig ist, dass die Hochschule Mainz und die TH Bingen in ihrer Arbeit überlappte Themenbereiche ansprechen: Wissenstransfer einerseits, Talentförderung und Kultur andererseits.</p>
+<p>Eine offene Beobachtungslinie liegt in der Frage, wie digitale Werkzeuge aus Pilotprojekten in konkrete Umsetzungen für Bau, Verwaltung oder Mittelstand überführt werden können. Die aktuellen Signale deuten darauf hin, dass Hochschulen hier nicht nur als Erfinder, sondern als Vermittler zwischen Ideen und Anwendungsfeldern agieren. Zudem bleibt die internationale Ausrichtung der Uni Trier mit ihrem neuen Jura-Bachelor-Studiengang ein weiterer Ankerpunkt, der im Kontext von globalen Kooperationen weiter beobachtet werden sollte.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Die Erfahrungen aus SpaGAT und die MINT-Initiativen der TH Bingen könnten als Grundlage für ein Gespräch mit regionalen Unternehmen dienen, um gemeinsame Umsetzungsprojekte zu prüfen.</p>
+<p>WATCH: Die Entwicklung der internationalen Studiengänge an der Uni Trier und ihre Verknüpfung mit regionalen Kooperationen sollte weiter beobachtet werden.</p>
+<p>MAYBE: Ein bilaterales Gespräch zwischen Hochschule Mainz und TH Bingen könnte aufgegriffen werden, um Vernetzungsansätze im Bereich Wissenstransfer und Nachwuchsförderung zu erkunden.</p></div></details></div>
+<div class="history-card"><h3>05.05.2026 bis 18.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 05.05.2026 bis 18.05.2026 · erstellt 18.05.2026, 12:15:06</small><p>Wochenanalyse Die Woche zeigte klare Impulse für eine verstärkte Vernetzung von Hochschulen mit der Wirtschaft, insbesondere im Umfeld von Transferprojekten. Die Zusammenarbeit zwischen Hochschule Mainz und Technischen Hochschule Bingen deutet auf ein konkretes Potenzial hin, das über die bisherigen Aktivitäten hinausgeht. Zentrale Beobachtung Beide Einrichtungen haben in der letzten Woche Signale gesetzt, die auf...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-18_12-15.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-18_12-15.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-18_12-15.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-18_12-15.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Woche zeigte klare Impulse für eine verstärkte Vernetzung von Hochschulen mit der Wirtschaft, insbesondere im Umfeld von Transferprojekten. Die Zusammenarbeit zwischen Hochschule Mainz und Technischen Hochschule Bingen deutet auf ein konkretes Potenzial hin, das über die bisherigen Aktivitäten hinausgeht.</p>
+<p>Zentrale Beobachtung</p>
+<p>Beide Einrichtungen haben in der letzten Woche Signale gesetzt, die auf eine gemeinsame Strategie hindeuten: Hochschule Mainz schloss das Projekt SpaGAT ab, das sich mit Kooperationen mit Unternehmen befasste, während Technische Hochschule Bingen mit dem Girls’ Day in der TH Bingen junge Frauen in MINT-Bereichen förderte. Beide Initiativen haben zwar unterschiedliche Sch</p></div></details></div>
+<div class="history-card"><h3>05.05.2026 bis 18.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 05.05.2026 bis 18.05.2026 · erstellt 18.05.2026, 11:17:58</small><p>Wochenanalyse Die Woche zeigte klare Impulse für digitale Transformation im Bau- und Industrieumfeld. Eine kritische Verknüpfung entstand zwischen Zahnen Technik GmbH und vero – Verband der Bau- und Rohstoffindustrie, die beide aktuell digitale Lösungen für Bau-, Planungs- und Genehmigungsprozesse prüfen. Die Hochschule Mainz und die Universität Trier hingegen zeigten zwar relevante Impulse im Hochschule-Wirtschaf...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-18_11-17.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-18_11-17.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-18_11-17.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-18_11-17.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Woche zeigte klare Impulse für digitale Transformation im Bau- und Industrieumfeld. Eine kritische Verknüpfung entstand zwischen Zahnen Technik GmbH und vero – Verband der Bau- und Rohstoffindustrie, die beide aktuell digitale Lösungen für Bau-, Planungs- und Genehmigungsprozesse prüfen. Die Hochschule Mainz und die Universität Trier hingegen zeigten zwar relevante Impulse im Hochschule-Wirtschaft-Transfer, blieben aber in ihrer Verknüpfung noch unklar formuliert.</p>
+<p>Zentrale Beobachtung: Die aktuelle Ausrichtung auf digitale Bau- und Planungstools bei Zahnen Technik und vero deutet auf eine strategische Überschneidung hin. Beide Akteure bringen unterschiedliche Perspektiven ein: Zahnen Technik fokussiert auf digitale Produktivität und Weiterbildung, vero ergänzt mit Kreislaufwirtschaft und der Ersatzbaustoffverordnung. Die Frage, wie digitale Werkzeuge konkrete Umsetzung in Bau, Verwaltung oder Mittelstand beschleunigen können, ist hier prüfbar.</p>
+<p>ZIRP-Relevanz:</p>
+<p>Die digitale Umsetzung in Bau- und Planungsprozessen ist ein Schlüsselthema für regionale Produktivität. Die Verknüpfung zwischen Zahnen Technik und vero bietet einen prüfbaren Anknüpfungspunkt, um digitale Werkzeuge für Bau, Industrie oder Verwaltung konkret zu testen. Die aktuelle Auslöser – etwa die EBV-Einbaukarte von vero oder das Control Cloud-System von Zahnen Technik – machen die Relevanz für ZIRP besonders spürbar.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Ein 30-minütiges Sondierungsgespräch mit Zahnen Technik und vero zur Frage „Wo kann digitale Umsetzung in Bau, Industrie oder Verwaltung konkret beschleunigt werden?“ prüfen.</p>
+<p>WATCH: Die Verknüpfung zwischen Hochschule Mainz und Universität Trier im Hochschule-Wirtschaft-Transfer weiter beobachten – insbesondere, wie sich der Studiengang Klinische Pflege B.Sc. an der Universität Trier und das Projekt mainzed der Hochschule Mainz konkret verknüpfen.</p>
+<p>MAYBE: Die Frage, ob der Hochschule-Wirtschaft-Transfer zu einem ZIRP-Gespräch führen könnte, in zwei Wochen erneut prüfen, falls ein weiteres Umsetzungssignal auftritt.</p></div></details></div>
+<div class="history-card"><h3>05.05.2026 bis 18.05.2026</h3><small>0 Mitglieder mit priorisierten Funden · Zeitraum 05.05.2026 bis 18.05.2026 · erstellt 18.05.2026, 10:32:55</small><p>Für den Zeitraum vom 05.05.2026 bis 18.05.2026 wurden keine priorisierten Funde identifiziert.</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-18_10-32.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-18_10-32.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-18_10-32.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-18_10-32.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Für den Zeitraum vom 05.05.2026 bis 18.05.2026 wurden keine priorisierten Funde identifiziert.</p></div></details></div>
+<div class="history-card"><h3>29.04.2026 bis 12.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 29.04.2026 bis 12.05.2026 · erstellt 12.05.2026, 00:19:44</small><p>Wochenanalyse Die Woche zeigt einen klaren Schwerpunkt auf digitalen Innovationen im Bau- und Industrieumfeld, die potenziell rheinland-pfälzische Vernetzungspunkte eröffnen. Der Fokus liegt auf der Verknüpfung von digitalen Werkzeugen und konkreten Umsetzungsfragen in der Bau- und Planungsbranche. Zahnen Technik GmbH und der vero – Verband der Bau- und Rohstoffindustrie präsentieren Lösungsansätze, die digitale P...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-12_00-19.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-12_00-19.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-12_00-19.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-12_00-19.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Die Woche zeigt einen klaren Schwerpunkt auf digitalen Innovationen im Bau- und Industrieumfeld, die potenziell rheinland-pfälzische Vernetzungspunkte eröffnen.</p>
+<p>Der Fokus liegt auf der Verknüpfung von digitalen Werkzeugen und konkreten Umsetzungsfragen in der Bau- und Planungsbranche. Zahnen Technik GmbH und der vero – Verband der Bau- und Rohstoffindustrie präsentieren Lösungsansätze, die digitale Prozesse in der Industrie, Verwaltung und Bauwirtschaft beschleunigen könnten. Die ZIRP sollte hier prüfen, wie solche Tools in Pilotprojekten oder Pilotlogiken zu einem breiteren Umsetzungsspektrum führen können – beispielsweise durch den Austausch über rechtssichere Digitalisierungsschritte oder den Einsatz von Cloud-Plattformen in der Bauverwaltung.</p>
+<p>Zentrale Akteure sind Zahnen Technik GmbH mit ihrer Control Cloud und Wave Cloud sowie vero mit der digitalen Einbaukarte für die Ersatzbaustoffverordnung (EBV). Beide Akteure verbinden digitale Innovationen mit konkreten Anforderungen aus der Industrie und Verwaltung. Die ZIRP könnte hier gezielt sondieren, wo digitale Lösungen in der Praxis konkret beschleunigt werden können, etwa durch den Austausch über digitale Genehmigungsprozesse oder die Integration von Kreislaufwirtschaftsprinzipien in digitalen Bauverfahren.</p>
+<p>DO: Die ZIRP sollte mit Zahnen Technik GmbH und vero – Verband der Bau- und Rohstoffindustrie ein 30-minütiges Sondierungsgespräch zur Frage „Wo kann digitale Umsetzung in Bau, Industrie oder Verwaltung konkret beschleunigt werden?“ prüfen.</p>
+<p>WATCH: Die Universität Trier und Hochschule Mainz verfolgen Themen wie Hochschule-Wirtschaft-Transfer und regionale Attraktivität. Die ZIRP sollte hier weiterhin beobachten, ob sich aus diesen Aktivitäten konkrete Transferfragen für gemeinsame Umsetzungsprojekte entwickeln.</p>
+<p>MAYBE: Die Einführung des neuen Studiengangs „Klinische Pflege B.Sc.“ an der Universität Trier könnte im Zusammenhang mit digitalen Gesundheitslösungen für die Bau- und Industriebranche interessant sein. Eine erste Prüfung wäre hier aber vorsichtig zu gestalten.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 28.04.2026 bis 11.05.2026 · erstellt 11.05.2026, 23:57:21</small><p>Prioritized Action Plan Based on SCIP Card Recommendations Below is a structured summary of the highest-impact opportunities and next steps, ordered by urgency and strategic value: --- 1. High-Priority: Digital Transformation in Construction &amp; Administration Members Involved: - Zahnen Technik GmbH (Digitalisierungsgedanke, Control Cloud, Wave Cloud) - vero – Verband der Bau- und Rohstoffindustrie (EBV-Einbaukarte)...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_23-57.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_23-57.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_23-57.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_23-57.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Prioritized Action Plan Based on SCIP Card Recommendations</p>
+<p>Below is a structured summary of the highest-impact opportunities and next steps, ordered by urgency and strategic value:</p>
+<p>1. High-Priority: Digital Transformation in Construction &amp; Administration</p>
+<p>Members Involved:</p>
+<ul><li>Zahnen Technik GmbH (Digitalisierungsgedanke, Control Cloud, Wave Cloud)</li></ul>
+<ul><li>vero – Verband der Bau- und Rohstoffindustrie (EBV-Einbaukarte)</li></ul>
+<p>Why This Matters:</p>
+<ul><li>Strong alignment between the members’ signals (digital tools for construction, administrative efficiency, and circular economy).</li></ul>
+<ul><li>High score (39.807) and clear ZIRP-fit (high relevance to regional innovation and digital governance).</li></ul>
+<ul><li>Shared tension: How to scale digital tools from pilot projects to systemic implementation.</li></ul>
+<p>Next Best Action:</p>
+<ul><li>Schedule a 30-minute Sondierungsgespräch with Zahnen Technik GmbH and vero – Verband der Bau- und Rohstoffindustrie to explore:</li></ul>
+<ul><li>Specific pain points in construction/administration workflows.</li></ul>
+<ul><li>Potential use cases for Control Cloud/Wave Cloud and EBV-Einbaukarte.</li></ul>
+<ul><li>Collaboration opportunities with public sector stakeholders (e.g., municipalities, planning authorities).</li></ul>
+<p>Outcome Goal:</p>
+<ul><li>Identify 1–2 concrete projects or pilot initiatives to test digital tools in real-world contexts.</li></ul>
+<p>2. Mid-Priority: University-Industry Transfer in Healthcare &amp; Social Innovation</p>
+<p>Members Involved:</p>
+<ul><li>Universität Trier (Klinische Pflege B.Sc., Prof. Weyers’ leadership)</li></ul>
+<ul><li>SWR – Südwestrundfunk (Social media initiatives for elderly engagement)</li></ul>
+<ul><li>Hochschule Mainz (mainzed, cultural identity projects)</li></ul>
+<p>Why This Matters:</p>
+<ul><li>Moderate score (37.306–39.807) but strong thematic overlap in healthcare, social innovation, and regional development.</li></ul>
+<ul><li>Shared tension: How to translate academic research (e.g., Klinische Pflege B.Sc.) and media campaigns (e.g., SWR’s social media projects) into scalable public-private partnerships.</li></ul>
+<p>Next Best Action:</p>
+<ul><li>Monitor signals for 2 weeks, focusing on:</li></ul>
+<ul><li>New initiatives from Universität Trier (e.g., health tech startups, nursing innovation).</li></ul>
+<ul><li>SWR’s upcoming projects on aging populations or digital inclusion.</li></ul>
+<ul><li>Hochschule Mainz’s mainzed (cultural-economic synergies).</li></ul>
+<p>Outcome Goal:</p>
+<ul><li>If a second concrete signal emerges (e.g., a new health tech startup or a SWR campaign), initiate a ZIRPzoom with academic and industry representatives.</li></ul>
+<p>3. Lower-Priority: Reframing Ambiguous Opportunities</p>
+<p>Members Involved:</p>
+<ul><li>Hochschule Mainz, Zahnen Technik GmbH, vero – Verband der Bau- und Rohstoffindustrie</li></ul>
+<p>Why This Matters:</p>
+<ul><li>Low score (28.603) and unclear ZIRP-fit due to overlapping but unaligned signals (e.g., Hochschule Mainz’s cultural projects vs. digital construction tools).</li></ul>
+<p>Next Best Action:</p>
+<ul><li>Reframe the opportunity by narrowing the scope:</li></ul>
+<ul><li>Focus on specific sectors (e.g., healthcare infrastructure, smart cities).</li></ul>
+<ul><li>Identify missing stakeholders (e.g., local governments, SMEs in construction).</li></ul>
+<ul><li>Avoid premature meetings until signals converge.</li></ul>
+<p>Key Takeaways</p>
+<p>1. Act immediately on the digital construction opportunity, as it has the highest score and clear strategic alignment.</p>
+<p>2. Delay action on university-related themes until additional signals confirm a shared interest in transfer projects.</p>
+<p>3. Avoid overcommitment to the third card until the opportunity is reframed with sharper focus.</p>
+<p>This approach balances urgency with due diligence, ensuring ZIRP resources are allocated to the most promising and actionable opportunities.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 28.04.2026 bis 11.05.2026 · erstellt 11.05.2026, 23:30:13</small><p>Wochenanalyse Diese Woche ergibt sich kein geschlossenes Leitthema, doch mehrere Signale deuten auf Themen hin, die für Rheinland-Pfalz und ZIRP in der nächsten Zeit relevant sein könnten. Zwei Aspekte aus der Wirtschafts- und Entwicklungsdiskussion sowie eine Entwicklung im Hochschulbereich verdienen Aufmerksamkeit. ZIRP-Relevanz Die Digitalisierung von Prozessen im Bauwesen und die Umsetzung von Ersatzbaustoffve...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_23-30.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_23-30.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_23-30.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_23-30.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Diese Woche ergibt sich kein geschlossenes Leitthema, doch mehrere Signale deuten auf Themen hin, die für Rheinland-Pfalz und ZIRP in der nächsten Zeit relevant sein könnten. Zwei Aspekte aus der Wirtschafts- und Entwicklungsdiskussion sowie eine Entwicklung im Hochschulbereich verdienen Aufmerksamkeit.</p>
+<p>ZIRP-Relevanz</p>
+<p>Die Digitalisierung von Prozessen im Bauwesen und die Umsetzung von Ersatzbaustoffverordnungen in NRW sind konkrete Beispiele, wie digitale Innovationen in der Praxis wirken können. Ein weiterer Punkt ist die Entwicklung von Heizungsgesetzen, die in den nächsten Jahren konkrete Pflichten für Hausbesitzer vorsehen. Diese Themen sind für ZIRP relevant, da sie sowohl technologische als auch politische Impulse für rheinland-pfälzische Strukturen enthalten.</p>
+<p>Auffällige Mitglieder</p>
+<p>Zahnen Technik GmbH spielt in zwei Signalen eine Rolle: Einmal im Kontext der Digitalisierung von Expertenwissen, einmal im Zusammenhang mit der „Control Cloud“. Die Verbindung zu digitalen Infrastrukturen könnte für ZIRP als Anschlussfrage dienen, wie solche Lösungen in der regionalen Wirtschaftslandschaft genutzt werden. Die Universität Trier hingegen bringt mit ihrem CHE-Ranking und dem neuen internationalen Jura-Bachelor zwei Aspekte ein, die auf Bildungsqualität und internationale Vernetzung hindeuten.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Die Digitalisierung der Ersatzbaustoffverordnung in NRW als Modellfall prüfen, ob sich vergleichbare Ansätze für Rheinland-Pfalz übertragen lassen.</p>
+<p>WATCH: Die Entwicklung der Bio-Treppe im Heizungsgesetz im Hinblick auf regionale Energieeffizienzstrategien beobachten, da hier ein Transferanlass entstehen könnte.</p>
+<p>MAYBE: Mit der Universität Trier über die Vorteile internationaler Studiengänge für die regionale Wissensökonomie austauschen, um Vernetzungschancen zu erkunden.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 28.04.2026 bis 11.05.2026 · erstellt 11.05.2026, 22:54:16</small><p>Wochenanalyse Diese Woche ergibt sich kein geschlossenes Leitthema, doch zwei Signalrichtungen fallen besonders auf: Digitalisierung im Bauwesen und die Entwicklung von Energierichtlinien. Beide Bereiche haben potenzielle Verknüpfungen zu Themen, die Rheinland-Pfalz in den nächsten Jahren prägen könnten. ZIRP-Relevanz Die Digitalisierung der Baustoffverordnung in NRW bringt eine praktische Lösung für eine komplexe...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_22-54.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_22-54.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_22-54.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_22-54.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Wochenanalyse</p>
+<p>Diese Woche ergibt sich kein geschlossenes Leitthema, doch zwei Signalrichtungen fallen besonders auf: Digitalisierung im Bauwesen und die Entwicklung von Energierichtlinien. Beide Bereiche haben potenzielle Verknüpfungen zu Themen, die Rheinland-Pfalz in den nächsten Jahren prägen könnten.</p>
+<p>ZIRP-Relevanz</p>
+<p>Die Digitalisierung der Baustoffverordnung in NRW bringt eine praktische Lösung für eine komplexe Anforderung. Eine digitale Einbaukarte könnte Vorbilder für ähnliche Initiativen in Rheinland-Pfalz bieten, insbesondere wenn es um die Umsetzung von Ersatzbaustoffvorschriften geht. Gleichzeitig wird in der Landesbank Baden-Württemberg ein Zeitraum für die Bio-Treppe genannt, der bis 2040 auf 35 Prozent Bio-Baustoffe hinausläuft. Obwohl die Vorschrift nicht direkt für RLP gilt, könnte sie Vorgaben für regionale Energiepolitik oder Baupraxis beeinflussen.</p>
+<p>Auffällige Mitglieder</p>
+<p>Zahnen Technik GmbH wird in zwei Signalen genannt: Einmal als Entwickler der „Control Cloud“, die digitale Innovationen für Umwelt und Lebensqualität verspricht, und als Anbieter der „Wave Cloud“, die Prozesse im Maschinenbau automatisiert. Beide Themen sind zwar im Bereich der digitalen Transformation angesiedelt, aber die Konkretisierung bleibt im Vordergrund der Meldungen. Die Universität Trier hingegen verzeichnete Erfolge im CHE-Ranking und präsentiert einen internationalen Jura-Bachelor. Diese Signale zeigen, dass Bildungseinrichtungen in RLP aktiv auf nationalen und internationalen Märkten präsent sind.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Mit Zahnen Technik in Gesprächen prüfen, ob ihre Cloud-Lösungen für digitale Baustoffverordnungen in RLP übertragbar sind.</p>
+<p>WATCH: Die Entwicklung der Bio-Treppe in Baden-Württemberg weiter verfolgen, um frühzeitig mögliche Auswirkungen auf Energiepolitik oder Baupraxis in RLP einzuschätzen.</p>
+<p>MAYBE: Die Erfolge der Universität Trier im CHE-Ranking als Anknüpfungspunkt für Diskussionen nutzen, um internationale Kooperationen im Bildungssektor zu sondieren.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>5 Mitglieder mit priorisierten Funden · Zeitraum 28.04.2026 bis 11.05.2026 · erstellt 11.05.2026, 22:16:09</small><p>Diese Woche ergibt sich kein geschlossenes Leitthema, doch drei Signalfelder erlauben eine gezielte Vernetzung: die Verknüpfung von Nachhaltigkeit und Industrie, die Stärkung von Bildung als Wettbewerbsfaktor sowie die Entwicklung von digitalen Lösungen für gesetzliche Rahmenbedingungen. Die Signale sind nicht dominierend, aber prüfbare Anschlussfragen für ZIRP als Plattform für Transfer und Vernetzung. ** Wochena...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_22-16.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_22-16.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_22-16.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_22-16.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Diese Woche ergibt sich kein geschlossenes Leitthema, doch drei Signalfelder erlauben eine gezielte Vernetzung: die Verknüpfung von Nachhaltigkeit und Industrie, die Stärkung von Bildung als Wettbewerbsfaktor sowie die Entwicklung von digitalen Lösungen für gesetzliche Rahmenbedingungen. Die Signale sind nicht dominierend, aber prüfbare Anschlussfragen für ZIRP als Plattform für Transfer und Vernetzung.</p>
+<p>**</p>
+<p>Wochenanalyse</p>
+<p>**</p>
+<p>Der Einsatz digitaler Tools zur Umsetzung der Ersatzbaustoffverordnung in NRW (vero) und die Diskussion um die Pflichten des Heizungsgesetzes (LBBW) zeigen, wie branchenspezifische Herausforderungen durch technologische Innovationen und politische Vorgaben gestaltet werden. Beide Themen sind für Rheinland-Pfalz relevant, da sie sowohl die Bauwirtschaft als auch die Energiepolitik betreffen. Die Hochschule Mainz und die Universität Trier betonen zudem die Bedeutung von Bildung und internationaler Ausrichtung, was in der aktuellen Diskussion um Fachkräftemangel und globalen Wettbewerb eine Rolle spielt.</p>
+<p>**</p>
+<p>ZIRP-Relevanz</p>
+<p>**</p>
+<p>Die Verknüpfung von Nachhaltigkeit und Industrie (z. B. EBV-Implementierung) bietet Anschlussfragen für ZIRP, um Akteure aus Bauwirtschaft, Energieversorgung und Politik zusammenzubringen. Bildungsinitiativen wie der internationale Jura-Bachelor der Universität Trier oder die CHE-Ranking-Erfolge der Rechtswissenschaften könnten als Vernetzungspunkt für Hochschulen, Unternehmen und Rechtsberufe genutzt werden. Die Organisationskampagne der IKK Südwest im Fritz-Walter-Stadion unterstreicht zudem die Relevanz von gesellschaftlichem Engagement als Brücke zwischen Wirtschaft und Zivilgesellschaft.</p>
+<p>**Auffällige Mitglieder**</p>
+<p>IKK Südwest, vero und die Landesbank Baden-Württemberg (LBBW) präsentieren sich mit Themen, die über ihre eigene Branche hinausreichen: von Gesundheitspolitik bis hin zu Energie- und Bauwirtschaft. Die Universität Trier setzt mit Bildungsinnovationen und internationalen Studiengängen auf eine klare Positionierung, die für ZIRP als Vernetzungspartner von Interesse ist.</p>
+<p>**Was ZIRP daraus machen könnte:**</p>
+<p>DO: Prüfen, ob ein Austauschformat zwischen Bauindustrie, Energieversorgern und Politik zur Umsetzung der EBV und Heizungsgesetz-Regelungen möglich ist.</p>
+<p>WATCH: Beobachten, ob die CHE-Ranking-Erfolge der Universität Trier Impulse für eine Hochschulkooperation mit Unternehmen in Rechtsberufen geben.</p>
+<p>MAYBE: Sondieren, ob die IKK Südwest bereit ist, eine Veranstaltung zum Thema Organspende als Plattform für Gesundheitswirtschaft und Zivilgesellschaft zu nutzen.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 28.04.2026 bis 11.05.2026 · erstellt 11.05.2026, 21:55:47</small><p>Diese Woche ergibt sich kein geschlossenes Leitthema, doch drei Signalbereiche bieten pruefbare Anschlussfragen fuer die Netzwerk- und Transferarbeit von ZIRP. Sie betreffen soziale Initiativen, digitale Umsetzung von Regulierungen sowie energiepolitische Rahmenbedingungen. Die Relevanz fuer ZIRP als Plattform fuer Vernetzung und gemeinsame Sondierungen liegt in der Konvergenz von Themen, die fuer mehrere Mitglied...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_21-55.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_21-55.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_21-55.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_21-55.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Diese Woche ergibt sich kein geschlossenes Leitthema, doch drei Signalbereiche bieten pruefbare Anschlussfragen fuer die Netzwerk- und Transferarbeit von ZIRP. Sie betreffen soziale Initiativen, digitale Umsetzung von Regulierungen sowie energiepolitische Rahmenbedingungen. Die Relevanz fuer ZIRP als Plattform fuer Vernetzung und gemeinsame Sondierungen liegt in der Konvergenz von Themen, die fuer mehrere Mitglieder strategisch sind.</p>
+<p>Wochenanalyse:</p>
+<p>Die Veranstaltung zur Organspende im Fritz-Walter-Stadion durch die IKK Südwest verbindet soziales Engagement mit regionaler Sichtbarkeit. Gleichzeitig koennte die digitale Einbaukarte fuer die Ersatzbaustoffverordnung (EBV) in NRW, initiiert von vero, als Beispiel fuer praxisnahe Umsetzung von Regulierungen dienen. Das Heizungsgesetz und die damit verbundene Bio-Treppe fuer 2029–2040, die die Landesbank Baden-Württemberg thematisiert, unterstreichen die Dringlichkeit energiepolitischer Maßnahmen. Diese Themen sind fuer ZIRP als Plattform fuer Austausch und gemeinsame Sondierungen von Bedeutung, da sie sowohl gesellschaftliche als auch wirtschaftliche Dimensionen betreffen.</p>
+<p>ZIRP-Relevanz:</p>
+<p>Die Verknuepfung von sozialem Engagement und technologischer Umsetzung von Regulierungen zeigt, dass ZIRP als Bruecke zwischen unterschiedlichen Akteuren fungieren kann. Die aktuelle Debatte um die Bio-Treppe unterstreicht zudem, dass energiepolitische Rahmenbedingungen fuer Wirtschaft und Gesellschaft gleichermaßen relevant sind. Die Hochschule Trier, die im CHE-Ranking fuer Rechtswissenschaften hervorragende Ergebnisse erzielt hat, bietet zudem potenzielle Anschlusspunkte fuer akademische Vernetzung.</p>
+<p>Auffaellige Mitglieder:</p>
+<p>Die IKK Südwest, vero und die Landesbank Baden-Württemberg sind in dieser Woche besonders prasent. Ihre Initiativen reichen von sozialen Kampagnen bis hin zu technologischen Lösungen fuer die Bauindustrie und energiepolitischen Szenarien. Die Universitaet Trier ergaenzt dies mit einer akademischen Leistung, die fuer Netzwerkarbeit in der Bildungsszene von Interesse sein koennte.</p>
+<p>Was ZIRP daraus machen koennte:</p>
+<p>DO: Pruefen Sie, ob eine gemeinsame Veranstaltung mit der IKK Südwest und der Universitaet Trier fuer soziale Themen wie Organspende und akademische Kooperationen sinnvoll ist.</p>
+<p>WATCH: Beobachten Sie die Entwicklung um die digitale Einbaukarte fuer die EBV, um potenzielle Transferchancen fuer andere Regionen zu erkunden.</p>
+<p>MAYBE: Nutzen Sie die aktuelle Debatte um die Bio-Treppe als Anlass fuer einen Austausch mit Mitgliedern aus der Energiebranche, um gemeinsame Handlungsoptionen zu sondieren.</p>
+<p>Diese Woche bietet keine klare Richtung, aber mehrere pruefbare Anschlusspunkte fuer gezielte Vernetzung und gemeinsame Sondierungen.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 28.04.2026 bis 11.05.2026 · erstellt 11.05.2026, 19:54:42</small><p>Diese Woche zeigt kein geschlossenes Leitthema, aber drei Signale aus unterschiedlichen Feldern erlauben eine differenzierte Beobachtung, die für ZIRP als Plattform für Vernetzung, Transfer und Konvening relevant sein könnten. Das erste Signal ist das Engagement der IKK Südwest im Rahmen der Organspende-Veranstaltung im Fritz-Walter-Stadion, die im Mai 2026 stattfindet. Die Verbindung zwischen Sport, Gesundheit un...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_19-54.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_19-54.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_19-54.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_19-54.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Diese Woche zeigt kein geschlossenes Leitthema, aber drei Signale aus unterschiedlichen Feldern erlauben eine differenzierte Beobachtung, die für ZIRP als Plattform für Vernetzung, Transfer und Konvening relevant sein könnten. Das erste Signal ist das Engagement der IKK Südwest im Rahmen der Organspende-Veranstaltung im Fritz-Walter-Stadion, die im Mai 2026 stattfindet. Die Verbindung zwischen Sport, Gesundheit und sozialer Verantwortung könnte als prüfbare Anschlussfrage dienen, um Kooperationen zwischen Gesundheitsversicherern, Sportvereinen und kommunalen Akteuren zu sondieren. Ein weiteres Signal ist die digitale Einbaukarte für die Umsetzung der Ersatzbaustoffverordnung in NRW, die von vero und dem Ministerium für Heimat, Kommunales, Bau und Verkehr entwickelt wurde. Hier zeigt sich ein praktisches Beispiel für die Vorteile von digitalen Lösungen in der Bauindustrie, die für ZIRP als Impuls für weitere Transferprojekte in der Region relevant sein könnte. Drittens ist der aktuelle Stand der Heizungsgesetz-Debatte zu nennen, insbesondere die Entwicklung der Bio-Treppe bis 2040, die für Hausbesitzer und Energieversorger langfristige Planungssicherheit erfordert. Diese Entwicklung könnte als Beobachtungspunkt dienen, um frühzeitig Stakeholder in der Energiebranche einzubinden.</p>
+<p>Die Verknüpfung zwischen sozialen Initiativen und technologischen Innovationen, wie sie in den Signalen der IKK Südwest und von vero sichtbar wird, unterstreicht die Vielfalt an Themen, die ZIRP als Plattform für Vernetzung und Wissensweitergabe ansprechen könnte. Gleichzeitig bleibt die Heizungsgesetz-Debatte ein Beispiel für die Notwendigkeit, politische und wirtschaftliche Perspektiven in der Energiebranche frühzeitig zu berücksichtigen. Die aktuelle Diskussion um die Schuldenbremse, die in einem der Convening-Inputs erwähnt wird, ist zwar weniger direkt für ZIRP relevant, könnte aber im Kontext der wirtschaftlichen Rahmenbedingungen für Investitionen und Projekte in der Region eine Rolle spielen.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Die Veranstaltung im Fritz-Walter-Stadion könnte als Anknüpfungspunkt für ein Netzwerk zwischen Gesundheitsversicherern, Sportvereinen und kommunalen Akteuren genutzt werden, um langfristige Partnerschaften im Bereich sozialer Verantwortung zu etablieren.</p>
+<p>WATCH: Die Entwicklung der digitalen Einbaukarte für die Ersatzbaustoffverordnung könnte als Vorbild für weitere Transferprojekte in der Bauindustrie beobachtet werden, um ähnliche Lösungen in anderen Regionen zu prüfen.</p>
+<p>MAYBE: Die Diskussion um die Bio-Treppe im Heizungsgesetz könnte genutzt werden, um frühzeitig mit Energieversorgern und Immobilienbesitzern in der Region über mögliche Impulsprojekte zu sprechen, um langfristige Planungssicherheit zu schaffen.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>6 Mitglieder mit priorisierten Funden ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€š · Zeitraum 28.04.2026 bis 11.05.2026 ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€š · erstellt 11.05.2026, 19:22:42</small><p>Diese Woche zeigt kein geschlossenes Leitthema, aber drei Signale verweisen auf Entwicklungen, die für ZIRP als Netzwerk- und Transferplattform Beobachtungswert haben. Erstens veranstaltet die IKK Südwest am 8. Mai 2026 ein Engagement-Event zum Thema Organspende im Fritz-Walter-Stadion, das als Plattform für gesundheitspolitische Diskurse und Kooperationsverhandlungen zwischen Kliniken, Versicherern und Patienteno...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_19-22.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_19-22.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_19-22.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_19-22.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Diese Woche zeigt kein geschlossenes Leitthema, aber drei Signale verweisen auf Entwicklungen, die für ZIRP als Netzwerk- und Transferplattform Beobachtungswert haben. Erstens veranstaltet die IKK Südwest am 8. Mai 2026 ein Engagement-Event zum Thema Organspende im Fritz-Walter-Stadion, das als Plattform für gesundheitspolitische Diskurse und Kooperationsverhandlungen zwischen Kliniken, Versicherern und Patientenorganisationen dienen könnte. Zweitens präsentiert der Verband der Bau- und Rohstoffindustrie eine digitale Einbaukarte, die die Umsetzung der Ersatzbaustoffverordnung in NRW erleichtert – ein Beispiel für praxisnahe Lösungen, die im Transfer zwischen Wirtschaft und Politik nach Nachahmermodellen suchen. Drittens startet die Universität Trier den Studiengang Klinische Pflege B.Sc., der sich als Brücke zwischen akademischer Ausbildung und der Bedarfsgestaltung im Gesundheitssektor positioniert.</p>
+<p>Die Relevanz dieser Signale liegt in der Vielfalt ihrer Anknüpfungspunkte: Das Organspende-Event könnte als Sondierung dienen, um Interessenvertreter aus der Gesundheitsbranche zu einem Austausch über strukturelle Herausforderungen im Gesundheitswesen zu konvenieren. Die digitale Einbaukarte der Bauindustrie wirft die Frage auf, ob ZIRP als Plattform für den Transfer von digitalen Lösungen in andere Branchen oder Bundesländer genutzt werden könnte – eine pruefbare Anschlussfrage, die nicht unbedingt eine konkrete Handlung erfordert. Der Studiengang der Universität Trier hingegen bietet einen direkten Anschluss an die Diskussion über die Zukunft der Pflege, wobei ZIRP als Vermittler zwischen Bildungseinrichtungen und Arbeitgebern in der Branche eine Rolle spielen könnte.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Die Einladung zur Organspende-Veranstaltung der IKK Südwest als Gelegenheit, einen Fokus auf gesundheitspolitische Netzwerke zu legen und potenzielle Partner für eine gemeinsame Initiative zu identifizieren.</p>
+<p>WATCH: Die digitale Einbaukarte der Bauindustrie als Beobachtungspunkt für weitere digitale Lösungen in der Wirtschaft, um sie im Rahmen von Transferveranstaltungen zu präsentieren.</p>
+<p>MAYBE: Die Pflege-Ausbildung der Universität Trier als Anknüpfungspunkt für eine Diskussion über die Bedarfsgestaltung im Gesundheitssektor, wobei ZIRP gezielt auf die Verknüpfung zwischen Bildung und Praxis hinweisen könnte.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>ZIRP-Relevanz hoch bei Sozialen Initiativen und Wirtschaftsstrategien; Handlungsoptionen in Digitalisierung und Bildung</small><p>Executive Brief: Die Woche zeigt klare Schwerpunkte in sozialen Engagement-Initiativen und wirtschaftsrelevanten Innovationen. Wochenanalyse: Die IKK Südwest betont mit der Organspende-Veranstaltung die Bedeutung sozialer Verantwortung, während die vero mit der digitalen Einbaukarte für die Ersatzbaustoffverordnung NRW technologische Lösungen für Wirtschaftsfragen präsentiert. ZIRP-Relevanz: Hoch bei beiden Themen...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_16-19.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_16-19.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_16-19.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_16-19.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Executive Brief:</p>
+<p>Die Woche zeigt klare Schwerpunkte in sozialen Engagement-Initiativen und wirtschaftsrelevanten Innovationen.</p>
+<p>Wochenanalyse:</p>
+<p>Die IKK Südwest betont mit der Organspende-Veranstaltung die Bedeutung sozialer Verantwortung, während die vero mit der digitalen Einbaukarte für die Ersatzbaustoffverordnung NRW technologische Lösungen für Wirtschaftsfragen präsentiert.</p>
+<p>ZIRP-Relevanz:</p>
+<p>Hoch bei beiden Themenbereichen, da sie direkt in die strategischen Schwerpunkte von ZIRP einpassen (Soziales Engagement, Wirtschaftsstrategie). Auffällige Mitglieder: IKK Südwest, vero, LBBW, Universität Trier. Was ZIRP daraus machen könnte: Soziale Projekte als Image-Boost nutzen, digitale Tools für Wirtschaftsinitiativen fördern, Bildungsprogramme wie den Klinischen Pflege-B.Sc. als langfristige Investitionen priorisieren.</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>6 Mitglieder mit priorisierten Funden · Zeitraum 28.04.2026 bis 11.05.2026 · erstellt 11.05.2026, 15:37:30</small><p># Executive Brief ## Wichtigstes Signal Die Heizungspflicht für Hausbesitzer in Baden-Württemberg (LBBW) wird 2026 konkreter. Die Beimischungsquote für erneuerbare Energien steigt bis 2040 auf 35 Prozent. Dies wirkt sich direkt auf die Energiepolitik und Bauindustrie aus. ## ZIRP-Relevanz ZIRP kann als Plattform für den Austausch zwischen Bauindustrie (vero) und Energieversorgern (LBBW) genutzt werden. Die Digital...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_15-37.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_15-37.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_15-37.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_15-37.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>#</p>
+<p>Executive Brief</p>
+<h3>Wichtigstes Signal</h3>
+<p>Die Heizungspflicht für Hausbesitzer in Baden-Württemberg (LBBW) wird 2026 konkreter. Die Beimischungsquote für erneuerbare Energien steigt bis 2040 auf 35 Prozent. Dies wirkt sich direkt auf die Energiepolitik und Bauindustrie aus.</p>
+<p>##</p>
+<p>ZIRP-Relevanz</p>
+<p>ZIRP kann als Plattform für den Austausch zwischen Bauindustrie (vero) und Energieversorgern (LBBW) genutzt werden. Die Digitalisierung der EBV-Implementierung (vero) und die klare politische Richtung der Heizungspflicht (LBBW) sind handlungsnah. Die soziale Initiative der IKK Südwest (Organspende) ist zwar relevant, aber weniger direkt für ZIRP als Transfer-Plattform.</p>
+<h3>Empfohlene Aktionen</h3>
+<ul><li>**DO**: Initiiere Gespräche mit LBBW und vero zur Umsetzung der Heizungspflicht und EBV-Tools.</li></ul>
+<ul><li>**WATCH**: Beobachte die Organspende-Initiative der IKK Südwest für mögliche Synergien mit Gesundheitsnetzwerken.</li></ul>
+<ul><li>**MAYBE**: Reframe den Studiengang Klinische Pflege der Universität Trier als potenziellen Anker für interdisziplinäre Kooperationen.</li></ul>
+<p>#</p>
+<p>Wochenanalyse</p>
+<h3>Kurzfazit</h3>
+<p>Es gibt keine einheitliche Leitthemenstruktur, aber vier klar definierte Signale, die jeweils in unterschiedlichen Politik- und Wirtschaftsbereichen relevant sind. Die Heizungspflicht, EBV-Implementierung und gesundheitliche Bildung sind konkrete Handlungsfelder, während die Organspende-Initiative eher isoliert bleibt.</p>
+<h3>Signalfeld 1: Heizungsgesetz – Pflicht für Hausbesitzer</h3>
+<p>**Mitglied**: LBBW. **Signal**: Beimischungsquote steigt bis 2040 auf 35 Prozent. **Relevanz**: Direkte Auswirkungen auf Bauindustrie, Energieversorgung und Kreditvergabe. **Aktion**: DO (Gespräche mit LBBW und vero).</p>
+<h3>Signalfeld 2: Digitale EBV-Implementierung</h3>
+<p>**Mitglied**: vero. **Signal**: Digitale Einbaukarte für Ersatzbaustoffverordnung. **Relevanz**: Effizienzsteigerung in der Bauindustrie, potenzielle Standardisierung. **Aktion**: DO (Gespräche mit LBBW und vero).</p>
+<h3>Signalfeld 3: Soziale Initiative der IKK Südwest</h3>
+<p>**Mitglied**: IKK Südwest. **Signal**: Organspende-Aktion im Fritz-Walter-Stadion. **Relevanz**: Geringe direkte Verknüpfung mit ZIRP-Transferfunktionen. **Aktion**: WATCH (Beobachtung für Synergien mit Gesundheitsnetzwerken).</p>
+<h3>Auffällige Mitglieder</h3>
+<ul><li>**LBBW**: Heizungspflicht und EBV-Implementierung sind zentrale Themen für Wirtschaft und Politik.</li></ul>
+<ul><li>**vero**: Digitale Lösungen für die Bauindustrie sind strategisch relevant.</li></ul>
+<ul><li>**IKK Südwest**: Soziale Initiativen sind zwar sichtbar, aber weniger direkt für ZIRP.</li></ul>
+<ul><li>**Universität Trier**: Neuer Studiengang könnte langfristig interdisziplinäre Kooperationen ermöglichen.</li></ul>
+<h3>Bewusst nicht priorisiert</h3>
+<ul><li>**USA-Iran-Konflikt**: Keine direkte Verknüpfung mit ZIRP-Handlungsfeldern.</li></ul>
+<ul><li>**Schuldenbremse**: Relevanz für Wirtschaftspolitik, aber keine klare ZIRP-Verknüpfung.</li></ul>
+<ul><li>**Zehn Jahre mainzed**: Veranstaltung ist lokal, aber keine strategische Priorität für ZIRP.</li></ul>
+<p>Die Woche zeigt klare Handlungsfelder in Energiepolitik, Bauindustrie und Gesundheitsversorgung, die ZIRP gezielt nutzen kann. Die soziale Initiative</p></div></details></div>
+<div class="history-card"><h3>28.04.2026 bis 11.05.2026</h3><small>0 Mitglieder mit priorisierten Funden · Zeitraum 28.04.2026 bis 11.05.2026 · erstellt 11.05.2026, 13:22:21</small><p># Executive Brief ## Wichtigstes Signal Es gibt keine klaren, handlungsfähigen Signale, die ein übergeordnetes Leitthema für ZIRP definieren. Die aktuelle Lage zeigt keine konzentrierte Dynamik, die Priorisierung erfordert. ## ZIRP-Relevanz Die fehlende Konzentration von Signalen bedeutet, dass ZIRP als Plattform keine unmittelbaren Handlungsaufforderungen erhält. Es gibt keine belastbaren Anknüpfungspunkte für Ne...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-11_13-22.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-11_13-22.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-11_13-22.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-11_13-22.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>#</p>
+<p>Executive Brief</p>
+<h3>Wichtigstes Signal</h3>
+<p>Es gibt keine klaren, handlungsfähigen Signale, die ein übergeordnetes Leitthema für ZIRP definieren. Die aktuelle Lage zeigt keine konzentrierte Dynamik, die Priorisierung erfordert.</p>
+<p>##</p>
+<p>ZIRP-Relevanz</p>
+<p>Die fehlende Konzentration von Signalen bedeutet, dass ZIRP als Plattform keine unmittelbaren Handlungsaufforderungen erhält. Es gibt keine belastbaren Anknüpfungspunkte für Netzwerk- oder Transferaktivitäten. Die aktuelle Situation ist nicht geeignet, um Ressourcen zu mobilisieren oder Initiativen zu priorisieren.</p>
+<h3>Empfohlene Aktionen</h3>
+<ul><li>**WATCH**: Fortlaufende Analyse der Watchlist-Signale auf erste Anzeichen von Konvergenz.</li></ul>
+<ul><li>**MAYBE**: Prüfung der Appendix-Signale auf potenzielle Verknüpfungen mit bestehenden Projekten.</li></ul>
+<ul><li>**DROP**: Keine weiteren Signale aus der Dropped-Liste sind für ZIRP relevant.</li></ul>
+<p>#</p>
+<p>Wochenanalyse</p>
+<h3>Kurzfazit</h3>
+<p>Es gibt keine konkrete These, die die aktuelle Woche prägt. Die Signallandschaft ist fragmentiert, und es fehlt an einer klaren Richtung, die für ZIRP strategisch relevant wäre.</p>
+<h3>Signalfeld 1: Keine relevanten Signale</h3>
+<p>Es liegen keine konkreten Signale vor, die für ZIRP als Netzwerk- oder Transferplattform relevant wären.</p>
+<h3>Auffällige Mitglieder</h3>
+<ul><li>Keine Mitglieder sind aufgrund von Signalen auffällig.</li></ul>
+<h3>Bewusst nicht priorisiert</h3>
+<ul><li>Keine Signale sind bewusst nicht priorisiert, da keine Signale vorliegen.</li></ul></div></details></div>
+<div class="history-card"><h3>27.04.2026 bis 10.05.2026</h3><small>8 Mitglieder mit priorisierten Funden · Zeitraum 27.04.2026 bis 10.05.2026 · erstellt 10.05.2026, 20:15:13</small><p>Diese Woche zeigt kein geschlossenes Leitthema, aber drei Signale verweisen auf Entwicklungen, die für ZIRP als Netzwerk- und Transferplattform potenziell prüfbare Anschlussfragen oder Sondierungsgelegenheiten bieten. Zunächst verzeichnet der 1. FC Kaiserslautern am 8. Mai 2026 ein Engagement für die Organspende, das im Rahmen eines Heimspiels stattfindet. Die Verbindung zu sozialem Engagement als zentraler Themen...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-10_20-15.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-10_20-15.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-10_20-15.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-10_20-15.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Diese Woche zeigt kein geschlossenes Leitthema, aber drei Signale verweisen auf Entwicklungen, die für ZIRP als Netzwerk- und Transferplattform potenziell prüfbare Anschlussfragen oder Sondierungsgelegenheiten bieten. Zunächst verzeichnet der 1. FC Kaiserslautern am 8. Mai 2026 ein Engagement für die Organspende, das im Rahmen eines Heimspiels stattfindet. Die Verbindung zu sozialem Engagement als zentraler Themenbereich für Mitglieder wie die IKK Südwest ist klar, doch die Frage, ob ein solches Event als Anknüpfungspunkt für interdisziplinäre Initiativen genutzt werden könnte, bleibt offen. ZIRP könnte hier eine Rolle spielen, indem es potenzielle Kooperationspartner aus der Gesundheitsbranche oder der Sportwirtschaft zusammenbringt, um das Thema über die Veranstaltung hinaus zu verankern.</p>
+<p>Zweitens präsentiert sich die digitale Einbaukarte für die Umsetzung der Ersatzbaustoffverordnung (EBV) in NRW als Beispiel für praxisnahe Innovation. Der Verband vero hat hier ein Instrument entwickelt, das die Umsetzung von politischen Vorgaben in konkrete Handlungsschritte übersetzt. Für ZIRP als Plattform für Transfer und Wissensteilung könnte dies eine Gelegenheit sein, die Vorteile solcher digitaler Lösungen in anderen Regionen oder Branchen zu bewerten. Die Relevanz liegt hier in der Frage, ob ähnliche Ansätze in anderen Mitgliederbereichen (z. B. Landesregierungen, kommunale Verbände) nachgefragt werden und ob ZIRP als Vermittler fungieren könnte.</p>
+<p>Drittens weisen die Studiengänge der Universität Trier, insbesondere der B.Sc. Klinische Pflege, auf eine Entwicklung hin, die sowohl für die Bildungspolitik als auch für die Gesundheitsversorgung von Interesse ist. Die hohe Bewertung der Rechtswissenschaften im CHE-Ranking unterstreicht die institutionelle Stärke der Universität, die jedoch nicht automatisch auf eine strategische Relevanz für ZIRP schließen lässt. Hier ist die Frage, ob ZIRP als Brücke zwischen akademischen Qualitätsentwicklungen und praktischen Anforderungen der Wirtschaft fungieren könnte, noch nicht formatreif.</p>
+<p>Was ZIRP daraus machen könnte:</p>
+<p>DO: Die Einbaukarte für die EBV in NRW als Beispiel für digitale Lösungen in der Politikumsetzung weiter beobachten und gezielt bei Mitgliedern abfragen, ob ähnliche Ansätze in anderen Regionen gesucht werden.</p>
+<p>WATCH: Das Engagement des FC Kaiserslautern für die Organspende als potenziellen Anknüpfungspunkt für interdisziplinäre Initiativen prüfen, etwa durch eine Sondierung mit Gesundheits- und Sportverbänden.</p>
+<p>DROP: Die Diskussion um die Schuldenbremse in Baden-Württemberg, sofern sie keine direkte Verbindung zu ZIRP-relevanten Themen wie Wirtschaftsstrategien oder regionaler Finanzpolitik aufweist, nicht weiter verfolgen.</p></div></details></div>
+<div class="history-card"><h3>27.04.2026 bis 10.05.2026</h3><small>8 Mitglieder mit priorisierten Funden · Zeitraum 27.04.2026 bis 10.05.2026 · erstellt 10.05.2026, 10:22:33</small><p>Diese Woche zeigt kein geschlossenes Leitthema, aber drei Signale aus unterschiedlichen Feldern erlauben eine differenzierte Beobachtung, die für ZIRP als Plattform für Vernetzung und Impulsgebung relevant sind. Zunächst ist die Initiative der IKK Südwest im Rahmen des FC Kaiserslautern-Events hervorzuheben, die die Organspende in den Fokus rückt. Die Verbindung zwischen Sport, Gesundheit und sozialem Engagement b...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-10_10-22.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-10_10-22.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-10_10-22.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-10_10-22.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Diese Woche zeigt kein geschlossenes Leitthema, aber drei Signale aus unterschiedlichen Feldern erlauben eine differenzierte Beobachtung, die für ZIRP als Plattform für Vernetzung und Impulsgebung relevant sind. Zunächst ist die Initiative der IKK Südwest im Rahmen des FC Kaiserslautern-Events hervorzuheben, die die Organspende in den Fokus rückt. Die Verbindung zwischen Sport, Gesundheit und sozialem Engagement bietet einen prüfbaren Anschlusspunkt für Diskurse, die über die bloße Sensibilisierung hinausgehen – etwa im Bereich der digitalen Kommunikation von Spenderwillen oder der Koordination von Transplantationsnetzwerken. Zweitens hat vero mit der Entwicklung einer digitalen Einbaukarte für die Umsetzung der Ersatzbaustoffverordnung in NRW ein konkretes Instrument geschaffen, das nicht nur technische Hürden abbaut, sondern auch den Dialog zwischen Industrie, Politik und Praxis strukturiert. Dieses Beispiel unterstreicht, wie digitale Lösungen in der Wirtschafts</p></div></details></div>
+<div class="history-card"><h3>26.04.2026 bis 09.05.2026</h3><small>ZIRP-Weekly-Radar: Regionale Impulse zu Organspende, Bildungsgerechtigkeit und digitaler Transformation</small><p>Executive Brief: Zwei Leitthemen dominieren die Woche – soziale Verantwortung und digitale Wirtschaftsinnovationen. Wochenanalyse: Die IKK Südwest betont mit ihrer Organspende-Initiative die Bedeutung von Gesundheitsengagement, während die Universität Trier durch Bildungsinnovationen (CHE-Ranking, Klinische Pflege-Studiengang) und digitale Lösungen für die Bauindustrie (EBV-Tool) markante Impulse setzt. ZIRP-Relev...</p><div class="artifact-row"><a href="zirp_leiterinnen_briefing_2026-05-09_22-03.docx" target="_blank" rel="noopener">Word-Bericht</a><a href="zirp_ereignisse_2026-05-09_22-03.csv" target="_blank" rel="noopener">Ereignisse CSV</a><a href="zirp_begriffe_gewichtet_2026-05-09_22-03.csv" target="_blank" rel="noopener">Begriffe CSV</a><a href="zirp_raw_events_2026-05-09_22-03.csv" target="_blank" rel="noopener">Raw Events CSV</a></div><details><summary>Briefing im Dashboard öffnen</summary><div class="history-full"><p>Executive Brief:</p>
+<p>Zwei Leitthemen dominieren die Woche – soziale Verantwortung und digitale Wirtschaftsinnovationen.</p>
+<p>Wochenanalyse:</p>
+<p>Die IKK Südwest betont mit ihrer Organspende-Initiative die Bedeutung von Gesundheitsengagement, während die Universität Trier durch Bildungsinnovationen (CHE-Ranking, Klinische Pflege-Studiengang) und digitale Lösungen für die Bauindustrie (EBV-Tool) markante Impulse setzt.</p>
+<p>ZIRP-Relevanz:</p>
+<p>Hoch für beide Felder, da sie sowohl regionale als auch überregionale Wirkungsketten aktivieren. Auffällige Mitglieder: Universität Trier (dreifache Präsenz) und vero (digitale EBV-Tool). Was ZIRP daraus machen könnte: Fokus auf Partizipationsmodelle in der Gesundheitspolitik und Förderung von Bildungs- und Digitalisierungsprojekten als Wachstumstreiber.</p></div></details></div></section>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><strong>SOR · Strategic Opportunity Radar</strong></span>
+      <span>© 2026 SOR / SCIP method, scoring logic and convening radar concept. All rights reserved.</span>
+    </div>
+  </footer>
+  <script>
+    function prepareScipFeedback(button, label) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      card.dataset.pendingFeedbackLabel = label;
+      box.hidden = false;
+      textarea.focus();
+      status.textContent = label === 'useful' ? 'optional: kurze Begründung ergänzen' : 'bitte kurz begründen';
+    }
+
+    function cancelScipFeedback(button) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      card.dataset.pendingFeedbackLabel = '';
+      textarea.value = '';
+      box.hidden = true;
+      status.textContent = '';
+    }
+
+    async function submitScipFeedback(button) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      const label = card.dataset.pendingFeedbackLabel || 'interesting_but_weak';
+      let payload = {};
+      try {
+        payload = JSON.parse(card.dataset.feedbackPayload || '{}');
+      } catch (error) {
+        payload = {};
+      }
+      payload.label = label;
+      payload.human_feedback_label = label;
+      payload.human_comment = textarea.value.trim();
+      payload.timestamp = new Date().toISOString();
+      payload.page_url = window.location.href;
+      payload.public_status = payload.public_status || 'unknown';
+      status.textContent = 'saving...';
+      try {
+        const response = await fetch('http://127.0.0.1:8766/feedback/scip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error('feedback server unavailable');
+        status.textContent = 'saved';
+      } catch (error) {
+        const key = 'sor_scip_feedback_queue';
+        const queue = JSON.parse(localStorage.getItem(key) || '[]');
+        queue.push(payload);
+        localStorage.setItem(key, JSON.stringify(queue));
+        status.textContent = 'saved locally';
+      }
+      textarea.value = '';
+      box.hidden = true;
+      card.dataset.pendingFeedbackLabel = '';
+    }
+  </script>
+</body>
+</html>

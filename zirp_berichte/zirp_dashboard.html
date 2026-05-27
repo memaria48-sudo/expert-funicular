@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wochenanalyse · Strategic Opportunity Radar</title>
+  <link rel="icon" type="image/png" href="sor-logo.png" />
+  <link rel="apple-touch-icon" href="sor-logo.png" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --ink: #101826;
+      --muted: #5f6f82;
+      --line: #dce4ec;
+      --navy: #071426;
+      --navy-2: #0d2238;
+      --gold: #f4b51e;
+      --gold-soft: #fff7df;
+      --blue-soft: #f4f8fc;
+      --shadow: 0 14px 34px rgba(7, 20, 38, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .site-header {
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+      color: white;
+      border-bottom: 4px solid var(--gold);
+    }
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 18px;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      color: inherit;
+      text-decoration: none;
+    }
+    .brand img {
+      width: 150px;
+      height: 54px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: #06101e;
+    }
+    .brand-title { min-width: 0; }
+    .brand-title strong {
+      display: block;
+      font-size: 1.15rem;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    .brand-title span {
+      display: block;
+      color: rgba(255,255,255,.72);
+      font-size: .86rem;
+      margin-top: 2px;
+    }
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: .9rem;
+      font-weight: 750;
+    }
+    nav a.active, nav a:hover {
+      color: var(--navy);
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 18px 70px;
+    }
+    .page-intro {
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: 0;
+      color: var(--navy);
+    }
+    .subtitle {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-weight: 650;
+      line-height: 1.45;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+    .analysis {
+      max-width: 920px;
+    }
+    .analysis p {
+      font-size: 1.07rem;
+      line-height: 1.76;
+      margin: 0 0 18px;
+    }
+    .analysis h2, .analysis h3 {
+      margin: 24px 0 10px;
+      color: var(--navy);
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .stat { background: var(--gold-soft); border: 1px solid #f2d784; border-radius: 8px; padding: 12px; }
+    .stat b { display: block; font-size: 1.55rem; color: var(--navy); }
+    .stat span { color: var(--muted); font-size: .82rem; font-weight: 800; text-transform: uppercase; }
+    h2 { margin: 0 0 14px; font-size: 1.18rem; color: var(--navy); }
+    h3 { color: var(--navy); }
+    .section-row { margin: 10px 0; }
+    .section-top { display: flex; justify-content: space-between; gap: 12px; font-size: .9rem; color: var(--muted); }
+    .bar { height: 8px; background: #edf1f5; border-radius: 999px; overflow: hidden; margin-top: 5px; }
+    .bar span { display: block; height: 100%; background: var(--gold); }
+    .event-chip { border-top: 1px solid var(--line); padding: 12px 0; }
+    .event-chip:first-child { border-top: 0; }
+    .event-chip a { color: var(--ink); text-decoration: none; font-weight: 760; }
+    .event-chip small { display: block; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    .term-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .term { background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: .86rem; }
+    .members { color: var(--muted); line-height: 1.58; font-size: .94rem; }
+    .history-card, .scip-card { border-top: 1px solid var(--line); padding: 18px 0; }
+    .history-card:first-child, .scip-card:first-child { border-top: 0; }
+    .history-card h3, .scip-card h3 { margin: 0 0 5px; font-size: 1.02rem; }
+    .history-card p, .scip-card p { color: var(--muted); margin: 8px 0 0; line-height: 1.58; }
+    .artifact-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .artifact-row a, .button-link {
+      border: 1px solid #f0cf6e;
+      background: var(--gold-soft);
+      border-radius: 999px;
+      padding: 7px 10px;
+      text-decoration: none;
+      color: var(--navy);
+      font-weight: 800;
+      font-size: .84rem;
+    }
+    details { margin-top: 10px; }
+    summary { cursor: pointer; color: var(--navy); font-weight: 800; }
+    .meeting-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .meeting-head > div { min-width: 0; }
+    .meeting-head p { margin: 6px 0 0; color: var(--muted); line-height: 1.45; }
+    .radar-filter-note { font-size: .9rem; }
+    .meeting-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .meeting-card { border: 1px solid var(--line); border-radius: 8px; padding: 15px; background: #fbfcfe; }
+    .meeting-card h3 { margin: 0 0 6px; font-size: 1rem; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .meeting-card h3 .meeting-title { min-width: 0; }
+    .meeting-card h3 .points-chip { color: var(--muted); font-size: .86rem; font-weight: 900; white-space: nowrap; background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; }
+    .meeting-card p, .meeting-card li { color: var(--muted); line-height: 1.5; font-size: .92rem; }
+    .meeting-card li strong { color: var(--navy); }
+    .meeting-card ul { margin: 6px 0 10px 18px; padding: 0; }
+    .role-list { list-style: none; margin-left: 0 !important; display: grid; gap: 6px; }
+    .role-list li { margin: 0; }
+    .scip-label { color: var(--gold); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: .76rem; margin-bottom: 5px; }
+    .scip-hypothesis { color: var(--navy) !important; font-weight: 750; }
+    .scip-status-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+    .scip-status-row span { background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; color: var(--navy); font-size: .76rem; font-weight: 800; }
+    .opportunity-line {
+      border: 1px solid #dfe7ef;
+      background: white;
+      border-radius: 8px;
+      padding: 9px 10px;
+      margin: 10px 0;
+      display: grid;
+      gap: 5px;
+    }
+    .opportunity-line strong {
+      color: var(--navy);
+      font-size: .84rem;
+    }
+    .opportunity-line > span {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.45;
+    }
+    .opportunity-line.rising { border-left: 4px solid #2f9e44; }
+    .opportunity-line.falling { border-left: 4px solid #d9480f; }
+    .opportunity-line.stable { border-left: 4px solid var(--gold); }
+    .timeline-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .timeline-chips span {
+      background: var(--blue-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 7px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 750;
+    }
+    .feedback-box {
+      border-top: 1px solid var(--line);
+      margin-top: 12px;
+      padding-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+    .feedback-box span {
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 800;
+      margin-right: 3px;
+    }
+    .feedback-box button {
+      border: 1px solid #d6e0ea;
+      background: white;
+      color: var(--navy);
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: .78rem;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .feedback-box button:hover { border-color: var(--gold); background: var(--gold-soft); }
+    .feedback-comment-box {
+      flex-basis: 100%;
+      display: grid;
+      gap: 7px;
+      margin-top: 6px;
+    }
+    .feedback-comment-box[hidden] { display: none; }
+    .feedback-comment-box label {
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 850;
+    }
+    .feedback-comment-box textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d6e0ea;
+      border-radius: 8px;
+      padding: 8px 9px;
+      font: inherit;
+      resize: vertical;
+      color: var(--ink);
+      background: white;
+    }
+    .feedback-status {
+      color: var(--muted);
+      font-size: .78rem;
+      margin-left: 2px;
+    }
+    .site-footer {
+      background: var(--navy);
+      color: rgba(255,255,255,.72);
+      border-top: 4px solid var(--gold);
+    }
+    .footer-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: .88rem;
+    }
+    .footer-inner strong { color: white; }
+    @media (max-width: 900px) {
+      .header-inner { display: block; }
+      nav { justify-content: flex-start; margin-top: 14px; }
+      .two-col { grid-template-columns: 1fr; }
+      .meeting-head { display: block; }
+      .meeting-head .button-link { display: inline-block; margin-top: 10px; }
+      .meeting-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="zirp_dashboard.html">
+        <img src="sor-logo.png" alt="SOR Strategic Opportunity Radar Logo" />
+        <span class="brand-title">
+          <strong>Strategic Opportunity Radar</strong>
+          <span>Detect signals. Connect actors. Act in time.</span>
+        </span>
+      </a>
+      <nav><a class="active" href="zirp_dashboard.html">Wochenanalyse</a>
+<a class="" href="signals.html">Signale &amp; Begriffe</a>
+<a class="" href="scip_archive.html">SCIP Matchings</a>
+<a class="" href="archive.html">Archiv</a></nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="page-intro">
+      <h1>Wochenanalyse</h1>
+      <p class="subtitle">101 Mitglieder geprüft · 8 Mitglieder mit priorisierten Funden · 13 belastbare Signale · Zeitraum 21.05.2026 bis 27.05.2026 · erstellt 27.05.2026, 02:17:46</p>
+    </section>
+    <article class="card analysis"><p>Die Auswertung der letzten 7 Tage hat 101 Mitglieder geprüft und daraus 5 belastbare Signale bei 4 Mitgliedern identifiziert. Ein wichtiger Bezugspunkt ist die Hochschule Mainz mit dem Projekt &quot;Die Welt zu Gast auf dem Campus&quot;, das vom DAAD und dem Bundesministerium für Forschung gefördert wird. Dieses Signal weist über reine Kommunikation hinaus auf Kooperation, Transfer und anwendungsnahe Vernetzung hin. Ein weiterer wichtiger Bezugspunkt ist die Handwerkskammern Rheinland-Pfalz mit der &quot;Softwaremesse Handwerk&quot;, die die Digitalisierung im Handwerk vorantreiben soll.</p>
+<p>Die Analyse der Signale zeigt, dass es um Kooperationen mit anderen Unternehmen und Partnern sowie um die Wirtschaftslage und -entwicklung geht. Die Signale von IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH, wie &quot;1. InnovationTalk@IQIB&quot; und &quot;Neue Publikation: Die Flutkatastrophe 2021 – vom Wiederaufbau zur Klimaresilienz&quot;, unterstreichen die Bedeutung von Resilienz und Klimaresilienz. Die Signale von Zahnen Technik GmbH, wie &quot;Wave Cloud by zahnen&quot;, zeigen die Bedeutung von digitaler Transformation und Automatisierung.</p>
+<p>Die unterstützenden Kontexte, wie die &quot;Softwaremesse Handwerk&quot; von Handwerkskammern Rheinland-Pfalz und die &quot;Studie schlägt in RLP Alarm: Versorgung in RLP-Kommunen nur mangelhaft&quot; von SWR – Südwestrundfunk, verdichten die Analyse und zeigen, dass es um die Wirtschaftslage und -entwicklung sowie um die Versorgung und das Gesundheitssystem geht.</p>
+<p>Was ZIRP daraus machen könnte: ZIRP könnte die Signale und unterstützenden Kontexte nutzen, um Kooperationen mit anderen Unternehmen und Partnern zu fördern und die Wirtschaftslage und -entwicklung zu unterstützen. Durch die Analyse der Signale und Kontexte kann ZIRP besser verstehen, wie digitale Werkzeuge und Technologien in der Region eingesetzt werden können, um die Wirtschaft und die Gesellschaft zu stärken. ZIRP könnte auch die Bedeutung von Resilienz und Klimaresilienz berücksichtigen und Maßnahmen ergreifen, um diese in der Region zu fördern. Durch die Förderung von Kooperationen und der Unterstützung von digitaler Transformation und Automatisierung kann ZIRP dazu beitragen, die Wirtschaft und die Gesellschaft in der Region zu stärken.</p></article>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><strong>SOR · Strategic Opportunity Radar</strong></span>
+      <span>© 2026 SOR / SCIP method, scoring logic and convening radar concept. All rights reserved.</span>
+    </div>
+  </footer>
+  <script>
+    function prepareScipFeedback(button, label) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      card.dataset.pendingFeedbackLabel = label;
+      box.hidden = false;
+      textarea.focus();
+      status.textContent = label === 'useful' ? 'optional: kurze Begründung ergänzen' : 'bitte kurz begründen';
+    }
+
+    function cancelScipFeedback(button) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      card.dataset.pendingFeedbackLabel = '';
+      textarea.value = '';
+      box.hidden = true;
+      status.textContent = '';
+    }
+
+    async function submitScipFeedback(button) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      const label = card.dataset.pendingFeedbackLabel || 'interesting_but_weak';
+      let payload = {};
+      try {
+        payload = JSON.parse(card.dataset.feedbackPayload || '{}');
+      } catch (error) {
+        payload = {};
+      }
+      payload.label = label;
+      payload.human_feedback_label = label;
+      payload.human_comment = textarea.value.trim();
+      payload.timestamp = new Date().toISOString();
+      payload.page_url = window.location.href;
+      payload.public_status = payload.public_status || 'unknown';
+      status.textContent = 'saving...';
+      try {
+        const response = await fetch('http://127.0.0.1:8766/feedback/scip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error('feedback server unavailable');
+        status.textContent = 'saved';
+      } catch (error) {
+        const key = 'sor_scip_feedback_queue';
+        const queue = JSON.parse(localStorage.getItem(key) || '[]');
+        queue.push(payload);
+        localStorage.setItem(key, JSON.stringify(queue));
+        status.textContent = 'saved locally';
+      }
+      textarea.value = '';
+      box.hidden = true;
+      card.dataset.pendingFeedbackLabel = '';
+    }
+  </script>
+</body>
+</html>

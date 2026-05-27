@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCIP Matchings · Strategic Opportunity Radar</title>
+  <link rel="icon" type="image/png" href="sor-logo.png" />
+  <link rel="apple-touch-icon" href="sor-logo.png" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --ink: #101826;
+      --muted: #5f6f82;
+      --line: #dce4ec;
+      --navy: #071426;
+      --navy-2: #0d2238;
+      --gold: #f4b51e;
+      --gold-soft: #fff7df;
+      --blue-soft: #f4f8fc;
+      --shadow: 0 14px 34px rgba(7, 20, 38, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .site-header {
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+      color: white;
+      border-bottom: 4px solid var(--gold);
+    }
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 18px;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      color: inherit;
+      text-decoration: none;
+    }
+    .brand img {
+      width: 150px;
+      height: 54px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: #06101e;
+    }
+    .brand-title { min-width: 0; }
+    .brand-title strong {
+      display: block;
+      font-size: 1.15rem;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    .brand-title span {
+      display: block;
+      color: rgba(255,255,255,.72);
+      font-size: .86rem;
+      margin-top: 2px;
+    }
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: .9rem;
+      font-weight: 750;
+    }
+    nav a.active, nav a:hover {
+      color: var(--navy);
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 18px 70px;
+    }
+    .page-intro {
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: 0;
+      color: var(--navy);
+    }
+    .subtitle {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-weight: 650;
+      line-height: 1.45;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+    .analysis {
+      max-width: 920px;
+    }
+    .analysis p {
+      font-size: 1.07rem;
+      line-height: 1.76;
+      margin: 0 0 18px;
+    }
+    .analysis h2, .analysis h3 {
+      margin: 24px 0 10px;
+      color: var(--navy);
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .stat { background: var(--gold-soft); border: 1px solid #f2d784; border-radius: 8px; padding: 12px; }
+    .stat b { display: block; font-size: 1.55rem; color: var(--navy); }
+    .stat span { color: var(--muted); font-size: .82rem; font-weight: 800; text-transform: uppercase; }
+    h2 { margin: 0 0 14px; font-size: 1.18rem; color: var(--navy); }
+    h3 { color: var(--navy); }
+    .section-row { margin: 10px 0; }
+    .section-top { display: flex; justify-content: space-between; gap: 12px; font-size: .9rem; color: var(--muted); }
+    .bar { height: 8px; background: #edf1f5; border-radius: 999px; overflow: hidden; margin-top: 5px; }
+    .bar span { display: block; height: 100%; background: var(--gold); }
+    .event-chip { border-top: 1px solid var(--line); padding: 12px 0; }
+    .event-chip:first-child { border-top: 0; }
+    .event-chip a { color: var(--ink); text-decoration: none; font-weight: 760; }
+    .event-chip small { display: block; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    .term-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .term { background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: .86rem; }
+    .members { color: var(--muted); line-height: 1.58; font-size: .94rem; }
+    .history-card, .scip-card { border-top: 1px solid var(--line); padding: 18px 0; }
+    .history-card:first-child, .scip-card:first-child { border-top: 0; }
+    .history-card h3, .scip-card h3 { margin: 0 0 5px; font-size: 1.02rem; }
+    .history-card p, .scip-card p { color: var(--muted); margin: 8px 0 0; line-height: 1.58; }
+    .artifact-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .artifact-row a, .button-link {
+      border: 1px solid #f0cf6e;
+      background: var(--gold-soft);
+      border-radius: 999px;
+      padding: 7px 10px;
+      text-decoration: none;
+      color: var(--navy);
+      font-weight: 800;
+      font-size: .84rem;
+    }
+    details { margin-top: 10px; }
+    summary { cursor: pointer; color: var(--navy); font-weight: 800; }
+    .meeting-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .meeting-head > div { min-width: 0; }
+    .meeting-head p { margin: 6px 0 0; color: var(--muted); line-height: 1.45; }
+    .radar-filter-note { font-size: .9rem; }
+    .meeting-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .meeting-card { border: 1px solid var(--line); border-radius: 8px; padding: 15px; background: #fbfcfe; }
+    .meeting-card h3 { margin: 0 0 6px; font-size: 1rem; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .meeting-card h3 .meeting-title { min-width: 0; }
+    .meeting-card h3 .points-chip { color: var(--muted); font-size: .86rem; font-weight: 900; white-space: nowrap; background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; }
+    .meeting-card p, .meeting-card li { color: var(--muted); line-height: 1.5; font-size: .92rem; }
+    .meeting-card li strong { color: var(--navy); }
+    .meeting-card ul { margin: 6px 0 10px 18px; padding: 0; }
+    .role-list { list-style: none; margin-left: 0 !important; display: grid; gap: 6px; }
+    .role-list li { margin: 0; }
+    .scip-label { color: var(--gold); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: .76rem; margin-bottom: 5px; }
+    .scip-hypothesis { color: var(--navy) !important; font-weight: 750; }
+    .scip-status-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+    .scip-status-row span { background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; color: var(--navy); font-size: .76rem; font-weight: 800; }
+    .opportunity-line {
+      border: 1px solid #dfe7ef;
+      background: white;
+      border-radius: 8px;
+      padding: 9px 10px;
+      margin: 10px 0;
+      display: grid;
+      gap: 5px;
+    }
+    .opportunity-line strong {
+      color: var(--navy);
+      font-size: .84rem;
+    }
+    .opportunity-line > span {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.45;
+    }
+    .opportunity-line.rising { border-left: 4px solid #2f9e44; }
+    .opportunity-line.falling { border-left: 4px solid #d9480f; }
+    .opportunity-line.stable { border-left: 4px solid var(--gold); }
+    .timeline-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .timeline-chips span {
+      background: var(--blue-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 7px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 750;
+    }
+    .feedback-box {
+      border-top: 1px solid var(--line);
+      margin-top: 12px;
+      padding-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+    .feedback-box span {
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 800;
+      margin-right: 3px;
+    }
+    .feedback-box button {
+      border: 1px solid #d6e0ea;
+      background: white;
+      color: var(--navy);
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: .78rem;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .feedback-box button:hover { border-color: var(--gold); background: var(--gold-soft); }
+    .feedback-comment-box {
+      flex-basis: 100%;
+      display: grid;
+      gap: 7px;
+      margin-top: 6px;
+    }
+    .feedback-comment-box[hidden] { display: none; }
+    .feedback-comment-box label {
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 850;
+    }
+    .feedback-comment-box textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d6e0ea;
+      border-radius: 8px;
+      padding: 8px 9px;
+      font: inherit;
+      resize: vertical;
+      color: var(--ink);
+      background: white;
+    }
+    .feedback-status {
+      color: var(--muted);
+      font-size: .78rem;
+      margin-left: 2px;
+    }
+    .site-footer {
+      background: var(--navy);
+      color: rgba(255,255,255,.72);
+      border-top: 4px solid var(--gold);
+    }
+    .footer-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: .88rem;
+    }
+    .footer-inner strong { color: white; }
+    @media (max-width: 900px) {
+      .header-inner { display: block; }
+      nav { justify-content: flex-start; margin-top: 14px; }
+      .two-col { grid-template-columns: 1fr; }
+      .meeting-head { display: block; }
+      .meeting-head .button-link { display: inline-block; margin-top: 10px; }
+      .meeting-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="zirp_dashboard.html">
+        <img src="sor-logo.png" alt="SOR Strategic Opportunity Radar Logo" />
+        <span class="brand-title">
+          <strong>Strategic Opportunity Radar</strong>
+          <span>Detect signals. Connect actors. Act in time.</span>
+        </span>
+      </a>
+      <nav><a class="" href="zirp_dashboard.html">Wochenanalyse</a>
+<a class="" href="signals.html">Signale &amp; Begriffe</a>
+<a class="active" href="scip_archive.html">SCIP Matchings</a>
+<a class="" href="archive.html">Archiv</a></nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="page-intro">
+      <h1>SCIP Matchings</h1>
+      <p class="subtitle">Aktueller Convening Radar, alte SCIP-Ausgaben und redaktionelle Einordnung.</p>
+    </section>
+    
+        <section class="card" style="margin-bottom:18px;">
+          <h2>Wie der Radar gelesen werden sollte</h2>
+          <p class="members">SOR zeigt nicht nur, wer gerade sichtbar ist. Der Radar trennt Publikationsvolumen von strategischer Relevanz und macht auch leise Akteure sichtbar, wenn sie für eine entstehende Opportunity Line wichtig werden.</p>
+          <p class="members">Wiederkehrende Signale werden über mehrere Wochen verfolgt. So erkennt SOR, ob eine Linie neu entsteht, stabil bleibt, sich verstärkt oder an Momentum verliert.</p>
+          <p class="members">SCIP übersetzt diese Entwicklung in erklärbare Matchings: Welche Akteure passen zu welchem Thema, welche Rollen übernehmen sie, und reicht die Evidenz für einen sinnvollen nächsten Gesprächsanlass?</p>
+          <p class="members">Die Punkte sind keine Wahrheit, sondern ein Priorisierungssignal aus Signalstärke, Rollenlogik, Memory, Feedback und Aktualität: Hauptlinie, Sondierungshypothese oder Watchlist.</p>
+        </section>
+    <section class="card meeting-panel">
+      <div class="meeting-head">
+        <div>
+          <h2>Convening Radar</h2>
+          <p>2 öffentliche Meetinglinien · 101 Mitglieder beobachtet · 60 Signale bei 21 Mitgliedern · 49 SCIP-Kandidaten geprüft · aktualisiert 27.05.2026, 02:18:16</p>
+          <p class="radar-filter-note">13 Hauptsignale, 42 Kontextsignale, 5 Watchlist. Öffentlich sichtbar sind nur Matchings ab 10 Punkten mit klarer Rollenlogik; schwächere oder unklare Kombinationen bleiben intern beobachtbar.</p>
+        </div>
+        <a class="button-link" href="zirp_meeting_recommendations_ai_2026-05-27_02-17.html" target="_blank" rel="noopener">SCIP-Details öffnen</a>
+      </div>
+      <div class="meeting-grid">
+        <article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;a7b5a9adc4db47dd&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-fuer-qualifizi_universitaet-trier_cyberresilienz-kritische-infrastruktur-wissenschaft-demokratie&quot;, &quot;pattern_id&quot;: &quot;0&quot;, &quot;actors&quot;: [&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;SWR – Südwestrundfunk&quot;, &quot;Universität Trier&quot;], &quot;actor_types&quot;: {&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;: &quot;profit_anchor&quot;, &quot;SWR – Südwestrundfunk&quot;: &quot;context_actor&quot;, &quot;Universität Trier&quot;: &quot;academic_support&quot;}, &quot;topic&quot;: &quot;Cyberresilienz und kritische Infrastruktur&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Cyberresilienz und kritische Infrastruktur&quot;, &quot;shared&quot;: [&quot;Cyberresilienz und kritische Infrastruktur&quot;, &quot;Wissenschaft&quot;, &quot;Demokratie und gesellschaftlicher Zusammenhalt&quot;, &quot;Gesundheitsversorgung und Prävention&quot;], &quot;bridge&quot;: [&quot;Gesellschaft&quot;, &quot;Nachhaltigkeit&quot;, &quot;Technologie&quot;, &quot;Versorgung und Gesundheit&quot;], &quot;concrete&quot;: [&quot;Cyberresilienz und kritische Infrastruktur&quot;, &quot;Wissenschaft&quot;, &quot;Demokratie und gesellschaftlicher Zusammenhalt&quot;, &quot;Gesundheitsversorgung und Prävention&quot;]}, &quot;reason&quot;: &quot;Prüfpunkt im Themenfeld Cyberresilienz und kritische Infrastruktur: Wie schützen Unternehmen, Kommunen und Versorger digitale Systeme, Daten und kritische Infrastruktur? Klären, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;words&quot;: [&quot;Cyberresilienz&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;Prüfpunkt&quot;, &quot;Themenfeld&quot;, &quot;Cyberresilienz&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;Wie&quot;, &quot;schützen&quot;, &quot;Unternehmen&quot;, &quot;Kommunen&quot;, &quot;und&quot;, &quot;Versorger&quot;, &quot;digitale&quot;, &quot;Systeme&quot;, &quot;Daten&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;Klären&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;, &quot;gemeinsamer&quot;, &quot;Arbeitsauftrag&quot;, &quot;entsteht&quot;, &quot;InnovationTalk&quot;], &quot;public_status&quot;: &quot;hauptlinie&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 73.592, &quot;display_points&quot;: 25, &quot;role_coverage_score&quot;: 0.9, &quot;number_of_signals&quot;: 5, &quot;signal_strength&quot;: 74.0, &quot;source_quality&quot;: 1.0, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: 0.0, &quot;public_status_score&quot;: 3, &quot;score&quot;: 73.592, &quot;raw_score&quot;: 73.592, &quot;rule_final_score&quot;: 73.592, &quot;nn_adjustment&quot;: 0.0, &quot;word_memory_hits&quot;: 0.0, &quot;feedback_evidence_count&quot;: 0.0, &quot;academic_support_count&quot;: 1.0, &quot;profit_anchor_count&quot;: 1.0, &quot;implementation_anchor_count&quot;: 0.0, &quot;context_actor_count&quot;: 1.0}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">Hauptlinie</div><h3><span class="meeting-title">IQIB x SWR – Südwestrundfunk x Uni Trier</span><span class="points-chip">25 Punkte</span></h3><div class="scip-status-row"><span>Status: Hauptlinie</span><span>Trend: stabil</span><span>Opportunity Window: offen</span><span>Erstmals gesehen: 2026-05-26</span><span>Neue Signale: 1</span></div><p class="scip-hypothesis">Resilienz / kommunale Umsetzung trifft auf Ethik, Gesundheit, Digitalisierung und Nachhaltigkeit.</p><div class="opportunity-line stable"><strong>Entwicklungslinie</strong><span>2026-05-26 gestartet · jetzt: Hauptlinie · Entwicklung: stabil · +1 neue Signale · Feedback: kein Feedback</span><div class="timeline-chips"><span>2026-05-26 · Hauptlinie · 25 Punkte</span><span>2026-05-27 · Hauptlinie · 25 Punkte</span></div></div><details><summary>Rollenlogik anzeigen</summary><ul class="role-list"><li><strong>IQIB:</strong> kommunale Resilienz, Wissenstransfer und angewandte Innovationsforschung.</li><li><strong>SWR – Südwestrundfunk:</strong> regionale Öffentlichkeit und Sichtbarkeit von Versorgungslücken.</li><li><strong>Uni Trier:</strong> Ethik, Gesundheit/Pflege, Digitalisierung und Nachhaltigkeit.</li></ul><p><strong>Warum diese Linie?</strong><br>Prüfpunkt im Themenfeld Cyberresilienz und kritische Infrastruktur: Wie schützen Unternehmen, Kommunen und Versorger digitale Systeme, Daten und kritische Infrastruktur? Klären, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.</p><p><strong>Warum diese Punktzahl?</strong><br>25 Punkte Gesamtpriorität · Rollenabdeckung 0.90 · 5 aktuelle Signale · Signalstärke 74.0<br><span class='members'>Die Punktzahl ist kein Wahrheitswert, sondern ein Priorisierungssignal aus Rollenlogik, Signalstärke, Aktualität, Memory und Feedback.</span></p></details><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Warum?</label><textarea rows="3" placeholder="z.B. Mainz 05 hat in diesem Thema keine klare Rolle."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
+<article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;ed64f48c02163d1b&quot;, &quot;opportunity_id&quot;: &quot;zahnen-technik-gmbh_handwerkskammern-rheinland-p_mittelstand-digitalisierung-produktivitaet&quot;, &quot;pattern_id&quot;: &quot;11&quot;, &quot;actors&quot;: [&quot;Zahnen Technik GmbH&quot;, &quot;Handwerkskammern Rheinland-Pfalz&quot;], &quot;actor_types&quot;: {&quot;Zahnen Technik GmbH&quot;: &quot;profit_anchor&quot;, &quot;Handwerkskammern Rheinland-Pfalz&quot;: &quot;implementation_anchor&quot;}, &quot;topic&quot;: &quot;Mittelstand, Digitalisierung und Produktivität&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Mittelstand, Digitalisierung und Produktivität&quot;, &quot;shared&quot;: [&quot;Mittelstand&quot;, &quot;Digitalisierung und Produktivität&quot;], &quot;bridge&quot;: [&quot;Kooperation und Transfer&quot;, &quot;Nachhaltigkeit&quot;, &quot;Technologie&quot;, &quot;Wirtschaft&quot;], &quot;concrete&quot;: [&quot;Mittelstand&quot;, &quot;Digitalisierung und Produktivität&quot;]}, &quot;reason&quot;: &quot;Prüfpunkt im Themenfeld Mittelstand, Digitalisierung und Produktivität: Wie können mittelständische Unternehmen digitale Werkzeuge praktisch einsetzen, ohne dass daraus nur Pilotprojekte entstehen? Klären, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;words&quot;: [&quot;Mittelstand&quot;, &quot;Digitalisierung&quot;, &quot;und&quot;, &quot;Produktivität&quot;, &quot;Prüfpunkt&quot;, &quot;Themenfeld&quot;, &quot;Mittelstand&quot;, &quot;Digitalisierung&quot;, &quot;und&quot;, &quot;Produktivität&quot;, &quot;Wie&quot;, &quot;können&quot;, &quot;mittelständische&quot;, &quot;Unternehmen&quot;, &quot;digitale&quot;, &quot;Werkzeuge&quot;, &quot;praktisch&quot;, &quot;einsetzen&quot;, &quot;ohne&quot;, &quot;dass&quot;, &quot;daraus&quot;, &quot;nur&quot;, &quot;Pilotprojekte&quot;, &quot;entstehen&quot;, &quot;Klären&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;, &quot;gemeinsamer&quot;, &quot;Arbeitsauftrag&quot;], &quot;public_status&quot;: &quot;sondierungshypothese&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 51.455, &quot;display_points&quot;: 17, &quot;role_coverage_score&quot;: 0.45, &quot;number_of_signals&quot;: 3, &quot;signal_strength&quot;: 51.0, &quot;source_quality&quot;: 0.75, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: 0.0, &quot;public_status_score&quot;: 2, &quot;score&quot;: 51.455, &quot;raw_score&quot;: 48.791, &quot;rule_final_score&quot;: 51.455, &quot;nn_adjustment&quot;: 0.0, &quot;word_memory_hits&quot;: 0.0, &quot;feedback_evidence_count&quot;: 0.0, &quot;academic_support_count&quot;: 0.0, &quot;profit_anchor_count&quot;: 1.0, &quot;implementation_anchor_count&quot;: 1.0, &quot;context_actor_count&quot;: 0.0}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">Sondierungshypothese</div><h3><span class="meeting-title">Zahnen Technik GmbH x Handwerkskammern Rheinland-Pfalz</span><span class="points-chip">17 Punkte</span></h3><div class="scip-status-row"><span>Status: Sondierungshypothese</span><span>Trend: stabil</span><span>Opportunity Window: neu</span><span>Erstmals gesehen: 2026-05-26</span><span>Neue Signale: 0</span></div><p class="scip-hypothesis">Mittelstand / Digitalisierung und Produktivität trifft auf Kooperation und Transfer / Nachhaltigkeit.</p><div class="opportunity-line stable"><strong>Entwicklungslinie</strong><span>2026-05-26 gestartet · jetzt: Sondierungshypothese · Entwicklung: stabil · +0 neue Signale · Feedback: kein Feedback</span><div class="timeline-chips"><span>2026-05-26 · Sondierungshypothese · 17 Punkte</span><span>2026-05-27 · Sondierungshypothese · 17 Punkte</span></div></div><details><summary>Rollenlogik anzeigen</summary><ul class="role-list"><li><strong>Zahnen Technik GmbH:</strong> mittelständische Umsetzungspraxis und digitale Werkzeuge.</li><li><strong>Handwerkskammern Rheinland-Pfalz:</strong> Zugang zum Mittelstand, Betrieben und praktischer Umsetzung.</li></ul><p><strong>Warum diese Linie?</strong><br>Prüfpunkt im Themenfeld Mittelstand, Digitalisierung und Produktivität: Wie können mittelständische Unternehmen digitale Werkzeuge praktisch einsetzen, ohne dass daraus nur Pilotprojekte entstehen? Klären, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.</p><p><strong>Warum diese Punktzahl?</strong><br>17 Punkte Gesamtpriorität · Rollenabdeckung 0.45 · 3 aktuelle Signale · Signalstärke 51.0<br><span class='members'>Die Punktzahl ist kein Wahrheitswert, sondern ein Priorisierungssignal aus Rollenlogik, Signalstärke, Aktualität, Memory und Feedback.</span></p></details><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Warum?</label><textarea rows="3" placeholder="z.B. Mainz 05 hat in diesem Thema keine klare Rolle."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
+      </div>
+    </section><section class='card' style='margin-top:18px;'><h2>Alte SCIP-Matchings</h2><div class="scip-card"><h3>ai_2026-05-27_02-17</h3><p>Erstellt 27.05.2026, 02:18 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-27_02-17.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-27_02-17</h3><p>Erstellt 27.05.2026, 02:18 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-27_02-17.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-27_01-48</h3><p>Erstellt 27.05.2026, 01:48 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-27_01-48.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>ai_2026-05-27_00-07</h3><p>Erstellt 27.05.2026, 00:07 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-27_00-07.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-27_00-07</h3><p>Erstellt 27.05.2026, 00:07 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-27_00-07.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-27_00-06</h3><p>Erstellt 27.05.2026, 00:06 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-27_00-06.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>ai_2026-05-26_23-34</h3><p>Erstellt 26.05.2026, 23:35 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-26_23-34.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_23-34</h3><p>Erstellt 26.05.2026, 23:35 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_23-34.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>ai_2026-05-26_23-14</h3><p>Erstellt 26.05.2026, 23:15 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-26_23-14.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_23-14</h3><p>Erstellt 26.05.2026, 23:15 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_23-14.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>ai_2026-05-26_22-59</h3><p>Erstellt 26.05.2026, 23:00 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-26_22-59.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_22-59</h3><p>Erstellt 26.05.2026, 23:00 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_22-59.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>ai_2026-05-26_22-40</h3><p>Erstellt 26.05.2026, 22:41 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-26_22-40.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_22-40</h3><p>Erstellt 26.05.2026, 22:41 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_22-40.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_22-38</h3><p>Erstellt 26.05.2026, 22:38 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_22-38.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>ai_2026-05-26_22-30</h3><p>Erstellt 26.05.2026, 22:32 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-26_22-30.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_22-30</h3><p>Erstellt 26.05.2026, 22:32 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_22-30.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_22-28</h3><p>Erstellt 26.05.2026, 22:28 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_22-28.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>ai_2026-05-26_21-50</h3><p>Erstellt 26.05.2026, 21:50 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-26_21-50.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_21-50</h3><p>Erstellt 26.05.2026, 21:50 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_21-50.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_21-49</h3><p>Erstellt 26.05.2026, 21:49 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_21-49.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>ai_2026-05-26_21-05</h3><p>Erstellt 26.05.2026, 21:06 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_ai_2026-05-26_21-05.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_21-05</h3><p>Erstellt 26.05.2026, 21:06 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_21-05.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div>
+<div class="scip-card"><h3>2026-05-26_21-04</h3><p>Erstellt 26.05.2026, 21:04 · enthält ausgewählte SCIP-Matchings und Begründungen aus diesem Lauf.</p><div class="artifact-row"><a href="zirp_meeting_recommendations_2026-05-26_21-04.html" target="_blank" rel="noopener">SCIP-Datei öffnen</a></div></div></section>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><strong>SOR · Strategic Opportunity Radar</strong></span>
+      <span>© 2026 SOR / SCIP method, scoring logic and convening radar concept. All rights reserved.</span>
+    </div>
+  </footer>
+  <script>
+    function prepareScipFeedback(button, label) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      card.dataset.pendingFeedbackLabel = label;
+      box.hidden = false;
+      textarea.focus();
+      status.textContent = label === 'useful' ? 'optional: kurze Begründung ergänzen' : 'bitte kurz begründen';
+    }
+
+    function cancelScipFeedback(button) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      card.dataset.pendingFeedbackLabel = '';
+      textarea.value = '';
+      box.hidden = true;
+      status.textContent = '';
+    }
+
+    async function submitScipFeedback(button) {
+      const card = button.closest('[data-feedback-payload]');
+      const status = card.querySelector('.feedback-status');
+      const box = card.querySelector('.feedback-comment-box');
+      const textarea = box.querySelector('textarea');
+      const label = card.dataset.pendingFeedbackLabel || 'interesting_but_weak';
+      let payload = {};
+      try {
+        payload = JSON.parse(card.dataset.feedbackPayload || '{}');
+      } catch (error) {
+        payload = {};
+      }
+      payload.label = label;
+      payload.human_feedback_label = label;
+      payload.human_comment = textarea.value.trim();
+      payload.timestamp = new Date().toISOString();
+      payload.page_url = window.location.href;
+      payload.public_status = payload.public_status || 'unknown';
+      status.textContent = 'saving...';
+      try {
+        const response = await fetch('http://127.0.0.1:8766/feedback/scip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error('feedback server unavailable');
+        status.textContent = 'saved';
+      } catch (error) {
+        const key = 'sor_scip_feedback_queue';
+        const queue = JSON.parse(localStorage.getItem(key) || '[]');
+        queue.push(payload);
+        localStorage.setItem(key, JSON.stringify(queue));
+        status.textContent = 'saved locally';
+      }
+      textarea.value = '';
+      box.hidden = true;
+      card.dataset.pendingFeedbackLabel = '';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# Local secrets
+.env
+
+# Python/runtime artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.py
+requirements.txt
+
+# Local source/config/data files
+configs/
+sor/
+tests/
+data/
+outputs/
+*.csv
+zirp_meeting_recommendations_*.html
+
+# Repair backups and local scratch
+*.bak
+*.mojibake.bak
+*.pre_source_repair.bak
+
+# Large/local reference artifacts
+*.pdf
+*.png
+!sor-logo.png
+!zirp_berichte/sor-logo.png
+
+# Generated report archive (publish only static Pages entrypoints)
+zirp_berichte/*
+!zirp_berichte/
+!zirp_berichte/archive.html
+!zirp_berichte/scip_archive.html
+!zirp_berichte/signals.html
+!zirp_berichte/zirp_dashboard.html
+!zirp_berichte/zirp_meeting_recommendations_latest.html
+!zirp_berichte/zirp_meeting_recommendations_ai_latest.html
+!zirp_berichte/sor-logo.png
+
+# Local monitor state
+zirp_member_monitor_state.json
