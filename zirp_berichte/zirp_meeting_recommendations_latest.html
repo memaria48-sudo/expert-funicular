@@ -25,6 +25,15 @@
     details { margin-top:12px; color:#344257; }
     summary { cursor:pointer; font-weight:800; }
     li { margin:7px 0; line-height:1.45; }
+    .feedback-box { border-top:1px solid #d9e1ea; margin-top:14px; padding-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .feedback-box span { color:#627084; font-weight:800; margin-right:2px; }
+    .feedback-box button { border:1px solid #cfe0f1; background:white; color:#172033; border-radius:999px; padding:7px 11px; font-weight:800; cursor:pointer; }
+    .feedback-box button:hover { border-color:#f1b51c; background:#fff7df; }
+    .feedback-comment-box { flex-basis:100%; margin-top:8px; display:grid; gap:7px; }
+    .feedback-comment-box[hidden] { display:none; }
+    .feedback-comment-box label { font-weight:800; color:#627084; }
+    .feedback-comment-box textarea { width:100%; box-sizing:border-box; border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; }
+    .feedback-status { color:#627084; flex-basis:100%; }
     .button-link { display:inline-block; margin-top:14px; border:1px solid #cfe0f1; background:#e8f1fa; color:#255f99; border-radius:999px; padding:9px 13px; text-decoration:none; font-weight:800; }
     a { color:#255f99; }
   </style>
@@ -33,54 +42,198 @@
 <main>
   <header>
     <h1>SCIP Match Selector</h1>
-    <div class="meta">Top 6 bilaterale Opportunity-Matches Â· SCIP-basierte Auswahl aus aktuellen Mitgliedssignalen Â· erstellt 03.06.2026, 00:20:36</div>
-    <p>Profile: <a href="zirp_member_topic_profiles_2026-06-03_00-20.csv">zirp_member_topic_profiles_2026-06-03_00-20.csv</a> Â· Patterns: <a href="zirp_meeting_patterns_2026-06-03_00-20.csv">zirp_meeting_patterns_2026-06-03_00-20.csv</a></p>
+    <div class="meta">Top 6 bilaterale Opportunity-Matches Â· SCIP-basierte Auswahl aus aktuellen Mitgliedssignalen Â· erstellt 03.06.2026, 00:54:36</div>
+    <p>Profile: <a href="zirp_member_topic_profiles_2026-06-03_00-54.csv">zirp_member_topic_profiles_2026-06-03_00-54.csv</a> Â· Patterns: <a href="zirp_meeting_patterns_2026-06-03_00-54.csv">zirp_meeting_patterns_2026-06-03_00-54.csv</a></p>
     <a class="button-link" href="zirp_dashboard.html">Zur Wochenanalyse</a>
   </header>
   <section class="grid">
     
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;11798094a35d95d9&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-f-r-qualifizie_universit-t-trier_hochschule-wirtschaft-transfer-standort-investition-industrielle-transfo&quot;, &quot;pattern_id&quot;: &quot;0&quot;, &quot;actors&quot;: [&quot;IQIB - Institut fÃƒ¼r qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;UniversitÃƒ¤t Trier&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: IQIB - Institut fÃƒ¼r qualifizierende Innovationsforschung und -beratung GmbH bringt aktuell Hochschule-Wirtschaft-Transfer, Verwaltungswissen und digitale Umsetzung ein, UniversitÃƒ¤t Trier ergänzt Hochschule-Wirtschaft-Transfer, Demokratie, Medien und gesellschaftlicher Zusammenhalt. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;score&quot;: 133.79, &quot;source&quot;: &quot;match_selector&quot;}">
               <div class="card-label">#1 Â· Top-Match Â· Sondierungslinie</div>
               <h2>IQIB x Uni Trier <span class="points">- 45 Punkte</span></h2>
               <p class="hypothesis">Resilienz / kommunale Umsetzung trifft auf Ethik, Gesundheit, Digitalisierung und Nachhaltigkeit.</p>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
             </article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;30e6ea8cc7271788&quot;, &quot;opportunity_id&quot;: &quot;zahnen-technik-gmbh_hochschule-mainz_standort-investition-industrielle-transformation-verwaltungswissen&quot;, &quot;pattern_id&quot;: &quot;3&quot;, &quot;actors&quot;: [&quot;Zahnen Technik GmbH&quot;, &quot;Hochschule Mainz&quot;], &quot;topic&quot;: &quot;Standort, Investition und industrielle Transformation&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Hochschule Mainz bringt aktuell Hochschule-Wirtschaft-Transfer, Arbeitsmarkt, Fachkräfte und Qualifizierung ein, Zahnen Technik GmbH ergänzt Verwaltungswissen und digitale Umsetzung, KI, Daten und Verwaltungs-/Wirtschaftsanwendungen. Für die ZIRP stellt sich die Frage: Welche Standortbedingungen entscheiden darüber, ob Unternehmen in Rheinland-Pfalz investieren, modernisieren oder verlagern?&quot;, &quot;score&quot;: 87.917, &quot;source&quot;: &quot;match_selector&quot;}">
               <div class="card-label">#2 Â· Starker Match Â· Sondierungslinie</div>
               <h2>Zahnen Technik GmbH x Hochschule Mainz <span class="points">- 29 Punkte</span></h2>
               <p class="hypothesis">Regulatorischer Druck trifft auf Investitions- und Umsetzungsfragen in der Wirtschaft.</p>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
             </article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;69b7a64fefaaa9bb&quot;, &quot;opportunity_id&quot;: &quot;zahnen-technik-gmbh_standort-investition-industrielle-transformation-verwaltungswissen&quot;, &quot;pattern_id&quot;: &quot;4&quot;, &quot;actors&quot;: [&quot;Zahnen Technik GmbH&quot;, &quot;SWR – SÃƒ¼dwestrundfunk&quot;], &quot;topic&quot;: &quot;Standort, Investition und industrielle Transformation&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: SWR – SÃƒ¼dwestrundfunk bringt aktuell Standort, Investition und industrielle Transformation, Verwaltungswissen und digitale Umsetzung ein, Zahnen Technik GmbH ergänzt Verwaltungswissen und digitale Umsetzung, KI, Daten und Verwaltungs-/Wirtschaftsanwendungen. Für die ZIRP stellt sich die Frage: Welche Standortbedingungen entscheiden darüber, ob Unternehmen in Rheinland-Pfalz investieren, modernisieren oder verlagern?&quot;, &quot;score&quot;: 87.236, &quot;source&quot;: &quot;match_selector&quot;}">
               <div class="card-label">#3 Â· Starker Match Â· Sondierungslinie</div>
-              <h2>Zahnen Technik GmbH x SWR Ã¢â‚¬“ Südwestrundfunk <span class="points">- 29 Punkte</span></h2>
+              <h2>Zahnen Technik GmbH x SWR – Südwestrundfunk <span class="points">- 29 Punkte</span></h2>
               <p class="hypothesis">Regulatorischer Druck trifft auf Investitions- und Umsetzungsfragen in der Wirtschaft.</p>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
             </article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;a94ecad0ae95b322&quot;, &quot;opportunity_id&quot;: &quot;handwerkskammern-rheinland-p_hochschule-wirtschaft-transfer-standort-investition-industrielle-transfo&quot;, &quot;pattern_id&quot;: &quot;8&quot;, &quot;actors&quot;: [&quot;Handwerkskammern Rheinland-Pfalz&quot;, &quot;SWR – SÃƒ¼dwestrundfunk&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: SWR – SÃƒ¼dwestrundfunk bringt aktuell Standort, Investition und industrielle Transformation, Verwaltungswissen und digitale Umsetzung ein, Handwerkskammern Rheinland-Pfalz ergänzt Standort, Investition und industrielle Transformation, Hochschule-Wirtschaft-Transfer. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;score&quot;: 77.368, &quot;source&quot;: &quot;match_selector&quot;}">
               <div class="card-label">#4 Â· Sondierungsmatch Â· Sondierungslinie</div>
-              <h2>Handwerkskammern Rheinland-Pfalz x SWR Ã¢â‚¬“ Südwestrundfunk <span class="points">- 26 Punkte</span></h2>
+              <h2>Handwerkskammern Rheinland-Pfalz x SWR – Südwestrundfunk <span class="points">- 26 Punkte</span></h2>
               <p class="hypothesis">Regulatorischer Druck trifft auf Investitions- und Umsetzungsfragen in der Wirtschaft.</p>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
             </article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;6f9b8fc628758d34&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-f-r-qualifizie_technische-hochschule-bingen_hochschule-wirtschaft-transfer-demokratie-medien-gesellschaftlicher-zusa&quot;, &quot;pattern_id&quot;: &quot;12&quot;, &quot;actors&quot;: [&quot;IQIB - Institut fÃƒ¼r qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;Technische Hochschule Bingen&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: IQIB - Institut fÃƒ¼r qualifizierende Innovationsforschung und -beratung GmbH bringt aktuell Hochschule-Wirtschaft-Transfer, Verwaltungswissen und digitale Umsetzung ein, Technische Hochschule Bingen ergänzt Hochschule-Wirtschaft-Transfer, Talentförderung, Musik und Nachwuchs. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;score&quot;: 74.076, &quot;source&quot;: &quot;match_selector&quot;}">
               <div class="card-label">#5 Â· Sondierungsmatch Â· Sondierungslinie</div>
               <h2>IQIB x TH Bingen <span class="points">- 25 Punkte</span></h2>
               <p class="hypothesis">Resilienz / kommunale Umsetzung trifft auf Ethik, Gesundheit, Digitalisierung und Nachhaltigkeit.</p>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
             </article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;31f6003f55a95fa8&quot;, &quot;opportunity_id&quot;: &quot;handwerkskammern-rheinland-p_technische-hochschule-bingen_hochschule-wirtschaft-transfer&quot;, &quot;pattern_id&quot;: &quot;15&quot;, &quot;actors&quot;: [&quot;Handwerkskammern Rheinland-Pfalz&quot;, &quot;Technische Hochschule Bingen&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Handwerkskammern Rheinland-Pfalz bringt aktuell Standort, Investition und industrielle Transformation, Hochschule-Wirtschaft-Transfer ein, Technische Hochschule Bingen ergänzt Hochschule-Wirtschaft-Transfer, Talentförderung, Musik und Nachwuchs. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;score&quot;: 48.623, &quot;source&quot;: &quot;match_selector&quot;}">
               <div class="card-label">#6 Â· Sondierungsmatch Â· Sondierungslinie</div>
               <h2>Handwerkskammern Rheinland-Pfalz x TH Bingen <span class="points">- 16 Punkte</span></h2>
               <p class="hypothesis">Hochschule-Wirtschaft-Transfer trifft auf Nachhaltigkeit / Technologie.</p>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
             </article>
             
   </section>
 </main>
+<script>
+  function prepareScipFeedback(button, label) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    card.dataset.pendingFeedbackLabel = label;
+    box.hidden = false;
+    textarea.focus();
+    status.textContent = label === 'useful' ? 'optional: kurze Begründung ergänzen' : 'bitte kurz begründen';
+  }
+  function cancelScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    card.dataset.pendingFeedbackLabel = '';
+    textarea.value = '';
+    box.hidden = true;
+    status.textContent = '';
+  }
+  async function submitScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const label = card.dataset.pendingFeedbackLabel || '';
+    if (!label) return;
+    let payload = {};
+    try { payload = JSON.parse(card.dataset.feedbackPayload || '{}'); } catch (err) { payload = {}; }
+    payload.human_feedback_label = label;
+    payload.human_feedback_comment = textarea.value.trim();
+    payload.created_at = new Date().toISOString();
+    status.textContent = 'speichere Feedback ...';
+    try {
+      const response = await fetch('http://127.0.0.1:8766/feedback/scip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error('feedback server unavailable');
+      status.textContent = 'Feedback gespeichert';
+    } catch (err) {
+      const key = 'sor_scip_feedback_queue';
+      const queue = JSON.parse(localStorage.getItem(key) || '[]');
+      queue.push(payload);
+      localStorage.setItem(key, JSON.stringify(queue));
+      status.textContent = 'Feedback lokal vorgemerkt';
+    }
+    textarea.value = '';
+    box.hidden = true;
+    card.dataset.pendingFeedbackLabel = '';
+  }
+</script>
 </body>
 </html>

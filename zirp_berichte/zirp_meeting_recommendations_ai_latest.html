@@ -27,19 +27,36 @@
     li { margin:7px 0; line-height:1.45; }
     .button-link { display:inline-block; margin-top:14px; border:1px solid #cfe0f1; background:#e8f1fa; color:#255f99; border-radius:999px; padding:9px 13px; text-decoration:none; font-weight:800; }
     a { color:#255f99; }
-  </style>
+  .feedback-box { border-top:1px solid #d9e1ea; margin-top:14px; padding-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.feedback-box span { color:#627084; font-weight:800; margin-right:2px; }
+.feedback-box button { border:1px solid #cfe0f1; background:white; color:#172033; border-radius:999px; padding:7px 11px; font-weight:800; cursor:pointer; }
+.feedback-box button:hover { border-color:#f1b51c; background:#fff7df; }
+.feedback-comment-box { flex-basis:100%; margin-top:8px; display:grid; gap:7px; }
+.feedback-comment-box[hidden] { display:none; }
+.feedback-comment-box label { font-weight:800; color:#627084; }
+.feedback-comment-box textarea { width:100%; box-sizing:border-box; border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; }
+.feedback-status { color:#627084; flex-basis:100%; }
+</style>
 <style id="public-view-trim">
   .event-chip small:not(:first-of-type),
   .radar-filter-note,
   .scip-status-row,
   .opportunity-line,
-  .feedback-box,
   .memory-badge,
   details,
   a.button-link[href$=".csv"],
   a.button-link[href$=".json"] {
     display: none !important;
   }
+.feedback-box { border-top:1px solid #d9e1ea; margin-top:14px; padding-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.feedback-box span { color:#627084; font-weight:800; margin-right:2px; }
+.feedback-box button { border:1px solid #cfe0f1; background:white; color:#172033; border-radius:999px; padding:7px 11px; font-weight:800; cursor:pointer; }
+.feedback-box button:hover { border-color:#f1b51c; background:#fff7df; }
+.feedback-comment-box { flex-basis:100%; margin-top:8px; display:grid; gap:7px; }
+.feedback-comment-box[hidden] { display:none; }
+.feedback-comment-box label { font-weight:800; color:#627084; }
+.feedback-comment-box textarea { width:100%; box-sizing:border-box; border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; }
+.feedback-status { color:#627084; flex-basis:100%; }
 </style>
 </head>
 <body>
@@ -52,7 +69,7 @@
   </header>
   <section class="grid">
     
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;pattern_id&quot;:&quot;1&quot;,&quot;source&quot;:&quot;match_selector_html&quot;,&quot;recommendation_id&quot;:&quot;html-card-1&quot;}">
               <div class="card-label">#1 Â· Top-Match Â· Sondierungslinie</div>
               <h2>Zahnen Technik GmbH x Hochschule Mainz <span class="points">- 39 Punkte</span></h2>
               <p class="memory-badge">Opportunity Window: neu erkannt Â· Trend: neu Â· Erstmals gesehen: 2026-06-02 Â· Neue Signale: 5</p>
@@ -66,11 +83,10 @@
                 <p><strong>AuslÃ¶sende Signale:</strong></p>
                 <ul><li>Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz  Am 28. April...</li><li>Zahnen Technik GmbH: Control Cloud by zahnen  Das ist der Digitalisierungsgedanke in Reinform, der...</li><li>Hochschule Mainz: Die Welt zu Gast auf dem Campus  Das Projekt GOAL (Global Outreach through Ac...</li><li>Hochschule Mainz: Green Finance in Chile  Im Rahmen des GOAL-Projekts reisten Studierende der B...</li></ul>
                 <p class="score-note">Die Punktzahl ist ein Priorisierungssignal, keine Wahrheit. Sie bÃ¼ndelt Rollenabdeckung, aktuelle Signale, thematische Passung, Memory und Feedback.</p>
-              </details>
-            </article>
+              </details><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Warum?</label><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;pattern_id&quot;:&quot;2&quot;,&quot;source&quot;:&quot;match_selector_html&quot;,&quot;recommendation_id&quot;:&quot;html-card-2&quot;}">
               <div class="card-label">#2 Â· Starker Match Â· Sondierungslinie</div>
               <h2>IQIB x Uni Trier <span class="points">- 37 Punkte</span></h2>
               <p class="memory-badge">Opportunity Window: neu erkannt Â· Trend: neu Â· Erstmals gesehen: 2026-06-02 Â· Neue Signale: 5</p>
@@ -84,11 +100,10 @@
                 <p><strong>AuslÃ¶sende Signale:</strong></p>
                 <ul><li>IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH: „1. InnovationTalk@IQIB“: Resilienz neu denken  Wie kann die Resilienz von Ko...</li><li>IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH: Resilienzforschung und Klimaanpassung  In dem vom Bundesministerium für Bildu...</li><li>Universität Trier: German-Namibian Exchange of Educators  Mit Auftaktworkshops in Trier und Goba...</li><li>Universität Trier: Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte E...</li></ul>
                 <p class="score-note">Die Punktzahl ist ein Priorisierungssignal, keine Wahrheit. Sie bÃ¼ndelt Rollenabdeckung, aktuelle Signale, thematische Passung, Memory und Feedback.</p>
-              </details>
-            </article>
+              </details><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Warum?</label><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;pattern_id&quot;:&quot;3&quot;,&quot;source&quot;:&quot;match_selector_html&quot;,&quot;recommendation_id&quot;:&quot;html-card-3&quot;}">
               <div class="card-label">#3 Â· Starker Match Â· Sondierungslinie</div>
               <h2>Handwerkskammern Rheinland-Pfalz x Hochschule Mainz <span class="points">- 30 Punkte</span></h2>
               <p class="memory-badge">Opportunity Window: neu erkannt Â· Trend: neu Â· Erstmals gesehen: 2026-06-02 Â· Neue Signale: 4</p>
@@ -102,11 +117,10 @@
                 <p><strong>AuslÃ¶sende Signale:</strong></p>
                 <ul><li>Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz  Am 28. April...</li><li>Hochschule Mainz: Die Welt zu Gast auf dem Campus  Das Projekt GOAL (Global Outreach through Ac...</li><li>Hochschule Mainz: Green Finance in Chile  Im Rahmen des GOAL-Projekts reisten Studierende der B...</li><li>Handwerkskammern Rheinland-Pfalz: Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt  Di...</li></ul>
                 <p class="score-note">Die Punktzahl ist ein Priorisierungssignal, keine Wahrheit. Sie bÃ¼ndelt Rollenabdeckung, aktuelle Signale, thematische Passung, Memory und Feedback.</p>
-              </details>
-            </article>
+              </details><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Warum?</label><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;pattern_id&quot;:&quot;4&quot;,&quot;source&quot;:&quot;match_selector_html&quot;,&quot;recommendation_id&quot;:&quot;html-card-4&quot;}">
               <div class="card-label">#4 Â· Sondierungsmatch Â· Sondierungslinie</div>
               <h2>IQIB x TH Bingen <span class="points">- 27 Punkte</span></h2>
               <p class="memory-badge">Opportunity Window: neu erkannt Â· Trend: neu Â· Erstmals gesehen: 2026-06-02 Â· Neue Signale: 4</p>
@@ -120,11 +134,10 @@
                 <p><strong>AuslÃ¶sende Signale:</strong></p>
                 <ul><li>IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH: „1. InnovationTalk@IQIB“: Resilienz neu denken  Wie kann die Resilienz von Ko...</li><li>IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH: Resilienzforschung und Klimaanpassung  In dem vom Bundesministerium für Bildu...</li><li>Technische Hochschule Bingen: Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Aud...</li><li>Technische Hochschule Bingen: TH Bingen bildet Biodiversitätsbotschafterinnen und -botschafter aus  Die Tec...</li></ul>
                 <p class="score-note">Die Punktzahl ist ein Priorisierungssignal, keine Wahrheit. Sie bÃ¼ndelt Rollenabdeckung, aktuelle Signale, thematische Passung, Memory und Feedback.</p>
-              </details>
-            </article>
+              </details><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Warum?</label><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
             
 
-            <article class="card compact-card">
+            <article class="card compact-card" data-feedback-payload="{&quot;pattern_id&quot;:&quot;5&quot;,&quot;source&quot;:&quot;match_selector_html&quot;,&quot;recommendation_id&quot;:&quot;html-card-5&quot;}">
               <div class="card-label">#5 Â· Sondierungsmatch Â· Sondierungslinie</div>
               <h2>Handwerkskammern Rheinland-Pfalz x Uni Trier <span class="points">- 26 Punkte</span></h2>
               <p class="memory-badge">Opportunity Window: neu erkannt Â· Trend: neu Â· Erstmals gesehen: 2026-06-02 Â· Neue Signale: 5</p>
@@ -138,10 +151,63 @@
                 <p><strong>AuslÃ¶sende Signale:</strong></p>
                 <ul><li>Handwerkskammern Rheinland-Pfalz: Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt  Di...</li><li>Universität Trier: German-Namibian Exchange of Educators  Mit Auftaktworkshops in Trier und Goba...</li><li>Universität Trier: Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte E...</li><li>Universität Trier: Klares Bekenntnis der Universität Trier zur Psychologie-Weiterbildung  Die Un...</li></ul>
                 <p class="score-note">Die Punktzahl ist ein Priorisierungssignal, keine Wahrheit. Sie bÃ¼ndelt Rollenabdeckung, aktuelle Signale, thematische Passung, Memory und Feedback.</p>
-              </details>
-            </article>
+              </details><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Warum?</label><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
             
   </section>
 </main>
+<script id="scip-feedback-js">
+  function prepareScipFeedback(button, label) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    card.dataset.pendingFeedbackLabel = label;
+    box.hidden = false;
+    textarea.focus();
+    status.textContent = label === 'useful' ? 'optional: kurze Begründung ergänzen' : 'bitte kurz begründen';
+  }
+  function cancelScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    card.dataset.pendingFeedbackLabel = '';
+    textarea.value = '';
+    box.hidden = true;
+    status.textContent = '';
+  }
+  async function submitScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const label = card.dataset.pendingFeedbackLabel || '';
+    if (!label) return;
+    let payload = {};
+    try { payload = JSON.parse(card.dataset.feedbackPayload || '{}'); } catch (err) { payload = {}; }
+    payload.human_feedback_label = label;
+    payload.human_feedback_comment = textarea.value.trim();
+    payload.created_at = new Date().toISOString();
+    status.textContent = 'speichere Feedback ...';
+    try {
+      const response = await fetch('http://127.0.0.1:8766/feedback/scip', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!response.ok) throw new Error('feedback server unavailable');
+      status.textContent = 'Feedback gespeichert';
+    } catch (err) {
+      const key = 'sor_scip_feedback_queue';
+      const queue = JSON.parse(localStorage.getItem(key) || '[]');
+      queue.push(payload);
+      localStorage.setItem(key, JSON.stringify(queue));
+      status.textContent = 'Feedback lokal vorgemerkt';
+    }
+    textarea.value = '';
+    box.hidden = true;
+    card.dataset.pendingFeedbackLabel = '';
+  }
+</script>
 </body>
 </html>
+
+
+
+
