@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>SCIP Match Selector</title>
+  <style>
+    body { margin:0; background:#f4f6f8; color:#172033; font-family:Inter,Segoe UI,sans-serif; }
+    main { max-width:1100px; margin:0 auto; padding:34px 18px 70px; }
+    header, .card { background:white; border:1px solid #d9e1ea; border-radius:12px; box-shadow:0 14px 36px rgba(23,32,51,.08); }
+    header { padding:28px; margin-bottom:18px; }
+    h1 { margin:0; font-size:2rem; }
+    .meta { color:#627084; margin-top:8px; }
+    .grid { display:grid; gap:14px; }
+    .card { padding:22px; position:relative; }
+    .card h2 { margin:0 72px 10px 0; font-size:1.1rem; }
+    .card p { line-height:1.55; margin:8px 0; }
+    .card-label { color:#255f99; font-weight:900; text-transform:uppercase; letter-spacing:.04em; font-size:.78rem; margin-bottom:6px; }
+    .points { color:#627084; font-size:.95rem; font-weight:800; }
+    .hypothesis { color:#172033; font-weight:700; }
+    .critical-decision-grid { border:1px solid #dfe7ef; background:#fbfcfe; border-radius:10px; padding:11px; margin:12px 0; display:grid; gap:9px; }
+    .decision-line span { display:block; color:#f0ad00; font-size:.72rem; font-weight:900; text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px; }
+    .decision-line p { margin:0; color:#172033; font-size:.9rem; line-height:1.45; }
+    .decision-footer { border-top:1px solid #d9e1ea; padding-top:8px; color:#627084; font-size:.82rem; line-height:1.45; }
+    .memory-badge { display:inline-block; background:#eef5fb; border:1px solid #d5e5f3; color:#255f99; border-radius:999px; padding:7px 11px; font-size:.86rem; font-weight:800; }
+    .score-note { color:#627084; font-size:.92rem; }
+    .compact-card h2 { margin-right:0; }
+    .compact-card strong { color:#172033; }
+    .theme { color:#255f99; font-weight:800; margin-bottom:12px; }
+    details { margin-top:12px; color:#344257; }
+    summary { cursor:pointer; font-weight:800; }
+    li { margin:7px 0; line-height:1.45; }
+    .feedback-box { border-top:1px solid #d9e1ea; margin-top:14px; padding-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .feedback-box span { color:#627084; font-weight:800; margin-right:2px; }
+    .feedback-box button { border:1px solid #cfe0f1; background:white; color:#172033; border-radius:999px; padding:7px 11px; font-weight:800; cursor:pointer; }
+    .feedback-box button:hover { border-color:#f1b51c; background:#fff7df; }
+    .feedback-comment-box { flex-basis:100%; margin-top:8px; display:grid; gap:7px; }
+    .feedback-comment-box[hidden] { display:none; }
+    .feedback-comment-box label { font-weight:800; color:#627084; }
+    .feedback-comment-box select { border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; font-weight:700; color:#172033; }
+    .feedback-comment-box textarea { width:100%; box-sizing:border-box; border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; }
+    .feedback-status { color:#627084; flex-basis:100%; }
+    .button-link { display:inline-block; margin-top:14px; border:1px solid #cfe0f1; background:#e8f1fa; color:#255f99; border-radius:999px; padding:9px 13px; text-decoration:none; font-weight:800; }
+    a { color:#255f99; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>SCIP Match Selector</h1>
+    <div class="meta">Top 6 bilaterale Opportunity-Matches · SCIP-basierte Auswahl aus aktuellen Mitgliedssignalen · erstellt 03.06.2026, 18:14:22</div>
+    <p>Profile: <a href="zirp_member_topic_profiles_2026-06-03_18-14.csv">zirp_member_topic_profiles_2026-06-03_18-14.csv</a> · Patterns: <a href="zirp_meeting_patterns_ai_2026-06-03_18-14.csv">zirp_meeting_patterns_ai_2026-06-03_18-14.csv</a></p>
+    <a class="button-link" href="zirp_dashboard.html">Zur Wochenanalyse</a>
+  </header>
+  <section class="grid">
+    
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;ea223415c78c2947&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-f-r-qualifizie_universit-t-trier_hochschule-wirtschaft-transfer-standort-investition-industrielle-transfo&quot;, &quot;pattern_id&quot;: &quot;0&quot;, &quot;actors&quot;: [&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;Universität Trier&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt aktuell Hochschule-Wirtschaft-Transfer, Wissenstransfer ein, Universität Trier ergänzt Hochschule-Wirtschaft-Transfer, Demokratie, Medien und gesellschaftlicher Zusammenhalt. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;score&quot;: 139.123, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Universität Trier bringt wissenschaftliche, ethische und gesellschaftliche Orientierung ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH: „1. InnovationTalk@IQIB“: Resilienz neu denken; Universität Trier: German-Namibian Exchange of Educators. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Sondierung: kommunales Resilienzformat mit Ethik-, Akzeptanz- und Umsetzungskriterien schärfen.&quot;, &quot;evidence_quality&quot;: &quot;hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität hoch ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;}">
+              <div class="card-label">#1 · Top-Match · Sondierungslinie</div>
+              <h2>IQIB x Uni Trier <span class="points">- 46 Punkte</span></h2>
+              <p class="hypothesis">Kommunale Resilienz trifft auf ethische und gesellschaftliche Legitimation digitaler Lösungen.</p>
+              <div class="critical-decision-grid"><div class="decision-line"><span>Why this actor</span><p>IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.</p></div><div class="decision-line"><span>Why this counterpart</span><p>Universität Trier bringt wissenschaftliche, ethische und gesellschaftliche Orientierung ein.</p></div><div class="decision-line"><span>Why now</span><p>Aktuelle Auslöser sind: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH: „1. InnovationTalk@IQIB“: Resilienz neu denken; Universität Trier: German-Namibian Exchange of Educators. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.</p></div><div class="decision-line"><span>Concrete action</span><p>Sondierung: kommunales Resilienzformat mit Ethik-, Akzeptanz- und Umsetzungskriterien schärfen.</p></div><div class="decision-footer">Decision: sondieren · Evidence: hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten. · Sufficiency: ausreichend für ein kuratiertes Sondierungsgespräch. · Uncertainty: Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.</div></div>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <select aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="good_match">Guter Match</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+            </article>
+            
+
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;2efe1e246ed1e53d&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-f-r-qualifizie_hochschule-mainz_hochschule-wirtschaft-transfer-standort-investition-industrielle-transfo&quot;, &quot;pattern_id&quot;: &quot;1&quot;, &quot;actors&quot;: [&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;Hochschule Mainz&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt aktuell Hochschule-Wirtschaft-Transfer, Wissenstransfer ein, Hochschule Mainz ergänzt Hochschule-Wirtschaft-Transfer, Arbeitsmarkt, Fachkräfte und Qualifizierung. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;score&quot;: 120.793, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Hochschule Mainz bringt anwendungsnahen Transfer und Projektzugang ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH: „1. InnovationTalk@IQIB“: Resilienz neu denken; Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Transfer-Sprint: aus Resilienz- und Transferwissen eine testbare kommunale Anwendungsskizze entwickeln.&quot;, &quot;evidence_quality&quot;: &quot;hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität hoch ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;}">
+              <div class="card-label">#2 · Starker Match · Sondierungslinie</div>
+              <h2>IQIB x Hochschule Mainz <span class="points">- 40 Punkte</span></h2>
+              <p class="hypothesis">Kommunale Resilienz trifft auf wissenschaftliche und gesellschaftliche Orientierung.</p>
+              <div class="critical-decision-grid"><div class="decision-line"><span>Why this actor</span><p>IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.</p></div><div class="decision-line"><span>Why this counterpart</span><p>Hochschule Mainz bringt anwendungsnahen Transfer und Projektzugang ein.</p></div><div class="decision-line"><span>Why now</span><p>Aktuelle Auslöser sind: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH: „1. InnovationTalk@IQIB“: Resilienz neu denken; Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.</p></div><div class="decision-line"><span>Concrete action</span><p>Transfer-Sprint: aus Resilienz- und Transferwissen eine testbare kommunale Anwendungsskizze entwickeln.</p></div><div class="decision-footer">Decision: sondieren · Evidence: hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten. · Sufficiency: ausreichend für ein kuratiertes Sondierungsgespräch. · Uncertainty: Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.</div></div>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <select aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="good_match">Guter Match</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+            </article>
+            
+
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;77169d803554587a&quot;, &quot;opportunity_id&quot;: &quot;handwerkskammern-rheinland-p_universit-t-trier_hochschule-wirtschaft-transfer-standort-investition-industrielle-transfo&quot;, &quot;pattern_id&quot;: &quot;5&quot;, &quot;actors&quot;: [&quot;Handwerkskammern Rheinland-Pfalz&quot;, &quot;Universität Trier&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Universität Trier bringt aktuell Hochschule-Wirtschaft-Transfer, Demokratie, Medien und gesellschaftlicher Zusammenhalt ein, Handwerkskammern Rheinland-Pfalz ergänzt Standort, Investition und industrielle Transformation, Mittelstand, Digitalisierung und Produktivität. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;score&quot;: 76.423, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Handwerkskammern Rheinland-Pfalz bringt Zugang zu Betrieben und mittelständischer Umsetzungspraxis ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Universität Trier bringt wissenschaftliche, ethische und gesellschaftliche Orientierung ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Handwerkskammern Rheinland-Pfalz: Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt; Universität Trier: German-Namibian Exchange of Educators. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Praxischeck: digitale Qualifizierungs- oder Akzeptanzfragen in einem mittelständischen Anwendungskontext prüfen.&quot;, &quot;evidence_quality&quot;: &quot;hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität hoch ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;}">
+              <div class="card-label">#3 · Starker Match · Sondierungslinie</div>
+              <h2>Handwerkskammern Rheinland-Pfalz x Uni Trier <span class="points">- 25 Punkte</span></h2>
+              <p class="hypothesis">Regulatorischer Druck trifft auf konkrete Pilotfähigkeit in Unternehmen.</p>
+              <div class="critical-decision-grid"><div class="decision-line"><span>Why this actor</span><p>Handwerkskammern Rheinland-Pfalz bringt Zugang zu Betrieben und mittelständischer Umsetzungspraxis ein.</p></div><div class="decision-line"><span>Why this counterpart</span><p>Universität Trier bringt wissenschaftliche, ethische und gesellschaftliche Orientierung ein.</p></div><div class="decision-line"><span>Why now</span><p>Aktuelle Auslöser sind: Handwerkskammern Rheinland-Pfalz: Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt; Universität Trier: German-Namibian Exchange of Educators. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.</p></div><div class="decision-line"><span>Concrete action</span><p>Praxischeck: digitale Qualifizierungs- oder Akzeptanzfragen in einem mittelständischen Anwendungskontext prüfen.</p></div><div class="decision-footer">Decision: sondieren · Evidence: hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten. · Sufficiency: ausreichend für ein kuratiertes Sondierungsgespräch. · Uncertainty: Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.</div></div>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <select aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="good_match">Guter Match</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+            </article>
+            
+
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;14f6de2011b02f5b&quot;, &quot;opportunity_id&quot;: &quot;zahnen-technik-gmbh_hochschule-mainz_verwaltungswissen-digitale-umsetzung&quot;, &quot;pattern_id&quot;: &quot;9&quot;, &quot;actors&quot;: [&quot;Zahnen Technik GmbH&quot;, &quot;Hochschule Mainz&quot;], &quot;topic&quot;: &quot;Verwaltungswissen und digitale Umsetzung&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Hochschule Mainz bringt aktuell Hochschule-Wirtschaft-Transfer, Arbeitsmarkt, Fachkräfte und Qualifizierung ein, Zahnen Technik GmbH ergänzt Verwaltungswissen und digitale Umsetzung, KI, Daten und Verwaltungs-/Wirtschaftsanwendungen. Für die ZIRP stellt sich die Frage: Wie wird Verwaltung bei Regulierung, Genehmigung, Digitalisierung und Umsetzung leistungsfähiger?&quot;, &quot;score&quot;: 66.289, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Zahnen Technik GmbH bringt digitale Anlagen-, Infrastruktur- und Prozesspraxis ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Hochschule Mainz bringt anwendungsnahen Transfer und Projektzugang ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz; Hochschule Mainz: Die Welt zu Gast auf dem Campus. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;90-Tage-Testfeld: eine digitale Infrastruktur- oder Prozessanwendung unter realen Bedingungen prüfen.&quot;, &quot;evidence_quality&quot;: &quot;hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität hoch ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;}">
+              <div class="card-label">#4 · Sondierungsmatch · Sondierungslinie</div>
+              <h2>Zahnen Technik GmbH x Hochschule Mainz <span class="points">- 22 Punkte</span></h2>
+              <p class="hypothesis">Digitale Anlagen- und Prozesskompetenz trifft auf anwendungsnahen Transfer.</p>
+              <div class="critical-decision-grid"><div class="decision-line"><span>Why this actor</span><p>Zahnen Technik GmbH bringt digitale Anlagen-, Infrastruktur- und Prozesspraxis ein.</p></div><div class="decision-line"><span>Why this counterpart</span><p>Hochschule Mainz bringt anwendungsnahen Transfer und Projektzugang ein.</p></div><div class="decision-line"><span>Why now</span><p>Aktuelle Auslöser sind: Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz; Hochschule Mainz: Die Welt zu Gast auf dem Campus. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.</p></div><div class="decision-line"><span>Concrete action</span><p>90-Tage-Testfeld: eine digitale Infrastruktur- oder Prozessanwendung unter realen Bedingungen prüfen.</p></div><div class="decision-footer">Decision: sondieren · Evidence: hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten. · Sufficiency: ausreichend für ein kuratiertes Sondierungsgespräch. · Uncertainty: Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.</div></div>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <select aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="good_match">Guter Match</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+            </article>
+            
+
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;0dfd509843d8945d&quot;, &quot;opportunity_id&quot;: &quot;landesbank-baden-w-rttemberg_technische-hochschule-bingen_kreislaufwirtschaft-bau-ersatzbaustoffverordnung&quot;, &quot;pattern_id&quot;: &quot;12&quot;, &quot;actors&quot;: [&quot;Landesbank Baden-Württemberg (LBBW)&quot;, &quot;Technische Hochschule Bingen&quot;], &quot;topic&quot;: &quot;Kreislaufwirtschaft, Bau und Ersatzbaustoffverordnung&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Landesbank Baden-Württemberg (LBBW) bringt aktuell Standort, Investition und industrielle Transformation, Kreislaufwirtschaft, Bau und Ersatzbaustoffverordnung ein, Technische Hochschule Bingen ergänzt Hochschule-Wirtschaft-Transfer, Talentförderung, Musik und Nachwuchs. Für die ZIRP stellt sich die Frage: Wie können Bauwirtschaft, Rohstoffindustrie, Kommunen und Verwaltung Kreislaufwirtschaft praktisch und rechtssicher umsetzen?&quot;, &quot;score&quot;: 58.331, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Landesbank Baden-Württemberg (LBBW) bringt Praxis-, Markt- oder Anwendungsperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Technische Hochschule Bingen bringt technische Transferkompetenz und Nachwuchsperspektive ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Landesbank Baden-Württemberg (LBBW): Internationaler Stromhandel: Deutschland ist wieder Netto-Exporteur; Technische Hochschule Bingen: Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Audimax ein. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Finanzierungscheck: ein Investitionshemmnis für digitale Infrastruktur in ein prüfbares Förder- oder Finanzierungsszenario übersetzen.&quot;, &quot;evidence_quality&quot;: &quot;mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität mittel ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;}">
+              <div class="card-label">#5 · Sondierungsmatch · Sondierungslinie</div>
+              <h2>LBBW x TH Bingen <span class="points">- 19 Punkte</span></h2>
+              <p class="hypothesis">Regulatorischer Druck trifft auf konkrete Pilotfähigkeit in Unternehmen.</p>
+              <div class="critical-decision-grid"><div class="decision-line"><span>Why this actor</span><p>Landesbank Baden-Württemberg (LBBW) bringt Praxis-, Markt- oder Anwendungsperspektive ein.</p></div><div class="decision-line"><span>Why this counterpart</span><p>Technische Hochschule Bingen bringt technische Transferkompetenz und Nachwuchsperspektive ein.</p></div><div class="decision-line"><span>Why now</span><p>Aktuelle Auslöser sind: Landesbank Baden-Württemberg (LBBW): Internationaler Stromhandel: Deutschland ist wieder Netto-Exporteur; Technische Hochschule Bingen: Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Audimax ein. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.</p></div><div class="decision-line"><span>Concrete action</span><p>Finanzierungscheck: ein Investitionshemmnis für digitale Infrastruktur in ein prüfbares Förder- oder Finanzierungsszenario übersetzen.</p></div><div class="decision-footer">Decision: sondieren · Evidence: mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden. · Sufficiency: ausreichend für ein kuratiertes Sondierungsgespräch. · Uncertainty: Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.</div></div>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <select aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="good_match">Guter Match</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+            </article>
+            
+
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;00f907314c591f9c&quot;, &quot;opportunity_id&quot;: &quot;landesbank-baden-w-rttemberg_zahnen-technik-gmbh_verwaltungswissen-digitale-umsetzung&quot;, &quot;pattern_id&quot;: &quot;14&quot;, &quot;actors&quot;: [&quot;Landesbank Baden-Württemberg (LBBW)&quot;, &quot;Zahnen Technik GmbH&quot;], &quot;topic&quot;: &quot;Verwaltungswissen und digitale Umsetzung&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Landesbank Baden-Württemberg (LBBW) bringt aktuell Standort, Investition und industrielle Transformation, Kreislaufwirtschaft, Bau und Ersatzbaustoffverordnung ein, Zahnen Technik GmbH ergänzt Verwaltungswissen und digitale Umsetzung, KI, Daten und Verwaltungs-/Wirtschaftsanwendungen. Für die ZIRP stellt sich die Frage: Wie wird Verwaltung bei Regulierung, Genehmigung, Digitalisierung und Umsetzung leistungsfähiger?&quot;, &quot;score&quot;: 56.291, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Landesbank Baden-Württemberg (LBBW) bringt Praxis-, Markt- oder Anwendungsperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Zahnen Technik GmbH bringt digitale Anlagen-, Infrastruktur- und Prozesspraxis ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Landesbank Baden-Württemberg (LBBW): Internationaler Stromhandel: Deutschland ist wieder Netto-Exporteur; Zahnen Technik GmbH: Wave Cloud by zahnen. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Finanzierungscheck: ein Investitionshemmnis für digitale Infrastruktur in ein prüfbares Förder- oder Finanzierungsszenario übersetzen.&quot;, &quot;evidence_quality&quot;: &quot;mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität mittel ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;}">
+              <div class="card-label">#6 · Sondierungsmatch · Sondierungslinie</div>
+              <h2>LBBW x Zahnen Technik GmbH <span class="points">- 19 Punkte</span></h2>
+              <p class="hypothesis">Regulatorischer Druck trifft auf konkrete Pilotfähigkeit in Unternehmen.</p>
+              <div class="critical-decision-grid"><div class="decision-line"><span>Why this actor</span><p>Landesbank Baden-Württemberg (LBBW) bringt Praxis-, Markt- oder Anwendungsperspektive ein.</p></div><div class="decision-line"><span>Why this counterpart</span><p>Zahnen Technik GmbH bringt digitale Anlagen-, Infrastruktur- und Prozesspraxis ein.</p></div><div class="decision-line"><span>Why now</span><p>Aktuelle Auslöser sind: Landesbank Baden-Württemberg (LBBW): Internationaler Stromhandel: Deutschland ist wieder Netto-Exporteur; Zahnen Technik GmbH: Wave Cloud by zahnen. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.</p></div><div class="decision-line"><span>Concrete action</span><p>Finanzierungscheck: ein Investitionshemmnis für digitale Infrastruktur in ein prüfbares Förder- oder Finanzierungsszenario übersetzen.</p></div><div class="decision-footer">Decision: sondieren · Evidence: mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden. · Sufficiency: ausreichend für ein kuratiertes Sondierungsgespräch. · Uncertainty: Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.</div></div>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <select aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="good_match">Guter Match</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+            </article>
+            
+
+            <article class="card compact-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;6e8e3ff080ec37cb&quot;, &quot;opportunity_id&quot;: &quot;handwerkskammern-rheinland-p_technische-hochschule-bingen_hochschule-wirtschaft-transfer&quot;, &quot;pattern_id&quot;: &quot;15&quot;, &quot;actors&quot;: [&quot;Handwerkskammern Rheinland-Pfalz&quot;, &quot;Technische Hochschule Bingen&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Handwerkskammern Rheinland-Pfalz bringt aktuell Standort, Investition und industrielle Transformation, Mittelstand, Digitalisierung und Produktivität ein, Technische Hochschule Bingen ergänzt Hochschule-Wirtschaft-Transfer, Talentförderung, Musik und Nachwuchs. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;score&quot;: 50.522, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Handwerkskammern Rheinland-Pfalz bringt Zugang zu Betrieben und mittelständischer Umsetzungspraxis ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Technische Hochschule Bingen bringt technische Transferkompetenz und Nachwuchsperspektive ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Handwerkskammern Rheinland-Pfalz: Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt; Technische Hochschule Bingen: Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Audimax ein. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Praxischeck: ein digitales Werkzeug für betriebliche Abläufe in einem Handwerkscluster testen.&quot;, &quot;evidence_quality&quot;: &quot;mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität mittel ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;}">
+              <div class="card-label">#7 · Sondierungsmatch · Sondierungslinie</div>
+              <h2>Handwerkskammern Rheinland-Pfalz x TH Bingen <span class="points">- 17 Punkte</span></h2>
+              <p class="hypothesis">Betriebliche Anwendungspraxis trifft auf technische Transferkompetenz.</p>
+              <div class="critical-decision-grid"><div class="decision-line"><span>Why this actor</span><p>Handwerkskammern Rheinland-Pfalz bringt Zugang zu Betrieben und mittelständischer Umsetzungspraxis ein.</p></div><div class="decision-line"><span>Why this counterpart</span><p>Technische Hochschule Bingen bringt technische Transferkompetenz und Nachwuchsperspektive ein.</p></div><div class="decision-line"><span>Why now</span><p>Aktuelle Auslöser sind: Handwerkskammern Rheinland-Pfalz: Softwaremesse Handwerk: Finden Sie die Lösung, die zu Ihrem Betrieb passt; Technische Hochschule Bingen: Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Audimax ein. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.</p></div><div class="decision-line"><span>Concrete action</span><p>Praxischeck: ein digitales Werkzeug für betriebliche Abläufe in einem Handwerkscluster testen.</p></div><div class="decision-footer">Decision: sondieren · Evidence: mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden. · Sufficiency: ausreichend für ein kuratiertes Sondierungsgespräch. · Uncertainty: Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.</div></div>
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Warum?</label>
+                  <select aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="good_match">Guter Match</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+            </article>
+            
+  </section>
+</main>
+<script>
+  function prepareScipFeedback(button, label) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const select = box.querySelector('select');
+    card.dataset.pendingFeedbackLabel = label;
+    box.hidden = false;
+    if (select && label === 'useful') select.value = 'good_match';
+    textarea.focus();
+    status.textContent = label === 'useful' ? 'optional: kurze Begründung ergänzen' : 'bitte kurz begründen';
+  }
+  function cancelScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const select = box.querySelector('select');
+    card.dataset.pendingFeedbackLabel = '';
+    textarea.value = '';
+    if (select) select.value = '';
+    box.hidden = true;
+    status.textContent = '';
+  }
+  async function submitScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const select = box.querySelector('select');
+    const label = card.dataset.pendingFeedbackLabel || '';
+    if (!label) return;
+    let payload = {};
+    try { payload = JSON.parse(card.dataset.feedbackPayload || '{}'); } catch (err) { payload = {}; }
+    payload.label = label;
+    payload.human_feedback_label = label;
+    payload.reason_category = select ? select.value : '';
+    payload.feedback_reason_category = payload.reason_category;
+    payload.human_comment = textarea.value.trim();
+    payload.human_feedback_comment = payload.human_comment;
+    payload.timestamp = new Date().toISOString();
+    payload.created_at = payload.timestamp;
+    status.textContent = 'speichere Feedback ...';
+    try {
+      const response = await fetch('http://127.0.0.1:8766/feedback/scip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error('feedback server unavailable');
+      status.textContent = 'Feedback gespeichert';
+    } catch (err) {
+      const key = 'sor_scip_feedback_queue';
+      const queue = JSON.parse(localStorage.getItem(key) || '[]');
+      queue.push(payload);
+      localStorage.setItem(key, JSON.stringify(queue));
+      status.textContent = 'Feedback lokal vorgemerkt';
+    }
+    textarea.value = '';
+    if (select) select.value = '';
+    box.hidden = true;
+    card.dataset.pendingFeedbackLabel = '';
+  }
+</script>
+</body>
+</html>
