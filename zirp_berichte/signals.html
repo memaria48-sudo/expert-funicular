@@ -415,17 +415,17 @@
             </article>
             <article class="card" style="margin-top:18px;">
               <h2>Gewichtete Begriffe</h2>
-              <div class="term-row"><span class="term">hochschule · 366</span>
-<span class="term">nachhaltigkeit · 330</span>
+              <div class="term-row"><span class="term">hochschule · 380</span>
+<span class="term">nachhaltigkeit · 335</span>
 <span class="term">gesundheit · 276</span>
-<span class="term">wirtschaft · 258</span>
+<span class="term">wirtschaft · 262</span>
 <span class="term">forschung · 250</span>
 <span class="term">förderung · 246</span>
 <span class="term">pflege · 240</span>
 <span class="term">gemeinsam · 239</span>
 <span class="term">standort · 237</span>
+<span class="term">verantwortung · 184</span>
 <span class="term">ausbildung · 183</span>
-<span class="term">verantwortung · 178</span>
 <span class="term">versorgung · 176</span></div>
             </article>
           </div>
@@ -455,17 +455,32 @@
     </div>
   </footer>
   <script>
+    function defaultFeedbackTarget(label) {
+      if (label === 'useful') return 'actor_match';
+      if (label === 'good_topic_wrong_actors' || label === 'wrong_connection') return 'actor_match';
+      if (label === 'not_relevant') return 'rlp_relevance';
+      return '';
+    }
+
+    function defaultFeedbackReason(label) {
+      if (label === 'useful') return 'good_match';
+      if (label === 'not_relevant') return 'missing_rlp_application_anchor';
+      return '';
+    }
+
     function prepareScipFeedback(button, label) {
       const card = button.closest('[data-feedback-payload]');
       const status = card.querySelector('.feedback-status');
       const box = card.querySelector('.feedback-comment-box');
       const textarea = box.querySelector('textarea');
-      const select = box.querySelector('select');
+      const targetSelect = box.querySelector('.feedback-target-select');
+      const reasonSelect = box.querySelector('.feedback-reason-select');
       card.dataset.pendingFeedbackLabel = label;
       box.hidden = false;
-      if (select && label === 'useful') select.value = 'good_match';
+      if (targetSelect && !targetSelect.value) targetSelect.value = defaultFeedbackTarget(label);
+      if (reasonSelect && !reasonSelect.value) reasonSelect.value = defaultFeedbackReason(label);
       textarea.focus();
-      status.textContent = label === 'useful' ? 'optional: kurze Begründung ergänzen' : 'bitte kurz begründen';
+      status.textContent = 'Feedback kann mehrfach pro Karte gespeichert werden';
     }
 
     function cancelScipFeedback(button) {
@@ -473,10 +488,10 @@
       const status = card.querySelector('.feedback-status');
       const box = card.querySelector('.feedback-comment-box');
       const textarea = box.querySelector('textarea');
-      const select = box.querySelector('select');
+      const selects = box.querySelectorAll('select');
       card.dataset.pendingFeedbackLabel = '';
       textarea.value = '';
-      if (select) select.value = '';
+      selects.forEach((select) => select.value = '');
       box.hidden = true;
       status.textContent = '';
     }
@@ -486,7 +501,8 @@
       const status = card.querySelector('.feedback-status');
       const box = card.querySelector('.feedback-comment-box');
       const textarea = box.querySelector('textarea');
-      const select = box.querySelector('select');
+      const targetSelect = box.querySelector('.feedback-target-select');
+      const reasonSelect = box.querySelector('.feedback-reason-select');
       const label = card.dataset.pendingFeedbackLabel || 'interesting_but_weak';
       let payload = {};
       try {
@@ -496,7 +512,9 @@
       }
       payload.label = label;
       payload.human_feedback_label = label;
-      payload.reason_category = select ? select.value : '';
+      payload.feedback_target = targetSelect ? targetSelect.value : '';
+      payload.feedback_dimension = payload.feedback_target;
+      payload.reason_category = reasonSelect ? reasonSelect.value : '';
       payload.feedback_reason_category = payload.reason_category;
       payload.human_comment = textarea.value.trim();
       payload.timestamp = new Date().toISOString();

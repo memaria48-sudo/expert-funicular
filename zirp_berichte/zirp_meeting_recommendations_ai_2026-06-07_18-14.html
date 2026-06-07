@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>SCIP Match Selector</title>
+  <style>
+    body { margin:0; background:#f4f6f8; color:#172033; font-family:Inter,Segoe UI,sans-serif; }
+    main { max-width:1100px; margin:0 auto; padding:34px 18px 70px; }
+    header, .card { background:white; border:1px solid #d9e1ea; border-radius:12px; box-shadow:0 14px 36px rgba(23,32,51,.08); }
+    header { padding:28px; margin-bottom:18px; }
+    h1 { margin:0; font-size:2rem; }
+    .meta { color:#627084; margin-top:8px; }
+    .grid { display:grid; gap:14px; }
+    .card { padding:22px; position:relative; }
+    .card h2 { margin:0 72px 10px 0; font-size:1.1rem; }
+    .card p { line-height:1.55; margin:8px 0; }
+    .card-label { color:#255f99; font-weight:900; text-transform:uppercase; letter-spacing:.04em; font-size:.78rem; margin-bottom:6px; }
+    .points { color:#627084; font-size:.95rem; font-weight:800; }
+    .hypothesis { color:#172033; font-weight:700; }
+    .critical-decision-grid, .design-arc { border:1px solid #dfe7ef; background:#fbfcfe; border-radius:10px; padding:11px; margin:12px 0; display:grid; gap:9px; }
+    .design-arc { grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); background:#fffdf6; border-color:#ead79a; }
+    .arc-line span { display:block; color:#7b5a00; font-size:.72rem; font-weight:900; text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px; }
+    .arc-line p { margin:0; color:#172033; font-size:.9rem; line-height:1.45; }
+    .decision-line span { display:block; color:#f0ad00; font-size:.72rem; font-weight:900; text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px; }
+    .decision-line p { margin:0; color:#172033; font-size:.9rem; line-height:1.45; }
+    .decision-footer { border-top:1px solid #d9e1ea; padding-top:8px; color:#627084; font-size:.82rem; line-height:1.45; }
+    .memory-badge { display:inline-block; background:#eef5fb; border:1px solid #d5e5f3; color:#255f99; border-radius:999px; padding:7px 11px; font-size:.86rem; font-weight:800; }
+    .score-note { color:#627084; font-size:.92rem; }
+    .compact-card h2 { margin-right:0; }
+    .compact-card strong { color:#172033; }
+    .theme { color:#255f99; font-weight:800; margin-bottom:12px; }
+    details { margin-top:12px; color:#344257; }
+    summary { cursor:pointer; font-weight:800; }
+    li { margin:7px 0; line-height:1.45; }
+    .feedback-box { border-top:1px solid #d9e1ea; margin-top:14px; padding-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .feedback-box span { color:#627084; font-weight:800; margin-right:2px; }
+    .feedback-box button { border:1px solid #cfe0f1; background:white; color:#172033; border-radius:999px; padding:7px 11px; font-weight:800; cursor:pointer; }
+    .feedback-box button:hover { border-color:#f1b51c; background:#fff7df; }
+    .feedback-comment-box { flex-basis:100%; margin-top:8px; display:grid; gap:7px; }
+    .feedback-comment-box[hidden] { display:none; }
+    .feedback-comment-box label { font-weight:800; color:#627084; }
+    .feedback-comment-box select { border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; font-weight:700; color:#172033; }
+    .feedback-comment-box textarea { width:100%; box-sizing:border-box; border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; }
+    .feedback-status { color:#627084; flex-basis:100%; }
+    .button-link { display:inline-block; margin-top:14px; border:1px solid #cfe0f1; background:#e8f1fa; color:#255f99; border-radius:999px; padding:9px 13px; text-decoration:none; font-weight:800; }
+    a { color:#255f99; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>SCIP Match Selector</h1>
+    <div class="meta">Top 6 bilaterale Opportunity-Matches · SCIP-basierte Auswahl aus aktuellen Mitgliedssignalen · erstellt 07.06.2026, 18:14:18</div>
+    <p>Profile: <a href="zirp_member_topic_profiles_2026-06-07_18-14.csv">zirp_member_topic_profiles_2026-06-07_18-14.csv</a> · Patterns: <a href="zirp_meeting_patterns_ai_2026-06-07_18-14.csv">zirp_meeting_patterns_ai_2026-06-07_18-14.csv</a></p>
+    <a class="button-link" href="zirp_dashboard.html">Zur Wochenanalyse</a>
+  </header>
+  <section class="grid">
+    <p>Keine Meeting-Empfehlungen ausgewählt.</p>
+  </section>
+</main>
+<script>
+  function defaultFeedbackTarget(label) {
+    if (label === 'useful') return 'actor_match';
+    if (label === 'good_topic_wrong_actors' || label === 'wrong_connection') return 'actor_match';
+    if (label === 'not_relevant') return 'rlp_relevance';
+    return '';
+  }
+  function defaultFeedbackReason(label) {
+    if (label === 'useful') return 'good_match';
+    if (label === 'not_relevant') return 'missing_rlp_application_anchor';
+    return '';
+  }
+  function prepareScipFeedback(button, label) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const targetSelect = box.querySelector('.feedback-target-select');
+    const reasonSelect = box.querySelector('.feedback-reason-select');
+    card.dataset.pendingFeedbackLabel = label;
+    box.hidden = false;
+    if (targetSelect && !targetSelect.value) targetSelect.value = defaultFeedbackTarget(label);
+    if (reasonSelect && !reasonSelect.value) reasonSelect.value = defaultFeedbackReason(label);
+    textarea.focus();
+    status.textContent = 'Feedback kann mehrfach pro Karte gespeichert werden';
+  }
+  function cancelScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const selects = box.querySelectorAll('select');
+    card.dataset.pendingFeedbackLabel = '';
+    textarea.value = '';
+    selects.forEach((select) => select.value = '');
+    box.hidden = true;
+    status.textContent = '';
+  }
+  async function submitScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const targetSelect = box.querySelector('.feedback-target-select');
+    const reasonSelect = box.querySelector('.feedback-reason-select');
+    const label = card.dataset.pendingFeedbackLabel || '';
+    if (!label) return;
+    let payload = {};
+    try { payload = JSON.parse(card.dataset.feedbackPayload || '{}'); } catch (err) { payload = {}; }
+    payload.label = label;
+    payload.human_feedback_label = label;
+    payload.feedback_target = targetSelect ? targetSelect.value : '';
+    payload.feedback_dimension = payload.feedback_target;
+    payload.reason_category = reasonSelect ? reasonSelect.value : '';
+    payload.feedback_reason_category = payload.reason_category;
+    payload.human_comment = textarea.value.trim();
+    payload.human_feedback_comment = payload.human_comment;
+    payload.timestamp = new Date().toISOString();
+    payload.created_at = payload.timestamp;
+    status.textContent = 'speichere Feedback ...';
+    try {
+      const response = await fetch('http://127.0.0.1:8766/feedback/scip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error('feedback server unavailable');
+      status.textContent = 'Feedback gespeichert';
+    } catch (err) {
+      const key = 'sor_scip_feedback_queue';
+      const queue = JSON.parse(localStorage.getItem(key) || '[]');
+      queue.push(payload);
+      localStorage.setItem(key, JSON.stringify(queue));
+      status.textContent = 'Feedback lokal vorgemerkt';
+    }
+    textarea.value = '';
+    if (select) select.value = '';
+    box.hidden = true;
+    card.dataset.pendingFeedbackLabel = '';
+  }
+</script>
+</body>
+</html>
