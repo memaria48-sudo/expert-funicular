@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>SCIP Match Selector</title>
+  <style>
+    body { margin:0; background:#f4f6f8; color:#172033; font-family:Inter,Segoe UI,sans-serif; }
+    main { max-width:1100px; margin:0 auto; padding:34px 18px 70px; }
+    header, .card, .candidate-row { background:white; border:1px solid #d9e1ea; border-radius:12px; box-shadow:0 14px 36px rgba(23,32,51,.08); }
+    header { padding:28px; margin-bottom:18px; }
+    h1 { margin:0; font-size:2rem; }
+    h2.section-title { margin:28px 0 8px; font-size:1.25rem; }
+    .section-note { color:#627084; margin:0 0 14px; line-height:1.45; }
+    .meta { color:#627084; margin-top:8px; }
+    .grid { display:grid; gap:14px; }
+    .card { padding:22px; position:relative; }
+    .card h2 { margin:0 72px 10px 0; font-size:1.1rem; }
+    .card p { line-height:1.55; margin:8px 0; }
+    .card-label { color:#255f99; font-weight:900; text-transform:uppercase; letter-spacing:.04em; font-size:.78rem; margin-bottom:6px; }
+    .critical-decision-grid, .design-arc, .decision-triplet { border:1px solid #dfe7ef; background:#fbfcfe; border-radius:10px; padding:11px; margin:12px 0; display:grid; gap:9px; }
+    .compact-card-copy h2 { margin:0 0 10px 0; font-size:1.05rem; line-height:1.3; }
+    .decision-summary { color:#172033; font-weight:650; line-height:1.5; }
+    .decision-triplet p { margin:0; font-size:.9rem; line-height:1.45; }
+    .compact-card h2 { margin-right:0; }
+    .compact-card strong { color:#172033; }
+    .candidate-row { padding:16px 18px; display:grid; gap:10px; }
+    .candidate-title { color:#172033; font-weight:900; line-height:1.35; }
+    .candidate-meta { color:#627084; font-weight:800; font-size:.88rem; margin-top:3px; }
+    .candidate-row p { margin:7px 0 0; color:#344257; line-height:1.45; }
+    .feedback-box { border-top:1px solid #d9e1ea; margin-top:14px; padding-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .candidate-row .feedback-box { margin-top:4px; }
+    .feedback-box span { color:#627084; font-weight:800; margin-right:2px; }
+    .feedback-box button { border:1px solid #cfe0f1; background:white; color:#172033; border-radius:999px; padding:7px 11px; font-weight:800; cursor:pointer; }
+    .feedback-box button:hover { border-color:#f1b51c; background:#fff7df; }
+    .feedback-comment-box { flex-basis:100%; margin-top:8px; display:grid; gap:7px; }
+    .feedback-comment-box[hidden] { display:none; }
+    .feedback-comment-box label { font-weight:800; color:#627084; }
+    .feedback-comment-box select { border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; font-weight:700; color:#172033; }
+    .feedback-comment-box textarea { width:100%; box-sizing:border-box; border:1px solid #cfe0f1; border-radius:10px; padding:9px; font:inherit; }
+    .feedback-status { color:#627084; flex-basis:100%; }
+    .button-link { display:inline-block; margin-top:14px; border:1px solid #cfe0f1; background:#e8f1fa; color:#255f99; border-radius:999px; padding:9px 13px; text-decoration:none; font-weight:800; }
+    a { color:#255f99; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>SCIP Match Selector</h1>
+    <div class="meta">Kuratierte Empfehlungen plus Feedback-Leaderboard · SCIP-basierte Auswahl aus aktuellen Mitgliedssignalen · erstellt 08.06.2026, 06:25:47</div>
+    <p>Profile: <a href="zirp_member_topic_profiles_2026-06-08_06-25.csv">zirp_member_topic_profiles_2026-06-08_06-25.csv</a> · Patterns: <a href="zirp_meeting_patterns_ai_2026-06-08_06-25.csv">zirp_meeting_patterns_ai_2026-06-08_06-25.csv</a></p>
+    <a class="button-link" href="zirp_dashboard.html">Zur Wochenanalyse</a>
+  </header>
+
+  <h2 class="section-title">Kuratierte Empfehlungen</h2>
+  <p class="section-note">Diese Karten sind die ausgewählten Entscheidungsoptionen für ZIRP.</p>
+  <section class="grid">
+    
+            <article class="card compact-card selected-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;fce37139c69f86e7&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-fuer-qualifizi_universitaet-trier_hochschule-wirtschaft-transfer-wissenschaft-demokratie-gesellschaftliche&quot;, &quot;pattern_id&quot;: &quot;0&quot;, &quot;rank&quot;: 1, &quot;selected&quot;: true, &quot;score&quot;: 100.0, &quot;display_points&quot;: 100, &quot;pair&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH x Universität Trier&quot;, &quot;actors&quot;: [&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;Universität Trier&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Universität Trier bringt aktuell Weiterbildung und lebenslanges Lernen, Hochschule-Wirtschaft-Transfer ein, IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH ergänzt Hochschule-Wirtschaft-Transfer, Wissenstransfer. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Universität Trier bringt wissenschaftliche, ethische und gesellschaftliche Orientierung ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Universität Trier: German-Namibian Exchange of Educators; Universität Trier: Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Sondierung: kommunales Resilienzformat mit Ethik-, Akzeptanz- und Umsetzungskriterien schärfen.&quot;, &quot;evidence_quality&quot;: &quot;mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;ob beide Seiten den Bedarf aktuell bestätigen&quot;, &quot;action_decision&quot;: &quot;watch&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: watch, weil Evidenzqualität mittel ist und die Suffizienz ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;selected_recommendation&quot;}">
+              <div class="card-label">#1 · Beobachtungslinie</div>
+              <div class="compact-card-copy"><h2>IQIB x Uni Trier · 100/100 · Top-Match</h2><p class="decision-summary">Die Universität Trier und das IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH ergänzen sich im Bereich Hochschule-Wirtschaft-Transfer, Wissenstransfer und Weiterbildung. Obwohl die Akteursrollen klar sind, muss noch überprüft werden, ob beide Seiten den Bedarf aktuell bestätigen. Ein Sondierungsgespräch ist empfehlenswert.</p><div class="decision-triplet"><p><strong>Decision:</strong> Beobachten der aktuellen Aktivitäten und Überprüfung des Bedarfs.</p><p><strong>Risk:</strong> Die Akteursrollen sind klar, aber die Bestätigung des Bedarfs muss noch validiert werden.</p><p><strong>Next:</strong> Sondierungsgespräch für die Validierung des Bedarfs.</p></div></div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+
+            <article class="card compact-card selected-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;2d0770f85a6cda83&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-fuer-qualifizi_hochschule-mainz_hochschule-wirtschaft-transfer&quot;, &quot;pattern_id&quot;: &quot;1&quot;, &quot;rank&quot;: 2, &quot;selected&quot;: true, &quot;score&quot;: 89.37, &quot;display_points&quot;: 89, &quot;pair&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH x Hochschule Mainz&quot;, &quot;actors&quot;: [&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;Hochschule Mainz&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt aktuell Hochschule-Wirtschaft-Transfer, Wissenstransfer ein, Hochschule Mainz ergänzt Hochschule-Wirtschaft-Transfer, Arbeitsmarkt, Fachkräfte und Qualifizierung. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Hochschule Mainz bringt anwendungsnahen Transfer und Projektzugang ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz; Hochschule Mainz: „Library of Things“ an der Hochschule Mainz eröffnet. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Transfer-Sprint: aus Resilienz- und Transferwissen eine testbare kommunale Anwendungsskizze entwickeln.&quot;, &quot;evidence_quality&quot;: &quot;mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;ob beide Seiten den Bedarf aktuell bestätigen&quot;, &quot;action_decision&quot;: &quot;watch&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: watch, weil Evidenzqualität mittel ist und die Suffizienz ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;selected_recommendation&quot;}">
+              <div class="card-label">#2 · Beobachtungslinie</div>
+              <div class="compact-card-copy"><h2>IQIB x Hochschule Mainz · 89/100 · Starker Match</h2><p class="decision-summary">IQIB und Hochschule Mainz bieten relevante Komplementaritäten im Bereich Hochschule-Wirtschaft-Transfer. Aktuelle Projekte wie EXIST-Women und die Library of Things deuten auf potenzielle gemeinsame Initiativen hin, aber es muss noch überprüft werden, ob beide Seiten den Bedarf aktuell bestätigen. Ein Sondierungsgespräch ist erforderlich, um die Bereitschaft zu verifizieren.</p><div class="decision-triplet"><p><strong>Decision:</strong> Bilaterales Sondierungsgespräch zur Vorbereitung eines Formats</p><p><strong>Risk:</strong> Die Akteursrollen sollten validiert werden, da das aktuelle Signal noch nicht direkt auf ZIRP angewendet werden kann.</p><p><strong>Next:</strong> Sondieren der Bereitschaft und Kompatibilität durch ein Sondierungsgespräch.</p></div></div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+
+            <article class="card compact-card selected-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;d3a7c6419e90ded8&quot;, &quot;opportunity_id&quot;: &quot;landesbank-baden-wuerttember_bundesagentur-fuer-arbeit-re_standort-investition-industrielle-transformation-verwaltungswissen&quot;, &quot;pattern_id&quot;: &quot;2&quot;, &quot;rank&quot;: 3, &quot;selected&quot;: true, &quot;score&quot;: 76.642, &quot;display_points&quot;: 77, &quot;pair&quot;: &quot;Landesbank Baden-Württemberg (LBBW) x Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;, &quot;actors&quot;: [&quot;Landesbank Baden-Württemberg (LBBW)&quot;, &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;], &quot;topic&quot;: &quot;Standort, Investition und industrielle Transformation&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland bringt aktuell Standort, Investition und industrielle Transformation, Finanzierung und Förderung von Transformation ein, Landesbank Baden-Württemberg (LBBW) ergänzt Standort, Investition und industrielle Transformation, Verwaltungswissen und digitale Umsetzung. Für die ZIRP stellt sich die Frage: Welche Standortbedingungen entscheiden darüber, ob Unternehmen in Rheinland-Pfalz investieren, modernisieren oder verlagern?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Landesbank Baden-Württemberg (LBBW) bringt Praxis-, Markt- oder Anwendungsperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland bringt Zugang zu Umsetzung, Fachpraxis oder Mitgliedern ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland: Arbeitslosenquote &amp; Arbeitslosenzahlen 2025; Landesbank Baden-Württemberg (LBBW): US-Arbeitsmarktbericht für Mai 2026. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Finanzierungscheck: ein Investitionshemmnis für digitale Infrastruktur in ein prüfbares Förder- oder Finanzierungsszenario übersetzen.&quot;, &quot;evidence_quality&quot;: &quot;mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität mittel ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;selected_recommendation&quot;}">
+              <div class="card-label">#3 · Sondierungslinie</div>
+              <div class="compact-card-copy"><h2>LBBW x Bundesagentur für Arbeit, Regionaldirektion... · 77/100 · Starker Match</h2><p class="decision-summary">Die Landesbank Baden-Württemberg (LBBW) und die Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland ergänzen sich in den Bereichen Standort, Investition und industrielle Transformation. Die aktuelle Arbeitslosenzahl und der US-Arbeitsmarktbericht bieten relevante Gesprächspunkte. Für ZIRP stellt sich die Frage: Welche Standortbedingungen entscheiden darüber, ob Unternehmen in Rheinland-Pfalz investieren, modernisieren oder verlagern? Derzeit fehlen jedoch klare Akteursrollen und ein klarer Message-Owner.</p><div class="decision-triplet"><p><strong>Decision:</strong> Sondierungsgespräch</p><p><strong>Risk:</strong> Die Rolle der Akteure muss im Vorkontakt bestätigt werden, da die aktuellen Signale noch nicht direkt auf ZIRP anwendbar sind.</p><p><strong>Next:</strong> Validieren der Akteursrollen und Identifizierung eines Message-Owners.</p></div></div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+
+            <article class="card compact-card selected-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;0ef55b829f2a5c59&quot;, &quot;opportunity_id&quot;: &quot;bundesagentur-fuer-arbeit-re_hochschule-mainz_hochschule-wirtschaft-transfer-arbeitsmarkt-fachkraefte-qualifizierung&quot;, &quot;pattern_id&quot;: &quot;3&quot;, &quot;rank&quot;: 4, &quot;selected&quot;: true, &quot;score&quot;: 65.003, &quot;display_points&quot;: 65, &quot;pair&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland x Hochschule Mainz&quot;, &quot;actors&quot;: [&quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;, &quot;Hochschule Mainz&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Hochschule Mainz bringt aktuell Hochschule-Wirtschaft-Transfer, Arbeitsmarkt, Fachkräfte und Qualifizierung ein, Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland ergänzt Standort, Investition und industrielle Transformation, Finanzierung und Förderung von Transformation. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland bringt Zugang zu Umsetzung, Fachpraxis oder Mitgliedern ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Hochschule Mainz bringt anwendungsnahen Transfer und Projektzugang ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz; Hochschule Mainz: „Library of Things“ an der Hochschule Mainz eröffnet. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;90-Tage-Praxischeck: eine digitale Anwendung für mittelständische Produktivität in einem Betriebskontext testen.&quot;, &quot;evidence_quality&quot;: &quot;mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität mittel ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;selected_recommendation&quot;}">
+              <div class="card-label">#4 · Sondierungslinie</div>
+              <div class="compact-card-copy"><h2>Bundesagentur für Arbeit, Regionaldirektion... x Hochschule Mainz · 65/100 · Sondierungsmatch</h2><p class="decision-summary">Die Bundesagentur für Arbeit und die Hochschule Mainz haben komplementäre Rollen bei der Förderung von Hochschule-Wirtschaft-Transfer. Die Hochschule bringt aktuelle Projekte wie EXIST-Women und Library of Things, während die Agentur Standort, Investition und industrielle Transformation vorantreibt. Für ZIRP stellt sich die Frage: Wie können Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte kommen? Die Rolle der Akteure muss im Vorkontakt bestätigt werden.</p><div class="decision-triplet"><p><strong>Decision:</strong> Sondierungsgespräch</p><p><strong>Risk:</strong> Die Rolle der Akteure und die spezifischen Pilotfragen müssen im Vorkontakt bestätigt werden, da diese unklar sind.</p><p><strong>Next:</strong> Vorkontakt mit den Akteuren zum Bestätigen der Rollen und Identifikation von Pilotfragen.</p></div></div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+  </section>
+
+  <h2 class="section-title">Nicht ausgewählte Kandidaten für Feedback</h2>
+  <p class="section-note">Diese Kandidaten sind keine Empfehlungen, bleiben aber sichtbar, damit SCIP aus nahen Alternativen und verworfenen Matchings lernen kann.</p>
+  <section class="grid">
+    
+            <article class="candidate-row" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;a7df60299cbf3f16&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-fuer-qualifizi_technische-hochschule-bingen_hochschule-wirtschaft-transfer&quot;, &quot;pattern_id&quot;: &quot;4&quot;, &quot;rank&quot;: 5, &quot;selected&quot;: false, &quot;score&quot;: 60.81, &quot;display_points&quot;: 61, &quot;pair&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH x Technische Hochschule Bingen&quot;, &quot;actors&quot;: [&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;Technische Hochschule Bingen&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt aktuell Hochschule-Wirtschaft-Transfer, Wissenstransfer ein, Technische Hochschule Bingen ergänzt Hochschule-Wirtschaft-Transfer, Talentförderung, Musik und Nachwuchs. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Technische Hochschule Bingen bringt technische Transferkompetenz und Nachwuchsperspektive ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Technische Hochschule Bingen: Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Audimax ein. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;90-Tage-Praxischeck: eine digitale Anwendung für mittelständische Produktivität in einem Betriebskontext testen.&quot;, &quot;evidence_quality&quot;: &quot;niedrig: bisher zu wenig unabhängige Evidenz für eine direkte Convening-Empfehlung.&quot;, &quot;sufficiency&quot;: &quot;nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;ob beide Seiten den Bedarf aktuell bestätigen&quot;, &quot;action_decision&quot;: &quot;reframe&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: reframe, weil Evidenzqualität niedrig ist und die Suffizienz nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;feedback_only_candidate&quot;}">
+              <div class="candidate-main">
+                <div class="candidate-title">#5 · IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH x Technische Hochschule Bingen · 61/100</div>
+                <div class="candidate-meta">nicht ausgewählt · Feedback erwünscht · Hochschule-Wirtschaft-Transfer</div>
+                <p>Nicht ausgewählt; als nahe Alternative für Feedback behalten.</p>
+              </div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+
+            <article class="candidate-row" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;2c95d5a143f1b109&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-fuer-qualifizi_landesbank-baden-wuerttember_kreislaufwirtschaft-bau-ersatzbaustoffverordnung&quot;, &quot;pattern_id&quot;: &quot;5&quot;, &quot;rank&quot;: 6, &quot;selected&quot;: false, &quot;score&quot;: 56.725, &quot;display_points&quot;: 57, &quot;pair&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH x Landesbank Baden-Württemberg (LBBW)&quot;, &quot;actors&quot;: [&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;Landesbank Baden-Württemberg (LBBW)&quot;], &quot;topic&quot;: &quot;Kreislaufwirtschaft, Bau und Ersatzbaustoffverordnung&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt aktuell Hochschule-Wirtschaft-Transfer, Wissenstransfer ein, Landesbank Baden-Württemberg (LBBW) ergänzt Standort, Investition und industrielle Transformation, Verwaltungswissen und digitale Umsetzung. Für die ZIRP stellt sich die Frage: Wie können Bauwirtschaft, Rohstoffindustrie, Kommunen und Verwaltung Kreislaufwirtschaft praktisch und rechtssicher umsetzen?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Landesbank Baden-Württemberg (LBBW) bringt Praxis-, Markt- oder Anwendungsperspektive ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Landesbank Baden-Württemberg (LBBW): US-Arbeitsmarktbericht für Mai 2026. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Finanzierungscheck: ein Investitionshemmnis für digitale Infrastruktur in ein prüfbares Förder- oder Finanzierungsszenario übersetzen.&quot;, &quot;evidence_quality&quot;: &quot;niedrig: bisher zu wenig unabhängige Evidenz für eine direkte Convening-Empfehlung.&quot;, &quot;sufficiency&quot;: &quot;nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;ob beide Seiten den Bedarf aktuell bestätigen&quot;, &quot;action_decision&quot;: &quot;reframe&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: reframe, weil Evidenzqualität niedrig ist und die Suffizienz nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;feedback_only_candidate&quot;}">
+              <div class="candidate-main">
+                <div class="candidate-title">#6 · IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH x Landesbank Baden-Württemberg (LBBW) · 57/100</div>
+                <div class="candidate-meta">nicht ausgewählt · Feedback erwünscht · Kreislaufwirtschaft, Bau und Ersatzbaustoffverordnung</div>
+                <p>Nicht ausgewählt; als nahe Alternative für Feedback behalten.</p>
+              </div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+
+            <article class="candidate-row" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;4ac731e19413c274&quot;, &quot;opportunity_id&quot;: &quot;bundesagentur-fuer-arbeit-re_technische-hochschule-bingen_standort-investition-industrielle-transformation-finanzierung&quot;, &quot;pattern_id&quot;: &quot;6&quot;, &quot;rank&quot;: 7, &quot;selected&quot;: false, &quot;score&quot;: 51.426, &quot;display_points&quot;: 51, &quot;pair&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland x Technische Hochschule Bingen&quot;, &quot;actors&quot;: [&quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;, &quot;Technische Hochschule Bingen&quot;], &quot;topic&quot;: &quot;Standort, Investition und industrielle Transformation&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland bringt aktuell Standort, Investition und industrielle Transformation, Finanzierung und Förderung von Transformation ein, Technische Hochschule Bingen ergänzt Hochschule-Wirtschaft-Transfer, Talentförderung, Musik und Nachwuchs. Für die ZIRP stellt sich die Frage: Welche Standortbedingungen entscheiden darüber, ob Unternehmen in Rheinland-Pfalz investieren, modernisieren oder verlagern?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland bringt Zugang zu Umsetzung, Fachpraxis oder Mitgliedern ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Technische Hochschule Bingen bringt technische Transferkompetenz und Nachwuchsperspektive ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland: Arbeitslosenquote &amp; Arbeitslosenzahlen 2025; Technische Hochschule Bingen: Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Audimax ein. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;90-Tage-Praxischeck: eine digitale Anwendung für mittelständische Produktivität in einem Betriebskontext testen.&quot;, &quot;evidence_quality&quot;: &quot;mittel: mehrere Signale, aber die Akteursrollen sollten validiert werden.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für ein kuratiertes Sondierungsgespräch.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;sondieren&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: sondieren, weil Evidenzqualität mittel ist und die Suffizienz ausreichend für ein kuratiertes Sondierungsgespräch.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;feedback_only_candidate&quot;}">
+              <div class="candidate-main">
+                <div class="candidate-title">#7 · Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland x Technische Hochschule Bingen · 51/100</div>
+                <div class="candidate-meta">nicht ausgewählt · Feedback erwünscht · Standort, Investition und industrielle Transformation</div>
+                <p>Nicht ausgewählt; als nahe Alternative für Feedback behalten.</p>
+              </div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+
+            <article class="candidate-row" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;064324fd92539351&quot;, &quot;opportunity_id&quot;: &quot;bundesagentur-fuer-arbeit-re_universitaet-trier_standort-investition-industrielle-transformation-verwaltungswissen&quot;, &quot;pattern_id&quot;: &quot;7&quot;, &quot;rank&quot;: 8, &quot;selected&quot;: false, &quot;score&quot;: 43.22, &quot;display_points&quot;: 43, &quot;pair&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland x Universität Trier&quot;, &quot;actors&quot;: [&quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;, &quot;Universität Trier&quot;], &quot;topic&quot;: &quot;Standort, Investition und industrielle Transformation&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: Universität Trier bringt aktuell Weiterbildung und lebenslanges Lernen, Hochschule-Wirtschaft-Transfer ein, Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland ergänzt Standort, Investition und industrielle Transformation, Finanzierung und Förderung von Transformation. Für die ZIRP stellt sich die Frage: Welche Standortbedingungen entscheiden darüber, ob Unternehmen in Rheinland-Pfalz investieren, modernisieren oder verlagern?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland bringt Zugang zu Umsetzung, Fachpraxis oder Mitgliedern ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Universität Trier bringt wissenschaftliche, ethische und gesellschaftliche Orientierung ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Universität Trier: German-Namibian Exchange of Educators; Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland: Arbeitslosenquote &amp; Arbeitslosenzahlen 2025. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;90-Tage-Praxischeck: eine digitale Anwendung für mittelständische Produktivität in einem Betriebskontext testen.&quot;, &quot;evidence_quality&quot;: &quot;hoch: mehrere aktuelle Signale aus mindestens zwei Akteurskontexten.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;Rollen, Bedarf und Pilotfrage sind plausibel, müssen aber im Vorkontakt bestätigt werden.&quot;, &quot;action_decision&quot;: &quot;watch&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: watch, weil Evidenzqualität hoch ist und die Suffizienz ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;feedback_only_candidate&quot;}">
+              <div class="candidate-main">
+                <div class="candidate-title">#8 · Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland x Universität Trier · 43/100</div>
+                <div class="candidate-meta">nicht ausgewählt · Feedback erwünscht · Standort, Investition und industrielle Transformation</div>
+                <p>Nicht ausgewählt; als nahe Alternative für Feedback behalten.</p>
+              </div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+
+            <article class="candidate-row" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;9411c26c57f55483&quot;, &quot;opportunity_id&quot;: &quot;iqib-institut-fuer-qualifizi_bundesagentur-fuer-arbeit-re_hochschule-wirtschaft-transfer-standort-investition-industrielle-transfo&quot;, &quot;pattern_id&quot;: &quot;8&quot;, &quot;rank&quot;: 9, &quot;selected&quot;: false, &quot;score&quot;: 42.449, &quot;display_points&quot;: 42, &quot;pair&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH x Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;, &quot;actors&quot;: [&quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH&quot;, &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;], &quot;topic&quot;: &quot;Hochschule-Wirtschaft-Transfer&quot;, &quot;reason&quot;: &quot;Der Anlass ist prüfbar: IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt aktuell Hochschule-Wirtschaft-Transfer, Wissenstransfer ein, Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland ergänzt Standort, Investition und industrielle Transformation, Finanzierung und Förderung von Transformation. Für die ZIRP stellt sich die Frage: Wie kommen Forschung, Unternehmen und öffentliche Akteure schneller in gemeinsame Umsetzungsprojekte?&quot;, &quot;selection_reason&quot;: &quot;&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH bringt angewandte Innovationsforschung und Resilienzperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland bringt Zugang zu Umsetzung, Fachpraxis oder Mitgliedern ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland: Arbeitslosenquote &amp; Arbeitslosenzahlen 2025. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;90-Tage-Praxischeck: eine digitale Anwendung für mittelständische Produktivität in einem Betriebskontext testen.&quot;, &quot;evidence_quality&quot;: &quot;niedrig: bisher zu wenig unabhängige Evidenz für eine direkte Convening-Empfehlung.&quot;, &quot;sufficiency&quot;: &quot;nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;, &quot;consequence&quot;: &quot;Wie werden digitale Werkzeuge aus Pilot- oder Fachlogik in konkrete Umsetzung für Bau, Verwaltung oder Mittelstand überführt?&quot;, &quot;uncertainty&quot;: &quot;ob beide Seiten den Bedarf aktuell bestätigen&quot;, &quot;action_decision&quot;: &quot;reframe&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: reframe, weil Evidenzqualität niedrig ist und die Suffizienz nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;}, &quot;source&quot;: &quot;match_selector&quot;, &quot;feedback_layer&quot;: &quot;feedback_only_candidate&quot;}">
+              <div class="candidate-main">
+                <div class="candidate-title">#9 · IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH x Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland · 42/100</div>
+                <div class="candidate-meta">nicht ausgewählt · Feedback erwünscht · Hochschule-Wirtschaft-Transfer</div>
+                <p>Nicht ausgewählt; als nahe Alternative für Feedback behalten.</p>
+              </div>
+              
+              <div class="feedback-box" aria-label="SCIP Feedback">
+                <span>Feedback für SCIP:</span>
+                <button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button>
+                <button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button>
+                <div class="feedback-comment-box" hidden>
+                  <label>Was bewertest du?</label>
+                  <select class="feedback-target-select" aria-label="Feedback-Ziel">
+                    <option value="">Ziel auswählen</option>
+                    <option value="actor_match">Akteursmatch</option>
+                    <option value="evidence_signal">Evidenzsignal</option>
+                    <option value="rlp_relevance">RLP-Relevanz</option>
+                    <option value="next_action">Nächster Schritt</option>
+                    <option value="typology_stage">Typologie/Reifegrad</option>
+                    <option value="public_framing">Öffentliche Darstellung</option>
+                  </select>
+                  <label>Warum?</label>
+                  <select class="feedback-reason-select" aria-label="Feedback-Grund">
+                    <option value="">Grund auswählen</option>
+                    <option value="good_match">Guter Match</option>
+                    <option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option>
+                    <option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option>
+                    <option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option>
+                    <option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option>
+                    <option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option>
+                    <option value="source_only_actor">Akteur ist nur Quelle/Kontext</option>
+                    <option value="wrong_counterpart">Gegenpart passt nicht</option>
+                    <option value="insufficient_evidence">Zu wenig Evidenz</option>
+                    <option value="too_macro">Zu makro / kein konkretes Umsetzungsproblem</option>
+                    <option value="weak_why_now">Warum jetzt unklar</option>
+                    <option value="too_broad_action">Vorschlag zu breit</option>
+                    <option value="wrong_pilot_lane">Falsches Pilotfeld</option>
+                    <option value="not_public">Nicht öffentlich zeigen</option>
+                    <option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option>
+                  </select>
+                  <textarea rows="3" placeholder="z.B. guter Match, aber RLP-Anker fehlt."></textarea>
+                  <button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button>
+                  <button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button>
+                </div>
+                <small class="feedback-status"></small>
+              </div>
+    
+            </article>
+            
+  </section>
+</main>
+<script>
+  function defaultFeedbackTarget(label) {
+    if (label === 'useful') return 'actor_match';
+    if (label === 'good_topic_wrong_actors' || label === 'wrong_connection') return 'actor_match';
+    if (label === 'not_relevant') return 'rlp_relevance';
+    return '';
+  }
+  function defaultFeedbackReason(label) {
+    if (label === 'useful') return 'good_match';
+    if (label === 'not_relevant') return 'missing_rlp_application_anchor';
+    return '';
+  }
+  function prepareScipFeedback(button, label) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const targetSelect = box.querySelector('.feedback-target-select');
+    const reasonSelect = box.querySelector('.feedback-reason-select');
+    card.dataset.pendingFeedbackLabel = label;
+    box.hidden = false;
+    if (targetSelect && !targetSelect.value) targetSelect.value = defaultFeedbackTarget(label);
+    if (reasonSelect && !reasonSelect.value) reasonSelect.value = defaultFeedbackReason(label);
+    textarea.focus();
+    status.textContent = 'Feedback kann mehrfach pro Karte gespeichert werden';
+  }
+  function cancelScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const selects = box.querySelectorAll('select');
+    card.dataset.pendingFeedbackLabel = '';
+    textarea.value = '';
+    selects.forEach((select) => select.value = '');
+    box.hidden = true;
+    status.textContent = '';
+  }
+  async function submitScipFeedback(button) {
+    const card = button.closest('[data-feedback-payload]');
+    const status = card.querySelector('.feedback-status');
+    const box = card.querySelector('.feedback-comment-box');
+    const textarea = box.querySelector('textarea');
+    const targetSelect = box.querySelector('.feedback-target-select');
+    const reasonSelect = box.querySelector('.feedback-reason-select');
+    const label = card.dataset.pendingFeedbackLabel || '';
+    if (!label) return;
+    let payload = {};
+    try { payload = JSON.parse(card.dataset.feedbackPayload || '{}'); } catch (err) { payload = {}; }
+    payload.label = label;
+    payload.human_feedback_label = label;
+    payload.feedback_target = targetSelect ? targetSelect.value : '';
+    payload.feedback_dimension = payload.feedback_target;
+    payload.reason_category = reasonSelect ? reasonSelect.value : '';
+    payload.feedback_reason_category = payload.reason_category;
+    payload.human_comment = textarea.value.trim();
+    payload.human_feedback_comment = payload.human_comment;
+    payload.timestamp = new Date().toISOString();
+    payload.created_at = payload.timestamp;
+    status.textContent = 'speichere Feedback ...';
+    try {
+      const response = await fetch('http://127.0.0.1:8766/feedback/scip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error('feedback server unavailable');
+      status.textContent = 'Feedback gespeichert';
+    } catch (err) {
+      const key = 'sor_scip_feedback_queue';
+      const queue = JSON.parse(localStorage.getItem(key) || '[]');
+      queue.push(payload);
+      localStorage.setItem(key, JSON.stringify(queue));
+      status.textContent = 'Feedback lokal vorgemerkt';
+    }
+    textarea.value = '';
+    if (targetSelect) targetSelect.value = '';
+    if (reasonSelect) reasonSelect.value = '';
+    box.hidden = true;
+    card.dataset.pendingFeedbackLabel = '';
+  }
+</script>
+</body>
+</html>
