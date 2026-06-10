@@ -3,72 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SCIP Matchings · Strategic Opportunity Radar</title>
+  <title>SCIP Match Radar · Strategic Opportunity Radar</title>
   <link rel="icon" type="image/png" href="sor-logo.png" />
   <link rel="apple-touch-icon" href="sor-logo.png" />
   <style>
     :root {
-      --bg: #ffffff;
-      --card: #ffffff;
-      --ink: #101826;
-      --muted: #5f6f82;
-      --line: #dce4ec;
-      --navy: #071426;
-      --navy-2: #0d2238;
-      --gold: #f4b51e;
-      --gold-soft: #fff7df;
-      --blue-soft: #f4f8fc;
-      --shadow: 0 14px 34px rgba(7, 20, 38, 0.08);
+      --bg: #05070A;
+      --panel: #07111F;
+      --panel-2: #0A1626;
+      --card: #F5F7FA;
+      --card-2: #FFFFFF;
+      --ink: #05070A;
+      --muted: #647183;
+      --line: #D8E3ED;
+      --navy: #07111F;
+      --navy-2: #0D1B2D;
+      --blue: #00AEEF;
+      --blue-soft: #EAF8FF;
+      --blue-line: rgba(0,174,239,.34);
+      --gold: #F5B82E;
+      --gold-soft: #FFF6D9;
+      --white: #F5F7FA;
+      --shadow: 0 18px 44px rgba(0,0,0,.24);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--ink);
+      background:
+        linear-gradient(180deg, #05070A 0%, #07111F 42%, #091320 100%);
+      color: var(--white);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background:
+        repeating-linear-gradient(90deg, rgba(0,174,239,.06) 0 1px, transparent 1px 96px),
+        repeating-linear-gradient(0deg, rgba(0,174,239,.045) 0 1px, transparent 1px 96px);
+      mask-image: linear-gradient(180deg, black, transparent 78%);
+    }
     .site-header {
-      background: linear-gradient(135deg, var(--navy), var(--navy-2));
-      color: white;
-      border-bottom: 4px solid var(--gold);
+      position: relative;
+      background: #05070A;
+      color: var(--white);
+      border-bottom: 1px solid var(--blue-line);
+      box-shadow: 0 18px 60px rgba(0,0,0,.32);
+    }
+    .site-header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
     }
     .header-inner {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 16px 18px;
+      padding: 18px;
       display: flex;
-      gap: 18px;
+      gap: 22px;
       align-items: center;
       justify-content: space-between;
     }
     .brand {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 15px;
       min-width: 0;
       color: inherit;
       text-decoration: none;
     }
     .brand img {
-      width: 150px;
-      height: 54px;
+      width: 172px;
+      height: 62px;
       object-fit: contain;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,.22);
-      background: #06101e;
+      border-radius: 8px;
+      border: 1px solid rgba(0,174,239,.28);
+      background: #020407;
+      box-shadow: 0 0 28px rgba(0,174,239,.14);
     }
     .brand-title { min-width: 0; }
     .brand-title strong {
       display: block;
-      font-size: 1.15rem;
-      letter-spacing: 0;
+      font-size: 1.02rem;
+      letter-spacing: .11em;
+      text-transform: uppercase;
       white-space: nowrap;
+      color: var(--white);
+      font-weight: 760;
     }
     .brand-title span {
       display: block;
-      color: rgba(255,255,255,.72);
-      font-size: .86rem;
-      margin-top: 2px;
+      color: #AAB3C0;
+      font-size: .8rem;
+      margin-top: 4px;
+      letter-spacing: .08em;
     }
     nav {
       display: flex;
@@ -77,50 +111,91 @@
       justify-content: flex-end;
     }
     nav a {
-      color: white;
+      color: #D9E7F2;
       text-decoration: none;
-      border: 1px solid rgba(255,255,255,.22);
+      border: 1px solid rgba(170,179,192,.22);
       border-radius: 999px;
       padding: 8px 12px;
-      font-size: .9rem;
-      font-weight: 750;
+      font-size: .78rem;
+      font-weight: 820;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      background: rgba(255,255,255,.035);
     }
     nav a.active, nav a:hover {
-      color: var(--navy);
-      background: var(--gold);
-      border-color: var(--gold);
+      color: #05070A;
+      background: var(--blue);
+      border-color: var(--blue);
+      box-shadow: 0 0 18px rgba(0,174,239,.32);
     }
     .wrap {
+      position: relative;
       max-width: 1180px;
       margin: 0 auto;
-      padding: 34px 18px 70px;
+      padding: 34px 18px 76px;
     }
     .page-intro {
-      margin-bottom: 18px;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 18px;
+      position: relative;
+      min-height: 164px;
+      margin-bottom: 22px;
+      border: 1px solid rgba(0,174,239,.22);
+      border-radius: 12px;
+      padding: 28px 30px;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(7,17,31,.98), rgba(5,7,10,.92));
+      box-shadow: var(--shadow);
+    }
+    .page-intro::before {
+      content: "";
+      position: absolute;
+      right: 34px;
+      top: 22px;
+      width: 112px;
+      height: 112px;
+      border: 1px solid rgba(0,174,239,.48);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, transparent 0 44%, rgba(0,174,239,.12) 45% 46%, transparent 47%),
+        conic-gradient(from 40deg, rgba(0,174,239,.65), transparent 24%, rgba(245,184,46,.85) 25%, transparent 31%, rgba(0,174,239,.65) 55%, transparent 77%);
+      opacity: .78;
+    }
+    .page-intro::after {
+      content: "SIGNAL INTELLIGENCE";
+      position: absolute;
+      right: 28px;
+      bottom: 22px;
+      color: rgba(170,179,192,.34);
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .18em;
     }
     h1 {
+      position: relative;
       margin: 0;
-      font-size: clamp(1.35rem, 2vw, 1.78rem);
-      line-height: 1.28;
-      font-weight: 900;
-      letter-spacing: 0;
-      color: var(--navy);
+      max-width: 760px;
+      font-size: clamp(1.52rem, 2.7vw, 2.35rem);
+      line-height: 1.14;
+      font-weight: 840;
+      letter-spacing: .02em;
+      color: var(--white);
     }
     .subtitle {
-      margin: 9px 0 0;
-      color: var(--muted);
+      position: relative;
+      margin: 12px 0 0;
+      color: #AAB3C0;
       font-weight: 650;
-      line-height: 1.45;
-      max-width: 1040px;
+      line-height: 1.48;
+      max-width: 850px;
     }
     .card {
       background: var(--card);
-      border: 1px solid var(--line);
+      border: 1px solid rgba(216,227,237,.9);
+      border-top: 2px solid rgba(0,174,239,.55);
       border-radius: 8px;
       box-shadow: var(--shadow);
       padding: 26px;
+      color: var(--ink);
     }
     .analysis {
       position: relative;
@@ -132,20 +207,21 @@
       content: "";
       position: absolute;
       inset: 0 auto 0 0;
-      width: 5px;
-      background: var(--gold);
+      width: 4px;
+      background: var(--blue);
+      box-shadow: 0 0 18px rgba(0,174,239,.45);
     }
     .analysis p {
       max-width: 820px;
-      font-size: 1.03rem;
+      font-size: 1.02rem;
       line-height: 1.72;
       margin: 0 0 17px;
-      color: #1e293b;
+      color: #172033;
     }
     .analysis .briefing-title {
       max-width: 860px;
-      font-size: clamp(1.35rem, 2vw, 1.78rem);
-      line-height: 1.28;
+      font-size: clamp(1.32rem, 2vw, 1.76rem);
+      line-height: 1.25;
       font-weight: 900;
       margin: 0 0 16px;
       padding-bottom: 16px;
@@ -156,40 +232,32 @@
       max-width: 840px;
       margin: 0 0 24px;
       padding: 14px 16px;
-      border-left: 4px solid var(--gold);
+      border-left: 4px solid var(--blue);
       border-radius: 7px;
-      background: #f8fafc;
-      font-size: 1.06rem;
+      background: #EAF8FF;
+      font-size: 1.04rem;
       line-height: 1.62;
       font-weight: 850;
       color: var(--navy);
     }
-    .analysis h2, .analysis h3 {
-      margin: 24px 0 10px;
-      color: var(--navy);
-    }
-    .two-col {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
-      gap: 18px;
-      align-items: start;
-    }
+    .analysis h2, .analysis h3 { margin: 24px 0 10px; color: var(--navy); }
+    .two-col { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
     .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
-    .stat { background: var(--gold-soft); border: 1px solid #f2d784; border-radius: 8px; padding: 12px; }
-    .stat b { display: block; font-size: 1.55rem; color: var(--navy); }
-    .stat span { color: var(--muted); font-size: .82rem; font-weight: 800; text-transform: uppercase; }
-    h2 { margin: 0 0 14px; font-size: 1.18rem; color: var(--navy); }
+    .stat { background: #07111F; border: 1px solid rgba(0,174,239,.38); border-radius: 8px; padding: 12px; }
+    .stat b { display: block; font-size: 1.55rem; color: var(--blue); }
+    .stat span { color: #AAB3C0; font-size: .78rem; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+    h2 { margin: 0 0 14px; font-size: 1.12rem; color: var(--navy); text-transform: uppercase; letter-spacing: .05em; }
     h3 { color: var(--navy); }
     .section-row { margin: 10px 0; }
     .section-top { display: flex; justify-content: space-between; gap: 12px; font-size: .9rem; color: var(--muted); }
-    .bar { height: 8px; background: #edf1f5; border-radius: 999px; overflow: hidden; margin-top: 5px; }
-    .bar span { display: block; height: 100%; background: var(--gold); }
+    .bar { height: 8px; background: #E6EDF4; border-radius: 999px; overflow: hidden; margin-top: 5px; }
+    .bar span { display: block; height: 100%; background: var(--blue); box-shadow: 0 0 14px rgba(0,174,239,.42); }
     .event-chip { border-top: 1px solid var(--line); padding: 12px 0; }
     .event-chip:first-child { border-top: 0; }
-    .event-chip a { color: var(--ink); text-decoration: none; font-weight: 760; }
+    .event-chip a { color: var(--ink); text-decoration: none; font-weight: 820; }
     .event-chip small { display: block; color: var(--muted); margin-top: 4px; line-height: 1.4; }
     .term-row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .term { background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: .86rem; }
+    .term { background: var(--blue-soft); border: 1px solid rgba(0,174,239,.22); border-radius: 999px; padding: 7px 10px; font-size: .84rem; color: var(--navy); font-weight: 720; }
     .members { color: var(--muted); line-height: 1.58; font-size: .94rem; }
     .history-card, .scip-card { border-top: 1px solid var(--line); padding: 18px 0; }
     .history-card:first-child, .scip-card:first-child { border-top: 0; }
@@ -197,33 +265,37 @@
     .history-card p, .scip-card p { color: var(--muted); margin: 8px 0 0; line-height: 1.58; }
     .artifact-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .artifact-row a, .button-link {
-      border: 1px solid #f0cf6e;
-      background: var(--gold-soft);
+      border: 1px solid rgba(0,174,239,.48);
+      background: #07111F;
       border-radius: 999px;
-      padding: 7px 10px;
+      padding: 8px 11px;
       text-decoration: none;
-      color: var(--navy);
-      font-weight: 800;
-      font-size: .84rem;
+      color: var(--white);
+      font-weight: 850;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      box-shadow: 0 0 16px rgba(0,174,239,.14);
     }
+    .artifact-row a:hover, .button-link:hover { background: var(--blue); color: #05070A; }
     details { margin-top: 10px; }
-    summary { cursor: pointer; color: var(--navy); font-weight: 800; }
+    summary { cursor: pointer; color: var(--navy); font-weight: 850; }
     .meeting-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
     .meeting-head > div { min-width: 0; }
     .meeting-head p { margin: 6px 0 0; color: var(--muted); line-height: 1.45; }
     .radar-filter-note { font-size: .9rem; }
     .meeting-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .meeting-card { border: 1px solid var(--line); border-radius: 8px; padding: 15px; background: #fbfcfe; }
+    .meeting-card { border: 1px solid var(--line); border-left: 3px solid var(--blue); border-radius: 8px; padding: 15px; background: var(--card-2); }
     .meeting-card h3 { margin: 0 0 6px; font-size: 1rem; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
     .meeting-card h3 .meeting-title { min-width: 0; }
-    .meeting-card h3 .points-chip { color: var(--muted); font-size: .86rem; font-weight: 900; white-space: nowrap; background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; }
+    .meeting-card h3 .points-chip { color: var(--navy); font-size: .82rem; font-weight: 900; white-space: nowrap; background: var(--blue-soft); border: 1px solid rgba(0,174,239,.35); border-radius: 999px; padding: 3px 7px; }
     .meeting-card p, .meeting-card li { color: var(--muted); line-height: 1.5; font-size: .92rem; }
     .meeting-card li strong { color: var(--navy); }
     .meeting-card ul { margin: 6px 0 10px 18px; padding: 0; }
     .role-list { list-style: none; margin-left: 0 !important; display: grid; gap: 6px; }
     .role-list li { margin: 0; }
-    .scip-label { color: var(--gold); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: .76rem; margin-bottom: 5px; }
-    .scip-hypothesis { color: var(--navy) !important; font-weight: 750; }
+    .scip-label { color: var(--blue); font-weight: 900; text-transform: uppercase; letter-spacing: .09em; font-size: .72rem; margin-bottom: 5px; }
+    .scip-hypothesis { color: var(--navy) !important; font-weight: 760; }
     .critical-decision-grid {
       border: 1px solid #dfe7ef;
       background: white;
@@ -233,150 +305,44 @@
       display: grid;
       gap: 8px;
     }
-    .decision-line span {
-      display: block;
-      color: var(--gold);
-      font-size: .72rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      margin-bottom: 2px;
-    }
-    .decision-line p {
-      color: var(--navy) !important;
-      margin: 0;
-      font-size: .86rem;
-      line-height: 1.42;
-    }
-    .decision-footer {
-      border-top: 1px solid var(--line);
-      padding-top: 7px;
-      color: var(--muted);
-      font-size: .78rem;
-      line-height: 1.4;
-    }
+    .decision-line span { display: block; color: var(--blue); font-size: .7rem; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px; }
+    .decision-line p { color: var(--navy) !important; margin: 0; font-size: .86rem; line-height: 1.42; }
+    .decision-footer { border-top: 1px solid var(--line); padding-top: 7px; color: var(--muted); font-size: .78rem; line-height: 1.4; }
     .scip-status-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
-    .scip-status-row span { background: var(--blue-soft); border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; color: var(--navy); font-size: .76rem; font-weight: 800; }
-    .opportunity-line {
-      border: 1px solid #dfe7ef;
-      background: white;
-      border-radius: 8px;
-      padding: 9px 10px;
-      margin: 10px 0;
-      display: grid;
-      gap: 5px;
-    }
-    .opportunity-line strong {
-      color: var(--navy);
-      font-size: .84rem;
-    }
-    .opportunity-line > span {
-      color: var(--muted);
-      font-size: .84rem;
-      line-height: 1.45;
-    }
-    .opportunity-line.rising { border-left: 4px solid #2f9e44; }
+    .scip-status-row span { background: var(--blue-soft); border: 1px solid rgba(0,174,239,.26); border-radius: 999px; padding: 4px 8px; color: var(--navy); font-size: .74rem; font-weight: 850; text-transform: uppercase; letter-spacing: .05em; }
+    .opportunity-line { border: 1px solid #dfe7ef; background: white; border-radius: 8px; padding: 9px 10px; margin: 10px 0; display: grid; gap: 5px; }
+    .opportunity-line strong { color: var(--navy); font-size: .84rem; }
+    .opportunity-line > span { color: var(--muted); font-size: .84rem; line-height: 1.45; }
+    .opportunity-line.rising { border-left: 4px solid var(--blue); }
     .opportunity-line.falling { border-left: 4px solid #d9480f; }
     .opportunity-line.stable { border-left: 4px solid var(--gold); }
     .timeline-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-    .timeline-chips span {
-      background: var(--blue-soft);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 4px 7px;
-      color: var(--muted);
-      font-size: .76rem;
-      font-weight: 750;
-    }
-    .feedback-box {
-      border-top: 1px solid var(--line);
-      margin-top: 12px;
-      padding-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      align-items: center;
-    }
-    .feedback-box span {
-      color: var(--muted);
-      font-size: .82rem;
-      font-weight: 800;
-      margin-right: 3px;
-    }
-    .feedback-box button {
-      border: 1px solid #d6e0ea;
-      background: white;
-      color: var(--navy);
-      border-radius: 999px;
-      padding: 6px 9px;
-      font-size: .78rem;
-      font-weight: 750;
-      cursor: pointer;
-    }
-    .feedback-box button:hover { border-color: var(--gold); background: var(--gold-soft); }
-    .feedback-box select {
-      border: 1px solid #d6e0ea;
-      background: white;
-      color: var(--navy);
-      border-radius: 8px;
-      padding: 6px 9px;
-      font-size: .78rem;
-      font-weight: 750;
-      max-width: 100%;
-    }
-    .feedback-comment-box {
-      flex-basis: 100%;
-      display: grid;
-      gap: 7px;
-      margin-top: 6px;
-    }
+    .timeline-chips span { background: var(--blue-soft); border: 1px solid rgba(0,174,239,.22); border-radius: 999px; padding: 4px 7px; color: var(--muted); font-size: .74rem; font-weight: 780; }
+    .feedback-box { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+    .feedback-box span { color: var(--muted); font-size: .82rem; font-weight: 850; margin-right: 3px; }
+    .feedback-box button { border: 1px solid rgba(0,174,239,.28); background: white; color: var(--navy); border-radius: 999px; padding: 6px 9px; font-size: .78rem; font-weight: 780; cursor: pointer; }
+    .feedback-box button:hover { border-color: var(--blue); background: var(--blue-soft); }
+    .feedback-box select { border: 1px solid #d6e0ea; background: white; color: var(--navy); border-radius: 8px; padding: 6px 9px; font-size: .78rem; font-weight: 750; max-width: 100%; }
+    .feedback-comment-box { flex-basis: 100%; display: grid; gap: 7px; margin-top: 6px; }
     .feedback-comment-box[hidden] { display: none; }
-    .feedback-comment-box label {
-      color: var(--muted);
-      font-size: .8rem;
-      font-weight: 850;
-    }
-    .feedback-comment-box textarea {
-      width: 100%;
-      box-sizing: border-box;
-      border: 1px solid #d6e0ea;
-      border-radius: 8px;
-      padding: 8px 9px;
-      font: inherit;
-      resize: vertical;
-      color: var(--ink);
-      background: white;
-    }
-    .feedback-status {
-      color: var(--muted);
-      font-size: .78rem;
-      margin-left: 2px;
-    }
-    .site-footer {
-      background: var(--navy);
-      color: rgba(255,255,255,.72);
-      border-top: 4px solid var(--gold);
-    }
-    .footer-inner {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 18px;
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      font-size: .88rem;
-    }
+    .feedback-comment-box label { color: var(--muted); font-size: .8rem; font-weight: 850; }
+    .feedback-comment-box textarea { width: 100%; box-sizing: border-box; border: 1px solid #d6e0ea; border-radius: 8px; padding: 8px 9px; font: inherit; resize: vertical; color: var(--ink); background: white; }
+    .feedback-status { color: var(--muted); font-size: .78rem; margin-left: 2px; }
+    .site-footer { background: #05070A; color: rgba(245,247,250,.68); border-top: 1px solid var(--blue-line); }
+    .footer-inner { max-width: 1180px; margin: 0 auto; padding: 18px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: .88rem; }
     .footer-inner strong { color: white; }
     @media (max-width: 900px) {
       .header-inner { display: block; }
+      .brand img { width: 142px; height: 52px; }
+      .brand-title strong { white-space: normal; }
       nav { justify-content: flex-start; margin-top: 14px; }
+      .page-intro { padding: 24px 20px; }
+      .page-intro::before, .page-intro::after { display: none; }
       .two-col { grid-template-columns: 1fr; }
       .meeting-head { display: block; }
       .meeting-head .button-link { display: inline-block; margin-top: 10px; }
       .meeting-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+    }  </style>
 </head>
 <body>
   <header class="site-header">
@@ -396,23 +362,23 @@
   </header>
   <main class="wrap">
     <section class="page-intro">
-      <h1>SCIP Matchings</h1>
-      <p class="subtitle">Aktueller Convening Radar und redaktionelle Einordnung. Aeltere SCIP-Matchings liegen im Archiv.</p>
+      <h1>SCIP Match Radar</h1>
+      <p class="subtitle">Detected actor bridges, evidence status and next validation steps.</p>
     </section>
     
     <section class="card meeting-panel">
       <div class="meeting-head">
         <div>
           <h2>SCIP Match Selector</h2>
-          <p>9 kuratierte Opportunity Matches · aktualisiert 10.06.2026, 00:13:09</p>
+          <p>9 kuratierte Opportunity Matches · aktualisiert 10.06.2026, 23:14:44</p>
         </div>
-        <a class="button-link" href="zirp_meeting_recommendations_ai_2026-06-10_00-11.html" target="_blank" rel="noopener">Alle Pairings bewerten</a>
+        <a class="button-link" href="zirp_meeting_recommendations_ai_2026-06-10_23-12.html" target="_blank" rel="noopener">Alle Pairings bewerten</a>
       </div>
       <div class="meeting-grid">
-        <article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;fbbf7e999380695e&quot;, &quot;opportunity_id&quot;: &quot;arbeitsmarkt-fachkraefte-handwerkskammern-rheinland-pfalz-hochschule-mainz&quot;, &quot;pattern_id&quot;: &quot;96&quot;, &quot;rank&quot;: &quot;2&quot;, &quot;selected&quot;: true, &quot;score&quot;: 18.784, &quot;display_points&quot;: 19, &quot;pair&quot;: &quot;Handwerkskammern Rheinland-Pfalz x Hochschule Mainz&quot;, &quot;actors&quot;: [&quot;Handwerkskammern Rheinland-Pfalz&quot;, &quot;Hochschule Mainz&quot;], &quot;actor_types&quot;: {&quot;Handwerkskammern Rheinland-Pfalz&quot;: &quot;implementation_anchor&quot;, &quot;Hochschule Mainz&quot;: &quot;academic_support&quot;}, &quot;topic&quot;: &quot;Arbeitsmarkt, Fachkräfte und Qualifizierung&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Arbeitsmarkt, Fachkräfte und Qualifizierung&quot;, &quot;shared&quot;: [&quot;Wirtschaft&quot;, &quot;Arbeitsmarkt&quot;, &quot;Fachkräfte und Qualifizierung&quot;], &quot;bridge&quot;: [&quot;4&quot;], &quot;concrete&quot;: [&quot;Arbeitsmarkt&quot;, &quot;Fachkräfte und Qualifizierung&quot;]}, &quot;reason&quot;: &quot;PrÃ¼fpunkt im Themenfeld Arbeitsmarkt, Fachkräfte und Qualifizierung: Wie sichern Unternehmen, Hochschulen, Kammern und Arbeitsverwaltung Fachkräfte für Transformation, Pflege, Technik und Verwaltung? KlÃ¤ren, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;selection_reason&quot;: &quot;Von SCIP ausgewählt, weil diese Linie im aktuellen Signalbild besonders tragfähig wirkt: klare Rollen, belastbarer Anlass und hoher erwarteter Nutzen für eine mögliche ZIRP-Sondierung.&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;feedback_layer&quot;: &quot;dashboard_selected_card&quot;, &quot;words&quot;: [&quot;Arbeitsmarkt&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;und&quot;, &quot;Qualifizierung&quot;, &quot;PrÃ¼fpunkt&quot;, &quot;Themenfeld&quot;, &quot;Arbeitsmarkt&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;und&quot;, &quot;Qualifizierung&quot;, &quot;Wie&quot;, &quot;sichern&quot;, &quot;Unternehmen&quot;, &quot;Hochschulen&quot;, &quot;Kammern&quot;, &quot;und&quot;, &quot;Arbeitsverwaltung&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;Transformation&quot;, &quot;Pflege&quot;, &quot;Technik&quot;, &quot;und&quot;, &quot;Verwaltung&quot;, &quot;KlÃ¤ren&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;], &quot;public_status&quot;: &quot;sondierungshypothese&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 18.784, &quot;display_points&quot;: 19, &quot;role_coverage_score&quot;: 0.65, &quot;number_of_signals&quot;: 1, &quot;signal_strength&quot;: 19.0, &quot;source_quality&quot;: 0.25, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: -2.616, &quot;public_status_score&quot;: 2, &quot;score&quot;: 18.784, &quot;raw_score&quot;: 38.4, &quot;rule_final_score&quot;: 38.4, &quot;nn_adjustment&quot;: -2.616, &quot;word_memory_hits&quot;: 16.0, &quot;feedback_evidence_count&quot;: 236.0, &quot;critical_action_penalty&quot;: 17.0, &quot;academic_support_count&quot;: 1.0, &quot;profit_anchor_count&quot;: 0.0, &quot;implementation_anchor_count&quot;: 1.0, &quot;context_actor_count&quot;: 0.0}, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Handwerkskammern Rheinland-Pfalz bringt Zugang zu Betrieben und mittelständischer Umsetzungspraxis ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Hochschule Mainz bringt anwendungsnahen Transfer und Projektzugang ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Sondierungsgespräch mit Ergebnisfrage: Validate the Excel-defined opportunity &#x27;Arbeitsmarkt, Fachkräfte und Qualifizierung&#x27; against current evidence, roles and a concrete RLP application anchor.&quot;, &quot;evidence_quality&quot;: &quot;mittel bis niedrig: die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einem Akteur.&quot;, &quot;sufficiency&quot;: &quot;nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;, &quot;consequence&quot;: &quot;Die gemeinsame Problemstellung ist noch nicht eng genug; ZIRP sollte sie vor einem Format schärfen.&quot;, &quot;uncertainty&quot;: &quot;ob die zweite Seite den Bedarf aktuell bestaetigt&quot;, &quot;action_decision&quot;: &quot;ignore&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: ignore, weil Evidenzqualität mittel bis niedrig ist und die Suffizienz nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">#2 · Top-Match</div><h3><span class="meeting-title">Handwerkskammern Rheinland-Pfalz x Hochschule Mainz · 19/100 · Beobachtungsmatch</span><span class="points-chip">19/100</span></h3><p class="scip-hypothesis">Die Handwerkskammern Rheinland-Pfalz und die Hochschule Mainz haben komplementäre Rollen im Arbeitsmarkt- und Fachkräfte-Thema. Der aktuelle Anlass kommt vor allem von der Hochschule, was die Akteurslogik plausibel macht. Die Kammern könnten den Bedarf bestätigen, aber dies ist noch nicht bewiesen. Es wird empfohlen, das Signal zu validieren.</p><div class="critical-decision-grid compact-decision-lines"><p><strong>Decision:</strong> Beobachten und fehlenden Evidenzanker validieren; noch keine Handlungsempfehlung ableiten.</p><p><strong>Risk:</strong> Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einer Seite.</p><p><strong>Next:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung pruefen; noch kein Format ansetzen.</p></div><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Was bewertest du?</label><select class="feedback-target-select" aria-label="Feedback-Ziel"><option value="">Ziel auswählen</option><option value="actor_match">Akteursmatch</option><option value="evidence_signal">Evidenzsignal</option><option value="rlp_relevance">RLP-Relevanz</option><option value="next_action">Nächster Schritt</option><option value="typology_stage">Typologie/Reifegrad</option><option value="public_framing">Öffentliche Darstellung</option></select><label>Warum?</label><select class="feedback-reason-select" aria-label="Feedback-Grund"><option value="">Grund auswählen</option><option value="good_match">Guter Match</option><option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option><option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option><option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option><option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option><option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option><option value="source_only_actor">Akteur ist nur Quelle/Kontext</option><option value="wrong_counterpart">Gegenpart passt nicht</option><option value="insufficient_evidence">Zu wenig Evidenz</option><option value="weak_why_now">Warum jetzt unklar</option><option value="too_broad_action">Vorschlag zu breit</option><option value="wrong_pilot_lane">Falsches Pilotfeld</option><option value="not_public">Nicht öffentlich zeigen</option><option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option></select><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
+        <article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;fbbf7e999380695e&quot;, &quot;opportunity_id&quot;: &quot;arbeitsmarkt-fachkraefte-handwerkskammern-rheinland-pfalz-hochschule-mainz&quot;, &quot;pattern_id&quot;: &quot;96&quot;, &quot;rank&quot;: &quot;2&quot;, &quot;selected&quot;: true, &quot;score&quot;: 18.784, &quot;display_points&quot;: 19, &quot;pair&quot;: &quot;Handwerkskammern Rheinland-Pfalz x Hochschule Mainz&quot;, &quot;actors&quot;: [&quot;Handwerkskammern Rheinland-Pfalz&quot;, &quot;Hochschule Mainz&quot;], &quot;actor_types&quot;: {&quot;Handwerkskammern Rheinland-Pfalz&quot;: &quot;implementation_anchor&quot;, &quot;Hochschule Mainz&quot;: &quot;academic_support&quot;}, &quot;topic&quot;: &quot;Arbeitsmarkt, Fachkräfte und Qualifizierung&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Arbeitsmarkt, Fachkräfte und Qualifizierung&quot;, &quot;shared&quot;: [&quot;Wirtschaft&quot;, &quot;Arbeitsmarkt&quot;, &quot;Fachkräfte und Qualifizierung&quot;], &quot;bridge&quot;: [&quot;4&quot;], &quot;concrete&quot;: [&quot;Arbeitsmarkt&quot;, &quot;Fachkräfte und Qualifizierung&quot;]}, &quot;reason&quot;: &quot;PrÃ¼fpunkt im Themenfeld Arbeitsmarkt, Fachkräfte und Qualifizierung: Wie sichern Unternehmen, Hochschulen, Kammern und Arbeitsverwaltung Fachkräfte für Transformation, Pflege, Technik und Verwaltung? KlÃ¤ren, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;selection_reason&quot;: &quot;Von SCIP ausgewählt, weil diese Linie im aktuellen Signalbild besonders tragfähig wirkt: klare Rollen, belastbarer Anlass und hoher erwarteter Nutzen für eine mögliche ZIRP-Sondierung.&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;feedback_layer&quot;: &quot;dashboard_selected_card&quot;, &quot;words&quot;: [&quot;Arbeitsmarkt&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;und&quot;, &quot;Qualifizierung&quot;, &quot;PrÃ¼fpunkt&quot;, &quot;Themenfeld&quot;, &quot;Arbeitsmarkt&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;und&quot;, &quot;Qualifizierung&quot;, &quot;Wie&quot;, &quot;sichern&quot;, &quot;Unternehmen&quot;, &quot;Hochschulen&quot;, &quot;Kammern&quot;, &quot;und&quot;, &quot;Arbeitsverwaltung&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;Transformation&quot;, &quot;Pflege&quot;, &quot;Technik&quot;, &quot;und&quot;, &quot;Verwaltung&quot;, &quot;KlÃ¤ren&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;], &quot;public_status&quot;: &quot;sondierungshypothese&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 18.784, &quot;display_points&quot;: 19, &quot;role_coverage_score&quot;: 0.65, &quot;number_of_signals&quot;: 1, &quot;signal_strength&quot;: 19.0, &quot;source_quality&quot;: 0.25, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: -2.616, &quot;public_status_score&quot;: 2, &quot;score&quot;: 18.784, &quot;raw_score&quot;: 38.4, &quot;rule_final_score&quot;: 38.4, &quot;nn_adjustment&quot;: -2.616, &quot;word_memory_hits&quot;: 16.0, &quot;feedback_evidence_count&quot;: 236.0, &quot;critical_action_penalty&quot;: 17.0, &quot;academic_support_count&quot;: 1.0, &quot;profit_anchor_count&quot;: 0.0, &quot;implementation_anchor_count&quot;: 1.0, &quot;context_actor_count&quot;: 0.0}, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Handwerkskammern Rheinland-Pfalz bringt Zugang zu Betrieben und mittelständischer Umsetzungspraxis ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Hochschule Mainz bringt anwendungsnahen Transfer und Projektzugang ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Hochschule Mainz: EXIST-Women: Zehn Gründerinnen starten an der Hochschule Mainz. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Sondierungsgespräch mit Ergebnisfrage: Validate the Excel-defined opportunity &#x27;Arbeitsmarkt, Fachkräfte und Qualifizierung&#x27; against current evidence, roles and a concrete RLP application anchor.&quot;, &quot;evidence_quality&quot;: &quot;mittel bis niedrig: die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einem Akteur.&quot;, &quot;sufficiency&quot;: &quot;nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;, &quot;consequence&quot;: &quot;Die gemeinsame Problemstellung ist noch nicht eng genug; ZIRP sollte sie vor einem Format schärfen.&quot;, &quot;uncertainty&quot;: &quot;ob die zweite Seite den Bedarf aktuell bestaetigt&quot;, &quot;action_decision&quot;: &quot;ignore&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: ignore, weil Evidenzqualität mittel bis niedrig ist und die Suffizienz nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">#2 · Top-Match</div><h3><span class="meeting-title">Handwerkskammern Rheinland-Pfalz x Hochschule Mainz · 19/100 · Beobachtungsmatch</span><span class="points-chip">19/100</span></h3><p class="scip-hypothesis">Die Handwerkskammern Rheinland-Pfalz und die Hochschule Mainz haben eine komplementäre Rolle in der Arbeitsmarkt- und Fachkräftefrage. Die Akteurslogik ist plausibel, aber die aktuelle Anlass kommt vor allem von der Hochschule Mainz. Es fehlen konkrete Implementierungspartner.</p><div class="critical-decision-grid compact-decision-lines"><p><strong>Decision:</strong> Beobachten und fehlenden Evidenzanker validieren; noch keine Handlungsempfehlung ableiten.</p><p><strong>Risk:</strong> Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einer Seite.</p><p><strong>Next:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung pruefen; noch kein Format ansetzen.</p></div><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Was bewertest du?</label><select class="feedback-target-select" aria-label="Feedback-Ziel"><option value="">Ziel auswählen</option><option value="actor_match">Akteursmatch</option><option value="evidence_signal">Evidenzsignal</option><option value="rlp_relevance">RLP-Relevanz</option><option value="next_action">Nächster Schritt</option><option value="typology_stage">Typologie/Reifegrad</option><option value="public_framing">Öffentliche Darstellung</option></select><label>Warum?</label><select class="feedback-reason-select" aria-label="Feedback-Grund"><option value="">Grund auswählen</option><option value="good_match">Guter Match</option><option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option><option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option><option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option><option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option><option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option><option value="source_only_actor">Akteur ist nur Quelle/Kontext</option><option value="wrong_counterpart">Gegenpart passt nicht</option><option value="insufficient_evidence">Zu wenig Evidenz</option><option value="weak_why_now">Warum jetzt unklar</option><option value="too_broad_action">Vorschlag zu breit</option><option value="wrong_pilot_lane">Falsches Pilotfeld</option><option value="not_public">Nicht öffentlich zeigen</option><option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option></select><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
 <article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;623da3946440fa5b&quot;, &quot;opportunity_id&quot;: &quot;arbeitsmarkt-fachkraefte-bundesagentur-für-arbeit-regionaldirektion-rheinland-pfalz-saarland-te&quot;, &quot;pattern_id&quot;: &quot;90&quot;, &quot;rank&quot;: &quot;3&quot;, &quot;selected&quot;: true, &quot;score&quot;: 18.127, &quot;display_points&quot;: 18, &quot;pair&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland x Technische Hochschule Bingen&quot;, &quot;actors&quot;: [&quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;, &quot;Technische Hochschule Bingen&quot;], &quot;actor_types&quot;: {&quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland&quot;: &quot;implementation_anchor&quot;, &quot;Technische Hochschule Bingen&quot;: &quot;academic_support&quot;}, &quot;topic&quot;: &quot;Arbeitsmarkt, Fachkräfte und Qualifizierung&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Arbeitsmarkt, Fachkräfte und Qualifizierung&quot;, &quot;shared&quot;: [&quot;Wirtschaft&quot;, &quot;Arbeitsmarkt&quot;, &quot;Fachkräfte und Qualifizierung&quot;], &quot;bridge&quot;: [&quot;4&quot;], &quot;concrete&quot;: [&quot;Arbeitsmarkt&quot;, &quot;Fachkräfte und Qualifizierung&quot;]}, &quot;reason&quot;: &quot;PrÃ¼fpunkt im Themenfeld Arbeitsmarkt, Fachkräfte und Qualifizierung: Wie sichern Unternehmen, Hochschulen, Kammern und Arbeitsverwaltung Fachkräfte für Transformation, Pflege, Technik und Verwaltung? KlÃ¤ren, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;selection_reason&quot;: &quot;Von SCIP ausgewählt, weil diese Linie im aktuellen Signalbild besonders tragfähig wirkt: klare Rollen, belastbarer Anlass und hoher erwarteter Nutzen für eine mögliche ZIRP-Sondierung.&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;feedback_layer&quot;: &quot;dashboard_selected_card&quot;, &quot;words&quot;: [&quot;Arbeitsmarkt&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;und&quot;, &quot;Qualifizierung&quot;, &quot;PrÃ¼fpunkt&quot;, &quot;Themenfeld&quot;, &quot;Arbeitsmarkt&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;und&quot;, &quot;Qualifizierung&quot;, &quot;Wie&quot;, &quot;sichern&quot;, &quot;Unternehmen&quot;, &quot;Hochschulen&quot;, &quot;Kammern&quot;, &quot;und&quot;, &quot;Arbeitsverwaltung&quot;, &quot;Fachkr&quot;, &quot;fte&quot;, &quot;Transformation&quot;, &quot;Pflege&quot;, &quot;Technik&quot;, &quot;und&quot;, &quot;Verwaltung&quot;, &quot;KlÃ¤ren&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;], &quot;public_status&quot;: &quot;sondierungshypothese&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 18.127, &quot;display_points&quot;: 18, &quot;role_coverage_score&quot;: 0.65, &quot;number_of_signals&quot;: 1, &quot;signal_strength&quot;: 18.0, &quot;source_quality&quot;: 0.25, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: -2.373, &quot;public_status_score&quot;: 2, &quot;score&quot;: 18.127, &quot;raw_score&quot;: 37.5, &quot;rule_final_score&quot;: 37.5, &quot;nn_adjustment&quot;: -2.373, &quot;word_memory_hits&quot;: 18.0, &quot;feedback_evidence_count&quot;: 267.0, &quot;critical_action_penalty&quot;: 17.0, &quot;academic_support_count&quot;: 1.0, &quot;profit_anchor_count&quot;: 0.0, &quot;implementation_anchor_count&quot;: 1.0, &quot;context_actor_count&quot;: 0.0}, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland bringt Zugang zu Umsetzung, Fachpraxis oder Mitgliedern ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Technische Hochschule Bingen bringt technische Transferkompetenz und Nachwuchsperspektive ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Technische Hochschule Bingen: Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Audimax ein. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;Vorkontakt: eine konkrete RLP-Qualifizierungs-, Weiterbildungs- oder Arbeitsmarktfrage klaeren.&quot;, &quot;evidence_quality&quot;: &quot;mittel bis niedrig: die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einem Akteur.&quot;, &quot;sufficiency&quot;: &quot;nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;, &quot;consequence&quot;: &quot;Die gemeinsame Problemstellung ist noch nicht eng genug; ZIRP sollte sie vor einem Format schärfen.&quot;, &quot;uncertainty&quot;: &quot;ob die zweite Seite den Bedarf aktuell bestaetigt&quot;, &quot;action_decision&quot;: &quot;ignore&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: ignore, weil Evidenzqualität mittel bis niedrig ist und die Suffizienz nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">#3 · Starker Match</div><h3><span class="meeting-title">Bundesagentur für Arbeit, Regionaldirektion... x TH Bingen · 18/100 · Beobachtungsmatch</span><span class="points-chip">18/100</span></h3><p class="scip-hypothesis">Die Bundesagentur bringt einen regionalen Arbeitsmarkt- und Qualifizierungsdruck ein, waehrend der Bildungsakteur Transfer-, Weiterbildungs- oder Reflexionskompetenz beisteuert. Die Verbindung ist plausibel, wenn sie auf Fachkraefte, Weiterbildung, Arbeitsmarktintegration oder Bildungstransfer in Rheinland-Pfalz zugespitzt wird. Vor einem Treffen muss ZIRP klaeren, welche konkrete Qualifizierungs- oder Arbeitsmarktfrage beide Seiten gemeinsam bearbeiten koennen.</p><div class="critical-decision-grid compact-decision-lines"><p><strong>Decision:</strong> Reframen auf Arbeitsmarkt, Qualifizierung und Bildungstransfer vor einer Sondierung.</p><p><strong>Risk:</strong> Der aktuelle Anlass belegt noch keinen digitalen Unternehmenspilot.</p><p><strong>Next:</strong> Vorkontakt zur Klaerung einer konkreten RLP-Qualifizierungsfrage.</p></div><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Was bewertest du?</label><select class="feedback-target-select" aria-label="Feedback-Ziel"><option value="">Ziel auswählen</option><option value="actor_match">Akteursmatch</option><option value="evidence_signal">Evidenzsignal</option><option value="rlp_relevance">RLP-Relevanz</option><option value="next_action">Nächster Schritt</option><option value="typology_stage">Typologie/Reifegrad</option><option value="public_framing">Öffentliche Darstellung</option></select><label>Warum?</label><select class="feedback-reason-select" aria-label="Feedback-Grund"><option value="">Grund auswählen</option><option value="good_match">Guter Match</option><option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option><option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option><option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option><option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option><option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option><option value="source_only_actor">Akteur ist nur Quelle/Kontext</option><option value="wrong_counterpart">Gegenpart passt nicht</option><option value="insufficient_evidence">Zu wenig Evidenz</option><option value="weak_why_now">Warum jetzt unklar</option><option value="too_broad_action">Vorschlag zu breit</option><option value="wrong_pilot_lane">Falsches Pilotfeld</option><option value="not_public">Nicht öffentlich zeigen</option><option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option></select><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
-<article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;c90c9dd550c01823&quot;, &quot;opportunity_id&quot;: &quot;cyber-resilienz-kritische-infrastruktur-entega-plus-gmbh-universität-trier&quot;, &quot;pattern_id&quot;: &quot;304&quot;, &quot;rank&quot;: &quot;5&quot;, &quot;selected&quot;: true, &quot;score&quot;: 16.63, &quot;display_points&quot;: 17, &quot;pair&quot;: &quot;ENTEGA Plus GmbH x Universität Trier&quot;, &quot;actors&quot;: [&quot;ENTEGA Plus GmbH&quot;, &quot;Universität Trier&quot;], &quot;actor_types&quot;: {&quot;ENTEGA Plus GmbH&quot;: &quot;profit_anchor&quot;, &quot;Universität Trier&quot;: &quot;academic_support&quot;}, &quot;topic&quot;: &quot;Cyberresilienz und kritische Infrastruktur&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Cyberresilienz und kritische Infrastruktur&quot;, &quot;shared&quot;: [&quot;Technologie&quot;, &quot;Cyberresilienz und kritische Infrastruktur&quot;], &quot;bridge&quot;: [&quot;4&quot;], &quot;concrete&quot;: [&quot;Cyberresilienz und kritische Infrastruktur&quot;]}, &quot;reason&quot;: &quot;PrÃ¼fpunkt im Themenfeld Cyberresilienz und kritische Infrastruktur: Wie schützen Unternehmen, Kommunen und Versorger digitale Systeme, Daten und kritische Infrastruktur? KlÃ¤ren, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;selection_reason&quot;: &quot;Von SCIP ausgewählt, weil diese Linie im aktuellen Signalbild besonders tragfähig wirkt: klare Rollen, belastbarer Anlass und hoher erwarteter Nutzen für eine mögliche ZIRP-Sondierung.&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;feedback_layer&quot;: &quot;dashboard_selected_card&quot;, &quot;words&quot;: [&quot;Cyberresilienz&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;PrÃ¼fpunkt&quot;, &quot;Themenfeld&quot;, &quot;Cyberresilienz&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;Wie&quot;, &quot;sch&quot;, &quot;tzen&quot;, &quot;Unternehmen&quot;, &quot;Kommunen&quot;, &quot;und&quot;, &quot;Versorger&quot;, &quot;digitale&quot;, &quot;Systeme&quot;, &quot;Daten&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;KlÃ¤ren&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;, &quot;gemeinsamer&quot;, &quot;Arbeitsauftrag&quot;, &quot;entsteht&quot;], &quot;public_status&quot;: &quot;sondierungshypothese&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 16.63, &quot;display_points&quot;: 17, &quot;role_coverage_score&quot;: 0.65, &quot;number_of_signals&quot;: 3, &quot;signal_strength&quot;: 17.0, &quot;source_quality&quot;: 0.75, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: -3.503, &quot;public_status_score&quot;: 2, &quot;score&quot;: 16.63, &quot;raw_score&quot;: 41.133, &quot;rule_final_score&quot;: 41.133, &quot;nn_adjustment&quot;: -3.503, &quot;word_memory_hits&quot;: 13.0, &quot;feedback_evidence_count&quot;: 214.0, &quot;critical_action_penalty&quot;: 21.0, &quot;academic_support_count&quot;: 1.0, &quot;profit_anchor_count&quot;: 1.0, &quot;implementation_anchor_count&quot;: 0.0, &quot;context_actor_count&quot;: 0.0}, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;ENTEGA Plus GmbH bringt Praxis-, Markt- oder Anwendungsperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Universität Trier bringt wissenschaftliche, ethische und gesellschaftliche Orientierung ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Universität Trier: Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik; Universität Trier: 2,7 Millionen Euro für die Zukunft der Lehre. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;90-Tage-Praxischeck: eine digitale Anwendung für mittelständische Produktivität in einem Betriebskontext testen.&quot;, &quot;evidence_quality&quot;: &quot;mittel bis niedrig: die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einem Akteur.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;, &quot;consequence&quot;: &quot;Welche Transferfrage ist konkret genug, damit aus Hochschul- oder Netzwerkaktivität ein ZIRP-Gespräch wird?&quot;, &quot;uncertainty&quot;: &quot;ob die zweite Seite den Bedarf aktuell bestaetigt&quot;, &quot;action_decision&quot;: &quot;ignore&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: ignore, weil Evidenzqualität mittel bis niedrig ist und die Suffizienz ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">#5 · Starker Match</div><h3><span class="meeting-title">ENTEGA Plus GmbH x Uni Trier · 17/100 · Beobachtungsmatch</span><span class="points-chip">17/100</span></h3><p class="scip-hypothesis">Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von Universität Trier. Beide Partner haben komplementäre Rollen in der Cyberresilienz und kritischen Infrastruktur, aber es fehlen konkrete Implementierungspotenziale. Die nächste Schritte sollten eine Validierung des aktuellen Signals und die Bestätigung des Bedarfs durch Unternehmen, Kommunen und Versorger sein.</p><div class="critical-decision-grid compact-decision-lines"><p><strong>Decision:</strong> Beobachten und fehlenden Evidenzanker validieren; noch keine Handlungsempfehlung ableiten.</p><p><strong>Risk:</strong> Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einer Seite.</p><p><strong>Next:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung pruefen; noch kein Format ansetzen.</p></div><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Was bewertest du?</label><select class="feedback-target-select" aria-label="Feedback-Ziel"><option value="">Ziel auswählen</option><option value="actor_match">Akteursmatch</option><option value="evidence_signal">Evidenzsignal</option><option value="rlp_relevance">RLP-Relevanz</option><option value="next_action">Nächster Schritt</option><option value="typology_stage">Typologie/Reifegrad</option><option value="public_framing">Öffentliche Darstellung</option></select><label>Warum?</label><select class="feedback-reason-select" aria-label="Feedback-Grund"><option value="">Grund auswählen</option><option value="good_match">Guter Match</option><option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option><option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option><option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option><option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option><option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option><option value="source_only_actor">Akteur ist nur Quelle/Kontext</option><option value="wrong_counterpart">Gegenpart passt nicht</option><option value="insufficient_evidence">Zu wenig Evidenz</option><option value="weak_why_now">Warum jetzt unklar</option><option value="too_broad_action">Vorschlag zu breit</option><option value="wrong_pilot_lane">Falsches Pilotfeld</option><option value="not_public">Nicht öffentlich zeigen</option><option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option></select><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
-<article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;5000891c547646d2&quot;, &quot;opportunity_id&quot;: &quot;verwaltungswissen-digitalisierung-deutsche-universität-für-verwaltungswissenschaften-speyer-min&quot;, &quot;pattern_id&quot;: &quot;279&quot;, &quot;rank&quot;: &quot;33&quot;, &quot;selected&quot;: true, &quot;score&quot;: 9.13, &quot;display_points&quot;: 9, &quot;pair&quot;: &quot;Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau x Deutsche Universität für Verwaltungswissenschaften Speyer&quot;, &quot;actors&quot;: [&quot;Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau&quot;, &quot;Deutsche Universität für Verwaltungswissenschaften Speyer&quot;], &quot;actor_types&quot;: {&quot;Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau&quot;: &quot;profit_anchor&quot;, &quot;Deutsche Universität für Verwaltungswissenschaften Speyer&quot;: &quot;academic_support&quot;}, &quot;topic&quot;: &quot;Verwaltungswissen und digitale Umsetzung&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Verwaltungswissen und digitale Umsetzung&quot;, &quot;shared&quot;: [&quot;Wissenstransfer&quot;, &quot;Verwaltungswissen und digitale Umsetzung&quot;], &quot;bridge&quot;: [&quot;4&quot;], &quot;concrete&quot;: [&quot;Verwaltungswissen und digitale Umsetzung&quot;]}, &quot;reason&quot;: &quot;PrÃ¼fpunkt im Themenfeld Verwaltungswissen und digitale Umsetzung: Wie wird Verwaltung bei Regulierung, Genehmigung, Digitalisierung und Umsetzung leistungsfähiger? KlÃ¤ren, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;selection_reason&quot;: &quot;Von SCIP ausgewählt, weil diese Linie im aktuellen Signalbild besonders tragfähig wirkt: klare Rollen, belastbarer Anlass und hoher erwarteter Nutzen für eine mögliche ZIRP-Sondierung.&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;feedback_layer&quot;: &quot;dashboard_selected_card&quot;, &quot;words&quot;: [&quot;Verwaltungswissen&quot;, &quot;und&quot;, &quot;digitale&quot;, &quot;Umsetzung&quot;, &quot;PrÃ¼fpunkt&quot;, &quot;Themenfeld&quot;, &quot;Verwaltungswissen&quot;, &quot;und&quot;, &quot;digitale&quot;, &quot;Umsetzung&quot;, &quot;Wie&quot;, &quot;wird&quot;, &quot;Verwaltung&quot;, &quot;bei&quot;, &quot;Regulierung&quot;, &quot;Genehmigung&quot;, &quot;Digitalisierung&quot;, &quot;und&quot;, &quot;Umsetzung&quot;, &quot;leistungsf&quot;, &quot;higer&quot;, &quot;KlÃ¤ren&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;, &quot;gemeinsamer&quot;, &quot;Arbeitsauftrag&quot;, &quot;entsteht&quot;], &quot;public_status&quot;: &quot;hidden&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 9.13, &quot;display_points&quot;: 9, &quot;role_coverage_score&quot;: 0.65, &quot;number_of_signals&quot;: 1, &quot;signal_strength&quot;: 9.0, &quot;source_quality&quot;: 0.25, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: -2.71, &quot;public_status_score&quot;: 0, &quot;score&quot;: 9.13, &quot;raw_score&quot;: 32.0, &quot;rule_final_score&quot;: 32.0, &quot;nn_adjustment&quot;: -2.71, &quot;word_memory_hits&quot;: 19.0, &quot;feedback_evidence_count&quot;: 178.0, &quot;critical_action_penalty&quot;: 21.0, &quot;academic_support_count&quot;: 1.0, &quot;profit_anchor_count&quot;: 1.0, &quot;implementation_anchor_count&quot;: 0.0, &quot;context_actor_count&quot;: 0.0}, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau bringt Praxis-, Markt- oder Anwendungsperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Deutsche Universität für Verwaltungswissenschaften Speyer bringt Wissens-, Forschungs- und Transferperspektive ein.&quot;, &quot;why_now&quot;: &quot;Der Anlass ist noch schwach; die Empfehlung beruht derzeit vor allem auf thematischer Naehe.&quot;, &quot;concrete_joint_action&quot;: &quot;Sondierung: eine konkrete Verwaltungsaufgabe als digitales Testfeld definieren.&quot;, &quot;evidence_quality&quot;: &quot;niedrig: die Verbindung ist indirekt und noch nicht durch aktuelle Paar-Evidenz belegt.&quot;, &quot;sufficiency&quot;: &quot;nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;, &quot;consequence&quot;: &quot;Welche Transferfrage ist konkret genug, damit aus Hochschul- oder Netzwerkaktivität ein ZIRP-Gespräch wird?&quot;, &quot;uncertainty&quot;: &quot;ob aus indirekter Evidenz ein konkreter RLP-Anwendungsanker entsteht&quot;, &quot;action_decision&quot;: &quot;ignore&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: ignore, weil Evidenzqualität niedrig ist und die Suffizienz nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">Nicht öffentlich anzeigen</div><h3><span class="meeting-title">Ministerium für Wirtschaft, Verkehr, Landwi... x Deutsche Universität für Verwaltungswissens... · 9/100 · Beobachtungsmatch</span><span class="points-chip">9/100</span></h3><p class="scip-hypothesis">Die Akteure haben komplementäre Rollen in der Themengebiete Verwaltungswissen und digitaler Umsetzung. Der aktuelle Anlass ist jedoch schwach und die Evidenz indirekt, was einen konkreten RLP-Anwendungsanker nicht belegt.</p><div class="critical-decision-grid compact-decision-lines"><p><strong>Decision:</strong> Beobachten und fehlenden Evidenzanker validieren; noch keine Handlungsempfehlung ableiten.</p><p><strong>Risk:</strong> Die Verbindung ist indirekt und braucht einen konkreten RLP-Anwendungsanker.</p><p><strong>Next:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung pruefen; noch kein Format ansetzen.</p></div><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Was bewertest du?</label><select class="feedback-target-select" aria-label="Feedback-Ziel"><option value="">Ziel auswählen</option><option value="actor_match">Akteursmatch</option><option value="evidence_signal">Evidenzsignal</option><option value="rlp_relevance">RLP-Relevanz</option><option value="next_action">Nächster Schritt</option><option value="typology_stage">Typologie/Reifegrad</option><option value="public_framing">Öffentliche Darstellung</option></select><label>Warum?</label><select class="feedback-reason-select" aria-label="Feedback-Grund"><option value="">Grund auswählen</option><option value="good_match">Guter Match</option><option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option><option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option><option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option><option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option><option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option><option value="source_only_actor">Akteur ist nur Quelle/Kontext</option><option value="wrong_counterpart">Gegenpart passt nicht</option><option value="insufficient_evidence">Zu wenig Evidenz</option><option value="weak_why_now">Warum jetzt unklar</option><option value="too_broad_action">Vorschlag zu breit</option><option value="wrong_pilot_lane">Falsches Pilotfeld</option><option value="not_public">Nicht öffentlich zeigen</option><option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option></select><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
+<article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;c90c9dd550c01823&quot;, &quot;opportunity_id&quot;: &quot;cyber-resilienz-kritische-infrastruktur-entega-plus-gmbh-universität-trier&quot;, &quot;pattern_id&quot;: &quot;304&quot;, &quot;rank&quot;: &quot;5&quot;, &quot;selected&quot;: true, &quot;score&quot;: 16.63, &quot;display_points&quot;: 17, &quot;pair&quot;: &quot;ENTEGA Plus GmbH x Universität Trier&quot;, &quot;actors&quot;: [&quot;ENTEGA Plus GmbH&quot;, &quot;Universität Trier&quot;], &quot;actor_types&quot;: {&quot;ENTEGA Plus GmbH&quot;: &quot;profit_anchor&quot;, &quot;Universität Trier&quot;: &quot;academic_support&quot;}, &quot;topic&quot;: &quot;Cyberresilienz und kritische Infrastruktur&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Cyberresilienz und kritische Infrastruktur&quot;, &quot;shared&quot;: [&quot;Technologie&quot;, &quot;Cyberresilienz und kritische Infrastruktur&quot;], &quot;bridge&quot;: [&quot;4&quot;], &quot;concrete&quot;: [&quot;Cyberresilienz und kritische Infrastruktur&quot;]}, &quot;reason&quot;: &quot;PrÃ¼fpunkt im Themenfeld Cyberresilienz und kritische Infrastruktur: Wie schützen Unternehmen, Kommunen und Versorger digitale Systeme, Daten und kritische Infrastruktur? KlÃ¤ren, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;selection_reason&quot;: &quot;Von SCIP ausgewählt, weil diese Linie im aktuellen Signalbild besonders tragfähig wirkt: klare Rollen, belastbarer Anlass und hoher erwarteter Nutzen für eine mögliche ZIRP-Sondierung.&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;feedback_layer&quot;: &quot;dashboard_selected_card&quot;, &quot;words&quot;: [&quot;Cyberresilienz&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;PrÃ¼fpunkt&quot;, &quot;Themenfeld&quot;, &quot;Cyberresilienz&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;Wie&quot;, &quot;sch&quot;, &quot;tzen&quot;, &quot;Unternehmen&quot;, &quot;Kommunen&quot;, &quot;und&quot;, &quot;Versorger&quot;, &quot;digitale&quot;, &quot;Systeme&quot;, &quot;Daten&quot;, &quot;und&quot;, &quot;kritische&quot;, &quot;Infrastruktur&quot;, &quot;KlÃ¤ren&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;, &quot;gemeinsamer&quot;, &quot;Arbeitsauftrag&quot;, &quot;entsteht&quot;], &quot;public_status&quot;: &quot;sondierungshypothese&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 16.63, &quot;display_points&quot;: 17, &quot;role_coverage_score&quot;: 0.65, &quot;number_of_signals&quot;: 3, &quot;signal_strength&quot;: 17.0, &quot;source_quality&quot;: 0.75, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: -3.503, &quot;public_status_score&quot;: 2, &quot;score&quot;: 16.63, &quot;raw_score&quot;: 41.133, &quot;rule_final_score&quot;: 41.133, &quot;nn_adjustment&quot;: -3.503, &quot;word_memory_hits&quot;: 13.0, &quot;feedback_evidence_count&quot;: 214.0, &quot;critical_action_penalty&quot;: 21.0, &quot;academic_support_count&quot;: 1.0, &quot;profit_anchor_count&quot;: 1.0, &quot;implementation_anchor_count&quot;: 0.0, &quot;context_actor_count&quot;: 0.0}, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;ENTEGA Plus GmbH bringt Praxis-, Markt- oder Anwendungsperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Universität Trier bringt wissenschaftliche, ethische und gesellschaftliche Orientierung ein.&quot;, &quot;why_now&quot;: &quot;Aktuelle Auslöser sind: Universität Trier: Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik; Universität Trier: 2,7 Millionen Euro für die Zukunft der Lehre. Das Zeitfenster ist relevant, weil sich daraus eine konkrete ZIRP-Frage ableiten lässt.&quot;, &quot;concrete_joint_action&quot;: &quot;90-Tage-Praxischeck: eine digitale Anwendung für mittelständische Produktivität in einem Betriebskontext testen.&quot;, &quot;evidence_quality&quot;: &quot;mittel bis niedrig: die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einem Akteur.&quot;, &quot;sufficiency&quot;: &quot;ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;, &quot;consequence&quot;: &quot;Welche Transferfrage ist konkret genug, damit aus Hochschul- oder Netzwerkaktivität ein ZIRP-Gespräch wird?&quot;, &quot;uncertainty&quot;: &quot;ob die zweite Seite den Bedarf aktuell bestaetigt&quot;, &quot;action_decision&quot;: &quot;ignore&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: ignore, weil Evidenzqualität mittel bis niedrig ist und die Suffizienz ausreichend für Beobachtung oder Reframing, noch nicht für ein Top-Match.&quot;}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">#5 · Starker Match</div><h3><span class="meeting-title">ENTEGA Plus GmbH x Uni Trier · 17/100 · Beobachtungsmatch</span><span class="points-chip">17/100</span></h3><p class="scip-hypothesis">Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von Universität Trier. Entega Plus GmbH und die Universität haben komplementäre Rollen, was Cyberresilienz und kritische Infrastruktur betrifft, aber es fehlen konkrete Implementierungspfade.</p><div class="critical-decision-grid compact-decision-lines"><p><strong>Decision:</strong> Beobachten und fehlenden Evidenzanker validieren; noch keine Handlungsempfehlung ableiten.</p><p><strong>Risk:</strong> Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von einer Seite.</p><p><strong>Next:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung pruefen; noch kein Format ansetzen.</p></div><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Was bewertest du?</label><select class="feedback-target-select" aria-label="Feedback-Ziel"><option value="">Ziel auswählen</option><option value="actor_match">Akteursmatch</option><option value="evidence_signal">Evidenzsignal</option><option value="rlp_relevance">RLP-Relevanz</option><option value="next_action">Nächster Schritt</option><option value="typology_stage">Typologie/Reifegrad</option><option value="public_framing">Öffentliche Darstellung</option></select><label>Warum?</label><select class="feedback-reason-select" aria-label="Feedback-Grund"><option value="">Grund auswählen</option><option value="good_match">Guter Match</option><option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option><option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option><option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option><option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option><option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option><option value="source_only_actor">Akteur ist nur Quelle/Kontext</option><option value="wrong_counterpart">Gegenpart passt nicht</option><option value="insufficient_evidence">Zu wenig Evidenz</option><option value="weak_why_now">Warum jetzt unklar</option><option value="too_broad_action">Vorschlag zu breit</option><option value="wrong_pilot_lane">Falsches Pilotfeld</option><option value="not_public">Nicht öffentlich zeigen</option><option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option></select><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
+<article class="meeting-card compact-meeting-card" data-feedback-payload="{&quot;recommendation_id&quot;: &quot;5000891c547646d2&quot;, &quot;opportunity_id&quot;: &quot;verwaltungswissen-digitalisierung-deutsche-universität-für-verwaltungswissenschaften-speyer-min&quot;, &quot;pattern_id&quot;: &quot;279&quot;, &quot;rank&quot;: &quot;33&quot;, &quot;selected&quot;: true, &quot;score&quot;: 9.13, &quot;display_points&quot;: 9, &quot;pair&quot;: &quot;Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau x Deutsche Universität für Verwaltungswissenschaften Speyer&quot;, &quot;actors&quot;: [&quot;Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau&quot;, &quot;Deutsche Universität für Verwaltungswissenschaften Speyer&quot;], &quot;actor_types&quot;: {&quot;Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau&quot;: &quot;profit_anchor&quot;, &quot;Deutsche Universität für Verwaltungswissenschaften Speyer&quot;: &quot;academic_support&quot;}, &quot;topic&quot;: &quot;Verwaltungswissen und digitale Umsetzung&quot;, &quot;topics&quot;: {&quot;theme&quot;: &quot;Verwaltungswissen und digitale Umsetzung&quot;, &quot;shared&quot;: [&quot;Wissenstransfer&quot;, &quot;Verwaltungswissen und digitale Umsetzung&quot;], &quot;bridge&quot;: [&quot;4&quot;], &quot;concrete&quot;: [&quot;Verwaltungswissen und digitale Umsetzung&quot;]}, &quot;reason&quot;: &quot;PrÃ¼fpunkt im Themenfeld Verwaltungswissen und digitale Umsetzung: Wie wird Verwaltung bei Regulierung, Genehmigung, Digitalisierung und Umsetzung leistungsfähiger? KlÃ¤ren, ob daraus ein konkreter gemeinsamer Arbeitsauftrag entsteht.&quot;, &quot;selection_reason&quot;: &quot;Von SCIP ausgewählt, weil diese Linie im aktuellen Signalbild besonders tragfähig wirkt: klare Rollen, belastbarer Anlass und hoher erwarteter Nutzen für eine mögliche ZIRP-Sondierung.&quot;, &quot;non_selection_reason&quot;: &quot;&quot;, &quot;feedback_layer&quot;: &quot;dashboard_selected_card&quot;, &quot;words&quot;: [&quot;Verwaltungswissen&quot;, &quot;und&quot;, &quot;digitale&quot;, &quot;Umsetzung&quot;, &quot;PrÃ¼fpunkt&quot;, &quot;Themenfeld&quot;, &quot;Verwaltungswissen&quot;, &quot;und&quot;, &quot;digitale&quot;, &quot;Umsetzung&quot;, &quot;Wie&quot;, &quot;wird&quot;, &quot;Verwaltung&quot;, &quot;bei&quot;, &quot;Regulierung&quot;, &quot;Genehmigung&quot;, &quot;Digitalisierung&quot;, &quot;und&quot;, &quot;Umsetzung&quot;, &quot;leistungsf&quot;, &quot;higer&quot;, &quot;KlÃ¤ren&quot;, &quot;daraus&quot;, &quot;ein&quot;, &quot;konkreter&quot;, &quot;gemeinsamer&quot;, &quot;Arbeitsauftrag&quot;, &quot;entsteht&quot;], &quot;public_status&quot;: &quot;hidden&quot;, &quot;features&quot;: {&quot;scip_score&quot;: 9.13, &quot;display_points&quot;: 9, &quot;role_coverage_score&quot;: 0.65, &quot;number_of_signals&quot;: 1, &quot;signal_strength&quot;: 9.0, &quot;source_quality&quot;: 0.25, &quot;recency&quot;: 1.0, &quot;llm_judge_score&quot;: -2.71, &quot;public_status_score&quot;: 0, &quot;score&quot;: 9.13, &quot;raw_score&quot;: 32.0, &quot;rule_final_score&quot;: 32.0, &quot;nn_adjustment&quot;: -2.71, &quot;word_memory_hits&quot;: 19.0, &quot;feedback_evidence_count&quot;: 178.0, &quot;critical_action_penalty&quot;: 21.0, &quot;academic_support_count&quot;: 1.0, &quot;profit_anchor_count&quot;: 1.0, &quot;implementation_anchor_count&quot;: 0.0, &quot;context_actor_count&quot;: 0.0}, &quot;critical_judgment&quot;: {&quot;why_this_actor&quot;: &quot;Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau bringt Praxis-, Markt- oder Anwendungsperspektive ein.&quot;, &quot;why_this_counterpart&quot;: &quot;Deutsche Universität für Verwaltungswissenschaften Speyer bringt Wissens-, Forschungs- und Transferperspektive ein.&quot;, &quot;why_now&quot;: &quot;Der Anlass ist noch schwach; die Empfehlung beruht derzeit vor allem auf thematischer Naehe.&quot;, &quot;concrete_joint_action&quot;: &quot;Sondierung: eine konkrete Verwaltungsaufgabe als digitales Testfeld definieren.&quot;, &quot;evidence_quality&quot;: &quot;niedrig: die Verbindung ist indirekt und noch nicht durch aktuelle Paar-Evidenz belegt.&quot;, &quot;sufficiency&quot;: &quot;nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;, &quot;consequence&quot;: &quot;Welche Transferfrage ist konkret genug, damit aus Hochschul- oder Netzwerkaktivität ein ZIRP-Gespräch wird?&quot;, &quot;uncertainty&quot;: &quot;ob aus indirekter Evidenz ein konkreter RLP-Anwendungsanker entsteht&quot;, &quot;action_decision&quot;: &quot;ignore&quot;, &quot;critical_decision_reason&quot;: &quot;Entscheidung: ignore, weil Evidenzqualität niedrig ist und die Suffizienz nicht ausreichend; weiteres Signal oder konkreter Bedarf fehlt.&quot;}, &quot;source&quot;: &quot;dashboard_scip_card&quot;}"><div class="scip-label">Nicht öffentlich anzeigen</div><h3><span class="meeting-title">Ministerium für Wirtschaft, Verkehr, Landwi... x Deutsche Universität für Verwaltungswissens... · 9/100 · Beobachtungsmatch</span><span class="points-chip">9/100</span></h3><p class="scip-hypothesis">Die Akteure passen gut aufgrund komplementärer Rollen, aber der aktuelle Anlass ist schwach. Die Verbindung basiert vor allem auf thematischer Nähe und indirekter Evidenz. Es fehlen konkrete RLP-Anwendungsanker.</p><div class="critical-decision-grid compact-decision-lines"><p><strong>Decision:</strong> Beobachten und fehlenden Evidenzanker validieren; noch keine Handlungsempfehlung ableiten.</p><p><strong>Risk:</strong> Die Verbindung ist indirekt und braucht einen konkreten RLP-Anwendungsanker.</p><p><strong>Next:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung pruefen; noch kein Format ansetzen.</p></div><div class="feedback-box" aria-label="SCIP Feedback"><span>Feedback für SCIP:</span><button type="button" onclick="prepareScipFeedback(this, 'useful')">Nützlich</button><button type="button" onclick="prepareScipFeedback(this, 'interesting_but_weak')">Schwach</button><button type="button" onclick="prepareScipFeedback(this, 'wrong_connection')">Verbindung falsch</button><button type="button" onclick="prepareScipFeedback(this, 'good_topic_wrong_actors')">Akteure falsch</button><button type="button" onclick="prepareScipFeedback(this, 'not_relevant')">Nicht relevant</button><div class="feedback-comment-box" hidden><label>Was bewertest du?</label><select class="feedback-target-select" aria-label="Feedback-Ziel"><option value="">Ziel auswählen</option><option value="actor_match">Akteursmatch</option><option value="evidence_signal">Evidenzsignal</option><option value="rlp_relevance">RLP-Relevanz</option><option value="next_action">Nächster Schritt</option><option value="typology_stage">Typologie/Reifegrad</option><option value="public_framing">Öffentliche Darstellung</option></select><label>Warum?</label><select class="feedback-reason-select" aria-label="Feedback-Grund"><option value="">Grund auswählen</option><option value="good_match">Guter Match</option><option value="good_match_weak_evidence">Guter Match, aber schwache Evidenz</option><option value="good_match_weak_rlp">Guter Match, aber schwacher RLP-Bezug</option><option value="indirect_transfer_legitimacy">Indirekte Transfer-Legitimation, keine direkte RLP-Anwendung</option><option value="missing_rlp_application_anchor">RLP-Anwendungsanker fehlt</option><option value="source_signal_not_application">Signal zeigt Kompetenz, aber keinen Anwendungskontext</option><option value="source_only_actor">Akteur ist nur Quelle/Kontext</option><option value="wrong_counterpart">Gegenpart passt nicht</option><option value="insufficient_evidence">Zu wenig Evidenz</option><option value="weak_why_now">Warum jetzt unklar</option><option value="too_broad_action">Vorschlag zu breit</option><option value="wrong_pilot_lane">Falsches Pilotfeld</option><option value="not_public">Nicht öffentlich zeigen</option><option value="downgrade_not_drop">Nicht löschen, sondern herunterstufen</option></select><textarea rows="3" placeholder="z.B. Akteursrolle oder Verbindung passt nicht."></textarea><button type="button" onclick="submitScipFeedback(this)">Feedback speichern</button><button type="button" onclick="cancelScipFeedback(this)">Abbrechen</button></div><small class="feedback-status"></small></div></article>
       </div>
     </section>
   </main>
