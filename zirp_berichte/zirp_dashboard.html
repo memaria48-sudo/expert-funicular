@@ -79,31 +79,18 @@
       text-decoration: none;
     }
     .brand img {
-      width: 172px;
-      height: 62px;
+      width: min(420px, 46vw);
+      height: auto;
+      aspect-ratio: 16 / 9;
       object-fit: contain;
+      object-position: center;
       border-radius: 8px;
-      border: 1px solid rgba(0,174,239,.28);
-      background: #020407;
-      box-shadow: 0 0 28px rgba(0,174,239,.14);
+      border: 1px solid rgba(0,174,239,.20);
+      background: #000;
+      box-shadow: 0 0 26px rgba(0,174,239,.14);
+      flex: 0 0 auto;
     }
-    .brand-title { min-width: 0; }
-    .brand-title strong {
-      display: block;
-      font-size: 1.02rem;
-      letter-spacing: .11em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      color: var(--white);
-      font-weight: 760;
-    }
-    .brand-title span {
-      display: block;
-      color: #AAB3C0;
-      font-size: .8rem;
-      margin-top: 4px;
-      letter-spacing: .08em;
-    }
+    .brand-title { display: none; }
     nav {
       display: flex;
       gap: 8px;
@@ -333,8 +320,7 @@
     .footer-inner strong { color: white; }
     @media (max-width: 900px) {
       .header-inner { display: block; }
-      .brand img { width: 142px; height: 52px; }
-      .brand-title strong { white-space: normal; }
+      .brand img { width: min(320px, 78vw); }
       nav { justify-content: flex-start; margin-top: 14px; }
       .page-intro { padding: 24px 20px; }
       .page-intro::before, .page-intro::after { display: none; }
@@ -349,10 +335,6 @@
     <div class="header-inner">
       <a class="brand" href="zirp_dashboard.html">
         <img src="sor-logo.png" alt="SOR Strategic Opportunity Radar Logo" />
-        <span class="brand-title">
-          <strong>Strategic Opportunity Radar</strong>
-          <span>Detect signals. Connect actors. Act in time.</span>
-        </span>
       </a>
       <nav><a class="active" href="zirp_dashboard.html">Wochenanalyse</a>
 <a class="" href="signals.html">Signale &amp; Begriffe</a>
@@ -363,14 +345,14 @@
   <main class="wrap">
     <section class="page-intro">
       <h1>SOR Wochenradar</h1>
-      <p class="subtitle">102 Mitglieder geprüft · erstellt 10.06.2026, 00:11:03 · Detect signals. Connect actors. Act in time.</p>
+      <p class="subtitle">102 Mitglieder geprüft · erstellt 13.06.2026, 00:38:42 · Detect signals. Connect actors. Act in time.</p>
     </section>
-    <article class="card analysis"><h2 class="briefing-title">Wird Umsetzung zur Engstelle der digitalen Transformation?</h2>
+    <article class="card analysis"><h2 class="briefing-title">Wird die regionale Anwendung zur Engstelle der digitalen Umsetzung?</h2>
 <p class="executive-summary"><strong>Die aktuellen SCIP-Matchings legen nahe, dass regionale Transformation weniger an fehlenden Ideen scheitert als an der Übersetzung vorhandener Kompetenzen in konkrete Anwendungen.</strong></p>
 <p>Die Digitalisierung erreicht kommunale Infrastruktur, Verwaltung, Handwerk und wissenschaftlichen Transfer zugleich. Dies zeigt, dass die zentrale Frage nicht mehr darin besteht, ob digitale Lösungen gebraucht werden, sondern wo vorhandenes Wissen, technologische Kompetenz und reale Anwendungskontexte zusammengeführt werden können. Die strategische Chance liegt nicht in der bloßen Verfügbarkeit von Technologien, sondern in der Fähigkeit, diese in konkrete regionale Anwendungen zu übersetzen.</p>
-<p>Die zentrale Engstelle liegt weniger in der Verfügbarkeit von digitalen Werkzeugen als in der Umsetzungslücke zwischen vorhandenem Wissen und realen Anwendungskontexten. Die wichtigsten ausgewählten SCIP-Karten zeigen, dass Universität Trier, IQIB und Hochschule Mainz jeweils eigene Rollen in diesem Prozess spielen können. Universität Trier und IQIB können eine bilaterale Sondierung für ein Testfeld tragen, während Hochschule Mainz eher Pfadfindung zu kommunaler Resilienz markiert. Eine Medien- oder Finanzierungskarte kann zunächst Validierung oder Briefing erfordern.</p>
-<p>Die Stufenlogik zeigt, dass nicht alle Karten sofortige Sondierung tragen. Während einige Karten wie die von Universität Trier und IQIB eine Sondierung rechtfertigen, sollten andere Karten wie die von Hochschule Mainz zunächst Validierung oder Lagebild erfordern. Es ist wichtig, diese Logik zu berücksichtigen, um nicht alle Karten in dieselbe Empfehlung zu pressen. Wenn eine Karte noch keine Umsetzung trägt, sollte ZIRP noch nicht umsetzen, sondern zunächst Validierung oder Briefing anstreben.</p>
-<p>Für ZIRP ergibt sich daraus eine klarere Rolle: nicht Akteure allgemein zu vernetzen, sondern komplementäre Fähigkeiten in entscheidungsfähige Pilotkonstellationen zu übersetzen. Ein erster Schritt könnte ein kuratiertes Sondierungsgespräch zwischen Universität Trier und IQIB sein, um eine konkrete Pilotkonstellation für regionale Infrastruktur zu entwickeln. Dieses Gespräch sollte einen klaren Teilnehmerkreis, eine konkrete Leitfrage und ein genau definiertes Pilotfeld haben, idealerweise als 90-Tage-Test. Durch diese konkrete Pilot-Lane kann ZIRP seine Rolle als Übersetzer in Pilotkonstellationen stärken und die Umsetzungslücke zwischen vorhandenem Wissen und realen Anwendungskontexten schließen.</p></article>
+<p>Die wichtigsten ausgewählten SCIP-Karten als Portfolio zeigen, dass Universität Trier und SmartFactory KL e.V. eine bilaterale Sondierung für ein Testfeld tragen können; Bundesagentur für Arbeit und Hochschule Mainz markieren eher Pfadfindung zu kommunaler Resilienz. Die Karten von Universität Trier und SmartFactory KL e.V. rechtfertigen Sondierung, während die Karten von Bundesagentur für Arbeit und Hochschule Mainz zunächst Validierung oder Briefing erfordern. Die Convening-Stufe und der nächste Move für jede Karte müssen sorgfältig abgestimmt werden, um eine entscheidungsfähige Pilotkonstellation zu bilden.</p>
+<p>Die Stufenlogik zeigt, dass nicht alle Karten sofortige Sondierung tragen, sondern dass einige nur Validierung, Lagebild oder Beobachtung rechtfertigen. Es ist entscheidend, die richtige Stufe für jede Karte zu bestimmen, um eine überzeugende Argumentation für ZIRP zu liefern. Die weiteren Matchings erweitern diese Logik und zeigen, dass die regionale Anwendung eine zentrale Engstelle der digitalen Umsetzung darstellt.</p>
+<p>Für ZIRP ergibt sich daraus eine klarere Rolle: nicht Akteure allgemein zu vernetzen, sondern komplementäre Fähigkeiten in entscheidungsfähige Pilotkonstellationen zu übersetzen. Ein erster Schritt könnte ein kuratiertes Sondierungsgespräch zwischen Universität Trier und SmartFactory KL e.V. sein, um die Möglichkeiten einer gemeinsamen Pilotanwendung zu erkunden. Die konkrete Leitfrage könnte lauten: &quot;Wie können wir gemeinsam eine digitale Plattform für die regionale Wirtschaftsentwicklung entwickeln?&quot; Das Ziel wäre, innerhalb von 90 Tagen ein Pilotprojekt zu starten, das die regionale Anwendung von digitalen Technologien vorantreibt.</p></article>
   </main>
   <footer class="site-footer">
     <div class="footer-inner">

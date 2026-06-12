@@ -79,31 +79,18 @@
       text-decoration: none;
     }
     .brand img {
-      width: 172px;
-      height: 62px;
+      width: min(420px, 46vw);
+      height: auto;
+      aspect-ratio: 16 / 9;
       object-fit: contain;
+      object-position: center;
       border-radius: 8px;
-      border: 1px solid rgba(0,174,239,.28);
-      background: #020407;
-      box-shadow: 0 0 28px rgba(0,174,239,.14);
+      border: 1px solid rgba(0,174,239,.20);
+      background: #000;
+      box-shadow: 0 0 26px rgba(0,174,239,.14);
+      flex: 0 0 auto;
     }
-    .brand-title { min-width: 0; }
-    .brand-title strong {
-      display: block;
-      font-size: 1.02rem;
-      letter-spacing: .11em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      color: var(--white);
-      font-weight: 760;
-    }
-    .brand-title span {
-      display: block;
-      color: #AAB3C0;
-      font-size: .8rem;
-      margin-top: 4px;
-      letter-spacing: .08em;
-    }
+    .brand-title { display: none; }
     nav {
       display: flex;
       gap: 8px;
@@ -333,8 +320,7 @@
     .footer-inner strong { color: white; }
     @media (max-width: 900px) {
       .header-inner { display: block; }
-      .brand img { width: 142px; height: 52px; }
-      .brand-title strong { white-space: normal; }
+      .brand img { width: min(320px, 78vw); }
       nav { justify-content: flex-start; margin-top: 14px; }
       .page-intro { padding: 24px 20px; }
       .page-intro::before, .page-intro::after { display: none; }
@@ -349,10 +335,6 @@
     <div class="header-inner">
       <a class="brand" href="zirp_dashboard.html">
         <img src="sor-logo.png" alt="SOR Strategic Opportunity Radar Logo" />
-        <span class="brand-title">
-          <strong>Strategic Opportunity Radar</strong>
-          <span>Detect signals. Connect actors. Act in time.</span>
-        </span>
       </a>
       <nav><a class="" href="zirp_dashboard.html">Wochenanalyse</a>
 <a class="active" href="signals.html">Signale &amp; Begriffe</a>
@@ -370,46 +352,46 @@
           <div>
             <article class="card">
               <h2>Priorisierte News-Signale</h2>
-              <div class="event-chip"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1[action]=detail&amp;tx_news_pi1[controller]=News&amp;tx_news_pi1[news]=30106&amp;cHash=6905ba8fb6baaf6a00b34ae26a5057e8" target="_blank" rel="noopener">German-Namibian Exchange of Educators</a><small>2026-06-08 · Universität Trier · Kooperation / Vernetzung</small></div>
-<div class="event-chip"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1[action]=detail&amp;tx_news_pi1[controller]=News&amp;tx_news_pi1[news]=30124&amp;cHash=7928e736536d0c044e5136d69f53e7dc" target="_blank" rel="noopener">2,7 Millionen Euro für die Zukunft der Lehre</a><small>2026-06-08 · Universität Trier · Wissenstransfer / institutionelle Öffnung</small></div>
-<div class="event-chip"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1%5Baction%5D=detail&amp;tx_news_pi1%5Bcontroller%5D=News&amp;tx_news_pi1%5Bnews%5D=30077&amp;cHash=53ed27af39e5860f87aaa791035df914" target="_blank" rel="noopener">Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik</a><small>2026-06-08 · Universität Trier · Gesellschaft / Engagement</small></div>
-<div class="event-chip"><a href="https://www.iqib.de/de/resilienzforschung-und-klimaanpassung.html" target="_blank" rel="noopener">Resilienzforschung und Klimaanpassung</a><small>2026-05-29 · IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH · Transformation / kommunale Praxis</small></div>
-<div class="event-chip"><a href="https://www.uni-trier.de/universitaet/fachbereiche-faecher/fachbereich-i/faecher-und-institute/pflegewissenschaft/studium/bsc-klinische-pflege-neu" target="_blank" rel="noopener">Klinische Pflege B.Sc.</a><small>2026-06-05 · Universität Trier · Internationalisierung</small></div>
-<div class="event-chip"><a href="https://www.th-bingen.de/news/neues-herzstueck-fuer-den-campus-minister-hochschule-und-gaeste-weihen-das-audimax-ein" target="_blank" rel="noopener">Neues Herzstück für den Campus: Minister, Hochschule und Gäste weihen das Audimax ein</a><small>2026-05-28 · Technische Hochschule Bingen · Gesellschaft / Engagement</small></div>
-<div class="event-chip"><a href="https://www.lbbw.de/artikel/news-und-einschaetzungen/deutsche-industrieproduktion-im-april-2026_amypki2xxx_d.html" target="_blank" rel="noopener">Deutsche Industrieproduktion legt im April zu</a><small>2026-06-09 · Landesbank Baden-Württemberg (LBBW) · Wirtschaft / Entwicklung</small></div>
-<div class="event-chip"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1[action]=detail&amp;tx_news_pi1[controller]=News&amp;tx_news_pi1[news]=30022&amp;cHash=e5c6f25a81ebb32aad793a63d7596748" target="_blank" rel="noopener">Klares Bekenntnis der Universität Trier zur Psychologie-Weiterbildung</a><small>2026-06-08 · Universität Trier · Gesellschaft / Engagement</small></div>
+              <div class="event-chip"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1[action]=detail&amp;tx_news_pi1[controller]=News&amp;tx_news_pi1[news]=30106&amp;cHash=6905ba8fb6baaf6a00b34ae26a5057e8" target="_blank" rel="noopener">German-Namibian Exchange of Educators als LernOrt Nachhaltigkeit ausgezeichnet</a><small>2026-06-10 · Universität Trier · Gesellschaft / Engagement</small></div>
+<div class="event-chip"><a href="https://www.lbbw.de/artikel/banking-erleben/asiengeschaeft-im-maschinenbau_amy7zz1h6k_d.html" target="_blank" rel="noopener">Asiengeschäft im Maschinenbau – LBBW vor Ort in Asien</a><small>2026-06-11 · Landesbank Baden-Württemberg (LBBW) · Wissen / Wirtschaft</small></div>
+<div class="event-chip"><a href="https://smartfactory.de/smartfactory-kl-beteiligt-sich-an-cosime-metaverse-fuer-den-strassenbau" target="_blank" rel="noopener">Neues Forschungsprojekt gestartet: CoSiMe – „Road Construction Site Metaverse“</a><small>2026-06-11 · SmartFactory KL e.V. · Kooperation / Vernetzung</small></div>
+<div class="event-chip"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1[action]=detail&amp;tx_news_pi1[controller]=News&amp;tx_news_pi1[news]=30124&amp;cHash=7928e736536d0c044e5136d69f53e7dc" target="_blank" rel="noopener">2,7 Millionen Euro für die Zukunft der Lehre</a><small>2026-06-10 · Universität Trier · Wissenstransfer / institutionelle Öffnung</small></div>
+<div class="event-chip"><a href="https://www.th-bingen.de/news/weniger-tierhaltung-was-wird-aus-dem-gruenland" target="_blank" rel="noopener">Weniger Tierhaltung – was wird aus dem Grünland?</a><small>2026-06-11 · Technische Hochschule Bingen · Gesellschaft / Engagement</small></div>
+<div class="event-chip"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1%5Baction%5D=detail&amp;tx_news_pi1%5Bcontroller%5D=News&amp;tx_news_pi1%5Bnews%5D=30077&amp;cHash=53ed27af39e5860f87aaa791035df914" target="_blank" rel="noopener">Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik</a><small>2026-06-10 · Universität Trier · Gesellschaft / Engagement</small></div>
+<div class="event-chip"><a href="https://www.hs-mainz.de/news/richtfest-fuer-lucy/?back=365&amp;cHash=21d7d7c7e94ca657d96293929f7d5ad9" target="_blank" rel="noopener">LUCY: Neues Coworking-Gebäude der Hochschule Mainz</a><small>2026-06-10 · Hochschule Mainz · Kooperation / Vernetzung</small></div>
+<div class="event-chip"><a href="https://www.uni-trier.de/universitaet/fachbereiche-faecher/fachbereich-i/faecher-und-institute/pflegewissenschaft/studium/bsc-klinische-pflege-neu" target="_blank" rel="noopener">Klinische Pflege B.Sc.</a><small>2026-06-11 · Universität Trier · Internationalisierung</small></div>
             </article>
             <article class="card" style="margin-top:18px;">
               <h2>Gewichtete Begriffe</h2>
-              <div class="term-row"><span class="term">hochschule · 408</span>
-<span class="term">nachhaltigkeit · 374</span>
-<span class="term">wirtschaft · 298</span>
-<span class="term">forschung · 251</span>
-<span class="term">gemeinsam · 240</span>
-<span class="term">gesundheit · 238</span>
-<span class="term">pflege · 205</span>
-<span class="term">standort · 204</span>
-<span class="term">verantwortung · 190</span>
-<span class="term">gesellschaft · 188</span>
-<span class="term">ausbildung · 181</span>
-<span class="term">markt · 152</span></div>
+              <div class="term-row"><span class="term">nachhaltigkeit · 391</span>
+<span class="term">hochschule · 352</span>
+<span class="term">forschung · 260</span>
+<span class="term">gesundheit · 252</span>
+<span class="term">wirtschaft · 242</span>
+<span class="term">gemeinsam · 225</span>
+<span class="term">standort · 184</span>
+<span class="term">markt · 160</span>
+<span class="term">versorgung · 160</span>
+<span class="term">bildung · 157</span>
+<span class="term">ausbildung · 152</span>
+<span class="term">gesellschaft · 150</span></div>
             </article>
           </div>
           <aside>
             <div class="card">
               <div class="stat-grid">
-                <div class="stat"><b>4</b><span>Mitglieder</span></div>
-                <div class="stat"><b>10</b><span>Signale</span></div>
+                <div class="stat"><b>5</b><span>Mitglieder</span></div>
+                <div class="stat"><b>12</b><span>Signale</span></div>
               </div>
               <h2>Schwerpunkte</h2>
-              <div class="section-row"><div class="section-top"><span>Soziales Engagement</span><strong>6</strong></div><div class="bar"><span style="width:100%"></span></div></div>
-<div class="section-row"><div class="section-top"><span>Wirtschaftslage und -entwicklung</span><strong>2</strong></div><div class="bar"><span style="width:36%"></span></div></div>
-<div class="section-row"><div class="section-top"><span>Kooperationen mit anderen Unternehmen / Partnern</span><strong>1</strong></div><div class="bar"><span style="width:18%"></span></div></div>
+              <div class="section-row"><div class="section-top"><span>Soziales Engagement</span><strong>8</strong></div><div class="bar"><span style="width:100%"></span></div></div>
+<div class="section-row"><div class="section-top"><span>Kooperationen mit anderen Unternehmen / Partnern</span><strong>2</strong></div><div class="bar"><span style="width:36%"></span></div></div>
+<div class="section-row"><div class="section-top"><span>Wirtschaftslage und -entwicklung</span><strong>1</strong></div><div class="bar"><span style="width:18%"></span></div></div>
 <div class="section-row"><div class="section-top"><span>Versorgung und Gesundheitssystem</span><strong>1</strong></div><div class="bar"><span style="width:18%"></span></div></div>
             </div>
             <div class="card" style="margin-top:18px;">
               <h2>Mitglieder</h2>
-              <p class="members">IQIB - Institut für qualifizierende Innovationsforschung und -beratung GmbH, Landesbank Baden-Württemberg (LBBW), Technische Hochschule Bingen, Universität Trier</p>
+              <p class="members">Hochschule Mainz, Landesbank Baden-Württemberg (LBBW), SmartFactory KL e.V., Technische Hochschule Bingen, Universität Trier</p>
             </div>
           </aside>
         </section>
