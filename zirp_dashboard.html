@@ -49,15 +49,15 @@ body::before {
 }
 a { color: inherit; }
 .shell {
-  width: min(1540px, calc(100% - 48px));
+  width: min(1720px, calc(100% - 48px));
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 .topbar {
   margin: 18px auto 16px;
-  padding: 16px 18px;
-  min-height: 92px;
+  padding: 20px 26px;
+  min-height: 118px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -68,7 +68,7 @@ a { color: inherit; }
   box-shadow: 0 22px 50px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.04);
 }
 .brand { display: inline-flex; align-items: center; text-decoration: none; }
-.brand img { width: 144px; height: auto; display: block; }
+.brand-logo { width: 220px; height: auto; display: block; }
 .nav { display: flex; align-items: center; justify-content: flex-end; gap: 16px; flex-wrap: wrap; }
 .nav a {
   min-width: 144px;
@@ -172,15 +172,15 @@ a { color: inherit; }
 
 .home-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(340px, .95fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 2.45fr) minmax(310px, .8fr);
+  gap: 18px;
 }
 .article {
   background: #fbfcfe;
   color: var(--ink);
   border: 1px solid rgba(91, 180, 255, .46);
   border-radius: 8px;
-  padding: 28px 30px;
+  padding: 40px 42px;
   box-shadow: 0 22px 44px rgba(0,0,0,.28);
 }
 .article h1 {
@@ -188,29 +188,29 @@ a { color: inherit; }
   color: #07101f;
   text-transform: uppercase;
   letter-spacing: .02em;
-  font-size: clamp(27px, 3.1vw, 38px);
+  font-size: clamp(32px, 3.25vw, 46px);
   line-height: 1.12;
 }
 .lead {
   margin: 0 0 22px;
-  padding: 16px 20px;
+  padding: 18px 22px;
   border: 1px solid rgba(31, 155, 255, .55);
   border-left: 5px solid var(--blue);
   border-radius: 5px;
   color: #0755b5;
-  font-size: 18px;
-  line-height: 1.55;
+  font-size: 19px;
+  line-height: 1.58;
   font-weight: 800;
   background: rgba(238, 248, 255, .72);
 }
 .article p {
   margin: 0 0 17px;
-  font-size: 17px;
-  line-height: 1.48;
+  font-size: 19px;
+  line-height: 1.58;
   color: #111827;
 }
 .sources {
-  padding: 28px 30px;
+  padding: 30px 34px;
   min-height: 100%;
 }
 .sources h2, .mini-panel h2 {
@@ -232,6 +232,7 @@ a { color: inherit; }
   font-weight: 800;
   text-decoration: none;
 }
+.source-title:hover { color: var(--blue2); text-decoration: underline; text-underline-offset: 4px; }
 .source-member {
   margin-top: 10px;
   color: #57b8ff;
@@ -283,7 +284,29 @@ a { color: inherit; }
     
     <header class="topbar">
       <a class="brand" href="zirp_berichte/zirp_dashboard.html" aria-label="SOR Wochenanalyse">
-        <img src="zirp_berichte/sor-logo-full.png" alt="SOR Strategic Opportunity Radar">
+        
+      <svg class="brand-logo" viewBox="0 0 340 112" role="img" aria-label="SOR Strategic Opportunity Radar">
+        <defs>
+          <linearGradient id="sorBlue" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset=".52" stop-color="#55d7ff"/>
+            <stop offset="1" stop-color="#126cff"/>
+          </linearGradient>
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" filter="url(#softGlow)">
+          <path stroke="#f8fbff" d="M68 20H22c-11 0-18 7-18 17s7 17 18 17h31c12 0 19 8 19 18s-8 18-20 18H8"/>
+          <path stroke="#f8fbff" d="M260 20h52c15 0 24 9 24 22s-9 22-24 22h-38v26"/>
+          <path stroke="#f8fbff" d="M309 64l27 26"/>
+          <path stroke="url(#sorBlue)" d="M151 18a43 43 0 1 1-2 0"/>
+          <circle cx="191" cy="31" r="6" fill="#2a9fff" stroke="none"/>
+        </g>
+        <text x="4" y="108" fill="#d9e7f5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" letter-spacing="1.8">Strategic Opportunity Radar</text>
+      </svg>
+    
       </a>
       
       <nav class="nav" aria-label="Hauptnavigation">
@@ -310,13 +333,13 @@ a { color: inherit; }
         </article>
         <aside class="panel sources">
           <h2>Quellen</h2>
-          <div class="source-item"><a class="source-title" href="#">Neues Forschungsprojekt gestartet: CoSiMe – „Road Construction Site Metaverse“</a><div class="source-member">SmartFactory KL e.V.</div></div>
-<div class="source-item"><a class="source-title" href="#">Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik</a><div class="source-member">Universität Trier</div></div>
-<div class="source-item"><a class="source-title" href="#">LUCY: Neues Coworking-Gebäude der Hochschule Mainz</a><div class="source-member">Hochschule Mainz</div></div>
-<div class="source-item"><a class="source-title" href="#">Klares Bekenntnis der Universität Trier zur Psychologie-Weiterbildung</a><div class="source-member">Universität Trier</div></div>
-<div class="source-item"><a class="source-title" href="#">Mehr Artenvielfalt auf dem Campus der Hochschule Mainz</a><div class="source-member">Hochschule Mainz</div></div>
-<div class="source-item"><a class="source-title" href="#">Thierry Tazemeta wird ein Roter Teufel</a><div class="source-member">SWR</div></div>
-<div class="source-item"><a class="source-title" href="#">Golfen für den guten Zweck</a><div class="source-member">SWR</div></div>
+          <div class="source-item"><a class="source-title" href="https://smartfactory.de/smartfactory-kl-beteiligt-sich-an-cosime-metaverse-fuer-den-strassenbau" target="_blank" rel="noopener noreferrer">Neues Forschungsprojekt gestartet: CoSiMe – „Road Construction Site Metaverse“</a><div class="source-member">SmartFactory KL e.V.</div></div>
+<div class="source-item"><a class="source-title" href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1%5Baction%5D=detail&amp;tx_news_pi1%5Bcontroller%5D=News&amp;tx_news_pi1%5Bnews%5D=30077&amp;cHash=53ed27af39e5860f87aaa791035df914" target="_blank" rel="noopener noreferrer">Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik</a><div class="source-member">Universität Trier</div></div>
+<div class="source-item"><a class="source-title" href="https://www.hs-mainz.de/news/richtfest-fuer-lucy/?back=1&amp;cHash=435504c161a476e28729345dace589e2" target="_blank" rel="noopener noreferrer">LUCY: Neues Coworking-Gebäude der Hochschule Mainz</a><div class="source-member">Hochschule Mainz</div></div>
+<div class="source-item"><a class="source-title" href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1[action]=detail&amp;tx_news_pi1[controller]=News&amp;tx_news_pi1[news]=30022&amp;cHash=e5c6f25a81ebb32aad793a63d7596748" target="_blank" rel="noopener noreferrer">Klares Bekenntnis der Universität Trier zur Psychologie-Weiterbildung</a><div class="source-member">Universität Trier</div></div>
+<div class="source-item"><a class="source-title" href="https://www.hs-mainz.de/news/mehr-raum-fuer-artenvielfalt/?back=1&amp;cHash=435504c161a476e28729345dace589e2" target="_blank" rel="noopener noreferrer">Mehr Artenvielfalt auf dem Campus der Hochschule Mainz</a><div class="source-member">Hochschule Mainz</div></div>
+<div class="source-item"><a class="source-title" href="https://fck.de/blog/thierry-tazemeta-wird-ein-roter-teufel" target="_blank" rel="noopener noreferrer">Thierry Tazemeta wird ein Roter Teufel</a><div class="source-member">Erster FC Kaiserslautern</div></div>
+<div class="source-item"><a class="source-title" href="https://fck.de/blog/golfen-fuer-den-guten-zweck" target="_blank" rel="noopener noreferrer">Golfen für den guten Zweck</a><div class="source-member">Erster FC Kaiserslautern</div></div>
         </aside>
       </section>
       <section class="insight-grid" aria-label="Signale und Begriffe">

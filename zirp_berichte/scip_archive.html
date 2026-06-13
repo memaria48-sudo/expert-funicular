@@ -49,15 +49,15 @@ body::before {
 }
 a { color: inherit; }
 .shell {
-  width: min(1540px, calc(100% - 48px));
+  width: min(1720px, calc(100% - 48px));
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 .topbar {
   margin: 18px auto 16px;
-  padding: 16px 18px;
-  min-height: 92px;
+  padding: 20px 26px;
+  min-height: 118px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -68,7 +68,7 @@ a { color: inherit; }
   box-shadow: 0 22px 50px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.04);
 }
 .brand { display: inline-flex; align-items: center; text-decoration: none; }
-.brand img { width: 144px; height: auto; display: block; }
+.brand-logo { width: 220px; height: auto; display: block; }
 .nav { display: flex; align-items: center; justify-content: flex-end; gap: 16px; flex-wrap: wrap; }
 .nav a {
   min-width: 144px;
@@ -170,20 +170,20 @@ a { color: inherit; }
   .footer-center, .footer-right { text-align: left; }
 }
 
-.match-panel { padding: 22px 26px 20px; }
+.match-panel { padding: 28px 30px 26px; }
 .match-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 .match-card {
-  min-height: 216px;
-  padding: 22px 26px 18px;
-  border: 1px solid rgba(176, 198, 221, .24);
+  min-height: 260px;
+  padding: 28px 30px 24px;
+  border: 1px solid rgba(176, 198, 221, .32);
   border-radius: 8px;
   background:
-    radial-gradient(circle at 12% 22%, rgba(31, 155, 255, .18), transparent 20rem),
-    linear-gradient(135deg, rgba(4, 17, 31, .96), rgba(3, 11, 21, .88));
+    radial-gradient(circle at 12% 18%, rgba(51, 167, 255, .24), transparent 22rem),
+    linear-gradient(135deg, rgba(7, 24, 43, .98), rgba(4, 13, 24, .94));
   box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
 }
 .match-card.top {
@@ -206,7 +206,7 @@ a { color: inherit; }
 .pair {
   margin: 9px 0 12px;
   color: #f6fbff;
-  font-size: 19px;
+  font-size: 21px;
   line-height: 1.25;
   font-weight: 850;
 }
@@ -223,24 +223,24 @@ a { color: inherit; }
 }
 .chip.stage { color: #43bbff; font-size: 13px; font-weight: 750; }
 .fit-dots { display: flex; gap: 28px; justify-content: flex-end; }
-.fit-dot { text-align: center; color: #d7e2ef; font-size: 11px; }
-.dot { width: 14px; height: 14px; margin: 0 auto 8px; border-radius: 50%; box-shadow: 0 0 15px currentColor; }
-.green { color: var(--green); background: var(--green); }
-.yellow { color: var(--yellow); background: var(--yellow); }
-.red { color: var(--red); background: var(--red); }
+.fit-dot { text-align: center; color: #d7e2ef; font-size: 12px; font-weight: 700; }
+.dot { display: block; width: 18px; height: 18px; margin: 0 auto 9px; border-radius: 50%; box-shadow: 0 0 18px currentColor; border: 1px solid rgba(255,255,255,.3); }
+.dot.green { color: var(--green); background: var(--green); }
+.dot.yellow { color: var(--yellow); background: var(--yellow); }
+.dot.red { color: var(--red); background: var(--red); }
 .summary {
-  margin: 22px 0 0;
-  max-width: 68ch;
-  color: #cfd9e6;
-  font-size: 15px;
-  line-height: 1.45;
+  margin: 24px 0 0;
+  color: #e1eaf5;
+  font-size: 16.5px;
+  line-height: 1.55;
 }
 .next {
   margin-top: 16px;
-  padding-top: 13px;
+  padding-top: 15px;
   border-top: 1px solid rgba(167, 205, 239, .18);
-  color: #e5edf6;
-  font-size: 14px;
+  color: #f0f6fd;
+  font-size: 15px;
+  line-height: 1.45;
 }
 .next strong { color: #fff; }
 @media (max-width: 1050px) {
@@ -255,7 +255,29 @@ a { color: inherit; }
     
     <header class="topbar">
       <a class="brand" href="zirp_dashboard.html" aria-label="SOR Wochenanalyse">
-        <img src="sor-logo-full.png" alt="SOR Strategic Opportunity Radar">
+        
+      <svg class="brand-logo" viewBox="0 0 340 112" role="img" aria-label="SOR Strategic Opportunity Radar">
+        <defs>
+          <linearGradient id="sorBlue" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset=".52" stop-color="#55d7ff"/>
+            <stop offset="1" stop-color="#126cff"/>
+          </linearGradient>
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="8" filter="url(#softGlow)">
+          <path stroke="#f8fbff" d="M68 20H22c-11 0-18 7-18 17s7 17 18 17h31c12 0 19 8 19 18s-8 18-20 18H8"/>
+          <path stroke="#f8fbff" d="M260 20h52c15 0 24 9 24 22s-9 22-24 22h-38v26"/>
+          <path stroke="#f8fbff" d="M309 64l27 26"/>
+          <path stroke="url(#sorBlue)" d="M151 18a43 43 0 1 1-2 0"/>
+          <circle cx="191" cy="31" r="6" fill="#2a9fff" stroke="none"/>
+        </g>
+        <text x="4" y="108" fill="#d9e7f5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" letter-spacing="1.8">Strategic Opportunity Radar</text>
+      </svg>
+    
       </a>
       
       <nav class="nav" aria-label="Hauptnavigation">
@@ -284,7 +306,7 @@ a { color: inherit; }
         <div class="match-head">
           <div>
             <div class="rank">#1 · Top-Match</div>
-            <h3 class="pair">Bundesagentur für Arbeit, Regionaldirektion… × Hochschule Mainz</h3>
+            <h3 class="pair">Bundesagentur für Arbeit, Regionaldirektion Rheinland-Pfalz-Saarland × Hochschule Mainz</h3>
             <div class="chips"><span class="chip">39/100</span><span class="chip stage">Validierungslinie</span></div>
           </div>
           <div class="fit-dots" aria-label="Bewertung">
@@ -293,7 +315,7 @@ a { color: inherit; }
             <div class="fit-dot"><span class="dot yellow"></span>Umsetzungsnähe</div>
           </div>
         </div>
-        <p class="summary">Die Bundesagentur bringt einen regionalen Arbeitsmarkt- und Qualifizierungsdruck ein, während der Bildungsakteur Transfer-, Weiterbildungs- oder Reflexionskompetenz beisteuert. Die Verbindung ist plausibel,…</p>
+        <p class="summary">Die Bundesagentur bringt einen regionalen Arbeitsmarkt- und Qualifizierungsdruck ein, während der Bildungsakteur Transfer-, Weiterbildungs- oder Reflexionskompetenz beisteuert. Die Verbindung ist plausibel, wenn sie auf Fachkräfte, Weiterbildung, Arbeitsmarktintegration oder Bildungstransfer in Rheinland-Pfalz zugespitzt wird. Vor einem Treffen muss ZIRP klären, welche konkrete Qualifizierungs- oder Arbeitsmarktfrage beide Seiten gemeinsam bearbeiten können.</p>
         <p class="next"><strong>Next Step:</strong> Vorkontakt zur Klärung einer konkreten RLP-Qualifizierungsfrage.</p>
       </article>
     
@@ -311,7 +333,7 @@ a { color: inherit; }
             <div class="fit-dot"><span class="dot red"></span>Umsetzungsnähe</div>
           </div>
         </div>
-        <p class="summary">Die Akteurslogik ist plausibel, da beide Partner komplementäre Rollen einbeziehen. Allerdings fehlen aktuelle Indizien für eine direkte Anwendung in Rheinland-Pfalz. Die Verbindung basiert auf thematischer…</p>
+        <p class="summary">Die Akteurslogik ist plausibel, da beide Partner komplementäre Rollen einbeziehen. Allerdings fehlen aktuelle Indizien für eine direkte Anwendung in Rheinland-Pfalz. Die Verbindung basiert auf thematischer Nähe und potentieller Lernpotenzial.</p>
         <p class="next"><strong>Next Step:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung prüfen; noch kein Format ansetzen.</p>
       </article>
     
@@ -329,7 +351,7 @@ a { color: inherit; }
             <div class="fit-dot"><span class="dot red"></span>Umsetzungsnähe</div>
           </div>
         </div>
-        <p class="summary">Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von Universität Trier. Die Entwicklung des neuen Instituts für Angewandte Ethik und die Psychologie-Weiterbildung deuten auf relevante…</p>
+        <p class="summary">Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von Universität Trier. Die Entwicklung des neuen Instituts für Angewandte Ethik und die Psychologie-Weiterbildung deuten auf relevante Themen hin, jedoch fehlt es an konkreten ZIRP-Anwendungen in Rheinland-Pfalz.</p>
         <p class="next"><strong>Next Step:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung prüfen; noch kein Format ansetzen.</p>
       </article>
     
@@ -338,7 +360,7 @@ a { color: inherit; }
         <div class="match-head">
           <div>
             <div class="rank">#4</div>
-            <h3 class="pair">Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau ×…</h3>
+            <h3 class="pair">Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau × Handwerkskammern Rheinland-Pfalz</h3>
             <div class="chips"><span class="chip">14/100</span><span class="chip stage">Watchlist</span></div>
           </div>
           <div class="fit-dots" aria-label="Bewertung">
@@ -347,7 +369,7 @@ a { color: inherit; }
             <div class="fit-dot"><span class="dot red"></span>Umsetzungsnähe</div>
           </div>
         </div>
-        <p class="summary">Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von den Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau. Die indirekte Evidenz zeigt eine relevante Thematik, aber es…</p>
+        <p class="summary">Die Akteurslogik ist plausibel, aber der aktuelle Anlass kommt vor allem von den Ministerium für Wirtschaft, Verkehr, Landwirtschaft und Weinbau. Die indirekte Evidenz zeigt eine relevante Thematik, aber es fehlen konkrete Anwendungsanker. Es wird empfohlen, die Signalstärke zu validieren.</p>
         <p class="next"><strong>Next Step:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung prüfen; noch kein Format ansetzen.</p>
       </article>
     
@@ -365,7 +387,7 @@ a { color: inherit; }
             <div class="fit-dot"><span class="dot red"></span>Umsetzungsnähe</div>
           </div>
         </div>
-        <p class="summary">Die Caritasverband für die Diözese Speyer e.V. und die Katholische Hochschule Mainz werden wegen komplementärer Rollen einbezogen, nicht wegen ähnlicher Schlagworte. Der Anlass ist noch schwach; die…</p>
+        <p class="summary">Die Caritasverband für die Diözese Speyer e.V. und die Katholische Hochschule Mainz werden wegen komplementärer Rollen einbezogen, nicht wegen ähnlicher Schlagworte. Der Anlass ist noch schwach; die Empfehlung beruht derzeit vor allem auf thematischer Nähe. Die Verbindung ist indirekt und noch nicht durch aktuelle Paar-Evidenz belegt.</p>
         <p class="next"><strong>Next Step:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung prüfen; noch kein Format ansetzen.</p>
       </article>
     
@@ -383,7 +405,7 @@ a { color: inherit; }
             <div class="fit-dot"><span class="dot red"></span>Umsetzungsnähe</div>
           </div>
         </div>
-        <p class="summary">Die Akteurslogik ist plausibel, da beide Partner komplementäre Rollen einbeziehen. Allerdings fehlen aktuelle Indizien für eine direkte Anwendung in Rheinland-Pfalz. Die Verbindung basiert auf thematischer…</p>
+        <p class="summary">Die Akteurslogik ist plausibel, da beide Partner komplementäre Rollen einbeziehen. Allerdings fehlen aktuelle Indizien für eine direkte Anwendung in Rheinland-Pfalz. Die Verbindung basiert auf thematischer Nähe und potentieller technologischer Unterstützung.</p>
         <p class="next"><strong>Next Step:</strong> Zweiten aktuellen Bedarf oder konkrete RLP-Anwendung prüfen; noch kein Format ansetzen.</p>
       </article>
     
