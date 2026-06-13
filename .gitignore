@@ -39,6 +39,8 @@ zirp_berichte/*
 !zirp_berichte/zirp_meeting_recommendations_latest.html
 !zirp_berichte/zirp_meeting_recommendations_ai_latest.html
 !zirp_berichte/sor-logo.png
+!zirp_berichte/sor-logo-full.png
+!zirp_berichte/sor-tab-o.png
 
 # Local monitor state
 zirp_member_monitor_state.json
