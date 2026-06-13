@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SOR Wochenradar · Strategic Opportunity Radar</title>
-  <link rel="icon" type="image/png" href="zirp_berichte/sor-logo.png" />
-  <link rel="apple-touch-icon" href="zirp_berichte/sor-logo.png" />
+  <link rel="icon" type="image/png" href="zirp_berichte/sor-tab-logo.png" />
+  <link rel="apple-touch-icon" href="zirp_berichte/sor-tab-logo.png" />
   <style>
     :root {
       --bg: #05070A;
@@ -64,7 +64,7 @@
     .header-inner {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 18px;
+      padding: 14px 18px;
       display: flex;
       gap: 22px;
       align-items: center;
@@ -79,15 +79,15 @@
       text-decoration: none;
     }
     .brand img {
-      width: min(420px, 46vw);
+      width: min(300px, 36vw);
       height: auto;
       aspect-ratio: 16 / 9;
       object-fit: contain;
       object-position: center;
-      border-radius: 8px;
-      border: 1px solid rgba(0,174,239,.20);
+      border-radius: 6px;
+      border: 1px solid rgba(0,174,239,.14);
       background: #000;
-      box-shadow: 0 0 26px rgba(0,174,239,.14);
+      box-shadow: 0 0 18px rgba(0,174,239,.10);
       flex: 0 0 auto;
     }
     .brand-title { display: none; }
@@ -123,39 +123,15 @@
     }
     .page-intro {
       position: relative;
-      min-height: 164px;
+      min-height: 118px;
       margin-bottom: 22px;
       border: 1px solid rgba(0,174,239,.22);
       border-radius: 12px;
-      padding: 28px 30px;
+      padding: 24px 28px;
       overflow: hidden;
       background:
         linear-gradient(135deg, rgba(7,17,31,.98), rgba(5,7,10,.92));
       box-shadow: var(--shadow);
-    }
-    .page-intro::before {
-      content: "";
-      position: absolute;
-      right: 34px;
-      top: 22px;
-      width: 112px;
-      height: 112px;
-      border: 1px solid rgba(0,174,239,.48);
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at center, transparent 0 44%, rgba(0,174,239,.12) 45% 46%, transparent 47%),
-        conic-gradient(from 40deg, rgba(0,174,239,.65), transparent 24%, rgba(245,184,46,.85) 25%, transparent 31%, rgba(0,174,239,.65) 55%, transparent 77%);
-      opacity: .78;
-    }
-    .page-intro::after {
-      content: "SIGNAL INTELLIGENCE";
-      position: absolute;
-      right: 28px;
-      bottom: 22px;
-      color: rgba(170,179,192,.34);
-      font-size: .68rem;
-      font-weight: 900;
-      letter-spacing: .18em;
     }
     h1 {
       position: relative;
@@ -229,6 +205,16 @@
     }
     .analysis h2, .analysis h3 { margin: 24px 0 10px; color: var(--navy); }
     .two-col { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+    .home-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 390px); gap: 18px; align-items: start; }
+    .home-insights { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .75fr) minmax(240px, .9fr); gap: 18px; margin-top: 18px; }
+    .source-card { padding: 22px; }
+    .source-list { display: grid; gap: 12px; }
+    .source-item { border-top: 1px solid var(--line); padding-top: 12px; }
+    .source-item:first-child { border-top: 0; padding-top: 0; }
+    .source-item a { color: var(--ink); text-decoration: none; font-weight: 840; line-height: 1.35; }
+    .source-item a:hover { color: #006C96; }
+    .source-item small { display: block; color: var(--muted); margin-top: 5px; line-height: 1.45; }
+    .source-item .source-context { display: block; margin-top: 7px; color: #26344A; font-size: .88rem; line-height: 1.48; }
     .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
     .stat { background: #07111F; border: 1px solid rgba(0,174,239,.38); border-radius: 8px; padding: 12px; }
     .stat b { display: block; font-size: 1.55rem; color: var(--blue); }
@@ -320,11 +306,11 @@
     .footer-inner strong { color: white; }
     @media (max-width: 900px) {
       .header-inner { display: block; }
-      .brand img { width: min(320px, 78vw); }
+      .brand img { width: min(260px, 72vw); }
       nav { justify-content: flex-start; margin-top: 14px; }
       .page-intro { padding: 24px 20px; }
-      .page-intro::before, .page-intro::after { display: none; }
       .two-col { grid-template-columns: 1fr; }
+      .home-grid, .home-insights { grid-template-columns: 1fr; }
       .meeting-head { display: block; }
       .meeting-head .button-link { display: inline-block; margin-top: 10px; }
       .meeting-grid { grid-template-columns: 1fr; }
@@ -345,14 +331,55 @@
   <main class="wrap">
     <section class="page-intro">
       <h1>SOR Wochenradar</h1>
-      <p class="subtitle">102 Mitglieder geprüft · erstellt 13.06.2026, 13:27:39 · Detect signals. Connect actors. Act in time.</p>
+      <p class="subtitle">102 Mitglieder geprüft · erstellt 13.06.2026, 14:49:56 · Detect signals. Connect actors. Act in time.</p>
     </section>
-    <article class="card analysis"><h2 class="briefing-title">Wird die regionale Anwendung zur Engstelle der digitalen Umsetzung?</h2>
-<p class="executive-summary"><strong>Die aktuellen SCIP-Matchings legen nahe, dass regionale Transformation weniger an fehlenden Ideen scheitert als an der Übersetzung vorhandener Kompetenzen in konkrete Anwendungen.</strong></p>
-<p>Die Digitalisierung erreicht kommunale Infrastruktur, Verwaltung, Handwerk und wissenschaftlichen Transfer zugleich. Dies zeigt, dass die zentrale Frage nicht mehr darin besteht, ob digitale Lösungen gebraucht werden, sondern wo vorhandenes Wissen, technologische Kompetenz und reale Anwendungskontexte zusammengeführt werden können. Die strategische Chance liegt nicht in der Sammlung von Einzelmeldungen, sondern in der Übersetzung von Kompetenzen in konkrete regionale Anwendungen.</p>
-<p>Die wichtigsten ausgewählten SCIP-Karten zeigen ein Portfolio von Möglichkeiten, um diese Übersetzung zu ermöglichen. Die Karte mit der Bundesagentur für Arbeit und der Hochschule Mainz kann als Ausgangspunkt für eine bilaterale Sondierung dienen, um die Frage zu klären, wie Unternehmen, Hochschulen, Kammern und Arbeitsverwaltung Fachkräfte für Transformation, Pflege, Technik und Verwaltung sichern können. Die Karte mit der Ingenieurkammer Rheinland-Pfalz und der Deutschen Universität für Verwaltungswissenschaften Speyer markiert eine Möglichkeit, digitale Werkzeuge für Bau, Planung und Genehmigung zu entwickeln und somit die Verwaltung zu unterstützen. Eine weitere Karte kann als Validierung oder Briefing dienen, um die Entwicklung der Ingenieurkammer zu verfolgen.</p>
-<p>Die Stufenlogik zeigt, dass nicht alle Karten sofortige Sondierung tragen. Einige Karten rechtfertigen nur Validierung, Lagebild oder Beobachtung. Es ist wichtig, die Convening-Stufe und den nächsten Move für jede Karte zu klären, um die Übersetzung von Kompetenzen in konkrete Anwendungen zu ermöglichen. Die Karte mit der Bundesagentur für Arbeit und der Hochschule Mainz kann als Invite Learning dienen, um die Frage zu klären, wie Fachkräfte für Transformation, Pflege, Technik und Verwaltung gesichert werden können. Die Karte mit der Ingenieurkammer Rheinland-Pfalz und der Deutschen Universität für Verwaltungswissenschaften Speyer kann als Forge Alliances dienen, um digitale Werkzeuge für Bau, Planung und Genehmigung zu entwickeln.</p>
-<p>Für ZIRP ergibt sich daraus eine klarere Rolle: nicht Akteure allgemein zu vernetzen, sondern komplementäre Fähigkeiten in entscheidungsfähige Pilotkonstellationen zu übersetzen. Ein erster Schritt könnte ein kuratiertes Sondierungsgespräch zwischen der Bundesagentur für Arbeit und der Hochschule Mainz sein, um die Frage zu klären, wie Fachkräfte für Transformation, Pflege, Technik und Verwaltung gesichert werden können. Dieses Gespräch könnte als 90-Tage-Test dienen, um die Pilotfähigkeit von regionalen Anwendungen zu testen. Der konkrete nächste Schritt wäre, ein solches Sondierungsgespräch zu initiieren und die Ergebnisse zu evaluieren, um die regionale Anwendung von digitalen Lösungen zu fördern.</p></article>
+    
+        <section class="home-grid">
+          <article class="card analysis"><h2 class="briefing-title">KÃ¶nnen regionale Kooperationen die UmsetzungslÃ¼cke schlieÃŸen?</h2>
+<p class="executive-summary"><strong>Die aktuellen SCIP-Matchings legen nahe, dass regionale Transformation weniger an fehlenden Ideen scheitert als an der Ãœbersetzung vorhandener Kompetenzen in konkrete Anwendungen.</strong></p>
+<p>In den letzten Wochen haben mehrere Signale auf eine zunehmende Bedeutung von Kooperationen und Sozialem Engagement in der Region hingewiesen. Die SmartFactory KL e.V. hat ein neues Forschungsprojekt gestartet, das auf die Entwicklung eines Metaversums fÃ¼r Baustellen abzielt. Gleichzeitig hat die UniversitÃ¤t Trier ein neues Institut fÃ¼r Angewandte Ethik erÃ¶ffnet, das sich mit Fragen der Digitalisierung und Nachhaltigkeit auseinandersetzt. Die Hochschule Mainz hat ein neues Coworking-GebÃ¤ude errichtet, das als Plattform fÃ¼r Kooperationen und Innovation dienen soll. Diese Entwicklungen deuten darauf hin, dass die regionale Transformation nicht an fehlenden Ideen scheitert, sondern an der Ãœbersetzung vorhandener Kompetenzen in konkrete Anwendungen.</p>
+<p>Die zentrale Engstelle liegt weniger in der Verfügbarkeit von Ideen als in der Fähigkeit, diese in konkrete Projekte und Anwendungen umzusetzen. Die Region benötigt Plattformen und Strukturen, die es ermöglichen, Kompetenzen und Ressourcen zu bündeln und in konkrete Projekte zu investieren. Die SCIP-Matchings haben mehrere Konstellationen identifiziert, die als Ausgangspunkt für solche Plattformen dienen könnten. Die Bundesagentur für Arbeit und die Hochschule Mainz könnten beispielsweise eine gemeinsame Plattform für die Qualifizierung von Fachkräften entwickeln.</p>
+<p>Die wichtigsten Matchings können als Portfolio gelesen werden, das eine Vielzahl von Ansatzpunkten für regionale Kooperationen und Innovationen bietet. Die SmartFactory KL e.V. und die Universität Trier könnten beispielsweise eine gemeinsame Plattform für die Entwicklung von Metaversums-Anwendungen entwickeln. Die Hochschule Mainz und die Bundesagentur für Arbeit könnten eine gemeinsame Plattform für die Qualifizierung von Fachkräften entwickeln. Jede dieser Konstellationen hat ihre eigene Convening-Stufe und ihren eigenen nächsten Move, der als Ausgangspunkt für weitere Entwicklungen dienen kann.</p>
+<p>Die Stufenlogik dieser Konstellationen ist entscheidend für die erfolgreiche Umsetzung von Projekten. Einige Konstellationen sind bereits weit fortgeschritten und können als Ausgangspunkt für konkrete Projekte dienen. Andere Konstellationen sind noch in der Validierungsphase und benötigen weitere Unterstützung, um ihre Umsetzbarkeit zu überprüfen. Die ZIRP kann als Plattform dienen, um diese Konstellationen zu unterstützen und zu fördern.</p>
+<p>Für die ZIRP ergibt sich daraus eine klarere Rolle: nicht Akteure allgemein zu vernetzen, sondern komplementäre Fähigkeiten in entscheidungsfähige Pilotkonstellationen zu übersetzen. Ein erster Schritt könnte ein kuratiertes Sondierungsgespräch zwischen der SmartFactory KL e.V. und der Universität Trier sein, um die Möglichkeiten für eine gemeinsame Plattform für die Entwicklung von Metaversums-Anwendungen zu erkunden. Dieses Gespräch könnte als Ausgangspunkt für weitere Entwicklungen dienen und die Region auf dem Weg zu einer erfolgreichen Transformation unterstützen.</p></article>
+          <aside class="card source-card">
+            <h2>Quellen</h2>
+            <div class="source-list"><div class="source-item"><a href="https://smartfactory.de/smartfactory-kl-beteiligt-sich-an-cosime-metaverse-fuer-den-strassenbau" target="_blank" rel="noopener">Neues Forschungsprojekt gestartet: CoSiMe – „Road Construction Site Metaverse“</a><small>2026-06-11 · SmartFactory KL e.V. · Kooperation / Vernetzung</small><span class="source-context">Stuttgart/Kaiserslautern, 11.06.2026 – Am 1. März 2026 ist das Forschungsprojekt CoSiMe – Road Construction Site Metaverse offiziell gestartet. Gefördert im Rahmen des Innovationsprogramms Invest BW des Wirtschaftsministeriums Baden-Württemberg entwickelt d...</span></div>
+<div class="source-item"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1%5Baction%5D=detail&amp;tx_news_pi1%5Bcontroller%5D=News&amp;tx_news_pi1%5Bnews%5D=30077&amp;cHash=53ed27af39e5860f87aaa791035df914" target="_blank" rel="noopener">Darf man Roboter treten? Universität eröffnet neues Institut für Angewandte Ethik</a><small>2026-06-10 · Universität Trier · Gesellschaft / Engagement</small><span class="source-context">Viele aktuelle Herausforderungen – etwa Digitalisierung, Gesundheitsversorgung oder Nachhaltigkeit – lassen sich zudem nur noch fachübergreifend beantworten. Das Institut wird daher von einem interdisziplinären Team geleitet; Sprecher ist der Philosoph Prof...</span></div>
+<div class="source-item"><a href="https://www.hs-mainz.de/news/richtfest-fuer-lucy/?back=1&amp;cHash=435504c161a476e28729345dace589e2" target="_blank" rel="noopener">LUCY: Neues Coworking-Gebäude der Hochschule Mainz</a><small>2026-06-10 · Hochschule Mainz · Kooperation / Vernetzung</small><span class="source-context">Das Bauprojekt LUCY nimmt weiter Gestalt an: Am 9. Juni feierte die Hochschule Mainz mit dem Richtfest den nächsten Schritt in der Realisierung des Neubaus. Vertreterinnen und Vertreter der Hochschule Mainz, der beteiligten Bauunternehmen sowie des Bauteams...</span></div>
+<div class="source-item"><a href="https://www.uni-trier.de/universitaet/news/beitrag?tx_news_pi1[action]=detail&amp;tx_news_pi1[controller]=News&amp;tx_news_pi1[news]=30022&amp;cHash=e5c6f25a81ebb32aad793a63d7596748" target="_blank" rel="noopener">Klares Bekenntnis der Universität Trier zur Psychologie-Weiterbildung</a><small>2026-06-10 · Universität Trier · Gesellschaft / Engagement</small><span class="source-context">Die Universität Trier bekennt sich klar zur Umsetzung der neuen psychotherapeutischen Weiterbildungsstruktur und zur damit verbundenen gesellschaftlichen Verantwortung.</span></div>
+<div class="source-item"><a href="https://www.hs-mainz.de/news/mehr-raum-fuer-artenvielfalt/?back=1&amp;cHash=435504c161a476e28729345dace589e2" target="_blank" rel="noopener">Mehr Artenvielfalt auf dem Campus der Hochschule Mainz</a><small>2026-06-11 · Hochschule Mainz · Gesellschaft / Engagement</small><span class="source-context">Im Sommer 2024 haben Mitarbeitende der Hochschule gemeinsam mit Kanzler Jens Egler erörtert, wie Nachhaltigkeit auf dem Hochschul-Campus sichtbarer werden kann. „Nachhaltigkeit soll an der Hochschule Mainz nicht nur ein strategisches Ziel sein, sondern auch...</span></div>
+<div class="source-item"><a href="https://fck.de/blog/thierry-tazemeta-wird-ein-roter-teufel" target="_blank" rel="noopener">Thierry Tazemeta wird ein Roter Teufel</a><small>2026-06-12 · Erster FC Kaiserslautern GmbH &amp; Co. KGaA · Gesellschaft / Engagement</small><span class="source-context">Der 1. FC Kaiserslautern begrüßt den zweiten Neuzugang für die Saison 2026/27 auf dem Betzenberg: Mit Thierry Tazemeta wechselt ein Top-Talent aus dem Nachwuchs von Bundesligist Borussia Dortmund in die Pfalz.</span></div>
+<div class="source-item"><a href="https://fck.de/blog/golfen-fuer-den-guten-zweck" target="_blank" rel="noopener">Golfen für den guten Zweck</a><small>2026-06-05 · Erster FC Kaiserslautern GmbH &amp; Co. KGaA · Gesellschaft / Engagement</small><span class="source-context">Am Freitag, 29. Mai 2026 gingen golfbegeisterte FCK-Freunde, ehemalige FCK-Größen wie Sepp Stabel, Hermann Bitz, Olaf Marschall, Martin Wagner, Florian Dick, Hendrick Zuck sowie Vertreter der FCK-Gremien und Sponsoren im Golfclub Barbarossa in Mackenbach fü...</span></div></div>
+          </aside>
+        </section>
+        <section class="home-insights">
+          <article class="card">
+            <h2>Begriffe</h2>
+            <div class="term-row"><span class="term">nachhaltigkeit · 364</span>
+<span class="term">standort · 350</span>
+<span class="term">wirtschaft · 328</span>
+<span class="term">hochschule · 324</span>
+<span class="term">gemeinsam · 299</span>
+<span class="term">markt · 290</span>
+<span class="term">gesundheit · 260</span>
+<span class="term">forschung · 239</span>
+<span class="term">versorgung · 180</span>
+<span class="term">bildung · 176</span>
+<span class="term">ausbildung · 171</span>
+<span class="term">zusammenarbeit · 167</span></div>
+          </article>
+          <article class="card">
+            <h2>Schwerpunkte</h2>
+            <div class="section-row"><div class="section-top"><span>Soziales Engagement</span><strong>7</strong></div><div class="bar"><span style="width:100%"></span></div></div>
+<div class="section-row"><div class="section-top"><span>Kooperationen mit anderen Unternehmen / Partnern</span><strong>2</strong></div><div class="bar"><span style="width:36%"></span></div></div>
+<div class="section-row"><div class="section-top"><span>Wirtschaftslage und -entwicklung</span><strong>1</strong></div><div class="bar"><span style="width:18%"></span></div></div>
+          </article>
+          <article class="card">
+            <h2>Mitglieder</h2>
+            <p class="members">Erster FC Kaiserslautern GmbH &amp; Co. KGaA, Hochschule Mainz, RPR1., SWR – Südwestrundfunk, SmartFactory KL e.V., Universität Trier</p>
+          </article>
+        </section>
   </main>
   <footer class="site-footer">
     <div class="footer-inner">
