@@ -8182,7 +8182,8 @@ def main() -> None:
         print("  Dashboard:", dashboard_path)
     print("\nSelected matches:")
     for _, row in patterns_df[patterns_df["selected"] == 1].iterrows():
-        print(f"  - {row['members']}  score={row['score']}")
+        members = repair_mojibake(str(row.get("members", "")))
+        print(f"  - {members}  score={row['score']}")
 
 
 if __name__ == "__main__":
