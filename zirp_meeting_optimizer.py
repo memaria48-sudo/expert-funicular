@@ -92,6 +92,11 @@ STATIC_CLUSTER_LIMITS: dict[str, int] = {}
 STATIC_ROLE_MASS_LIMITS: dict[str, float] = {}
 STATIC_ROLE_INVERSE_WEIGHTS: dict[str, float] = {}
 STATIC_MEMBER_ROLE_WEIGHTS: dict[str, tuple[str, float]] = {}
+STATIC_SUBROLE_MASS_LIMITS: dict[str, float] = {}
+STATIC_SUBROLE_INVERSE_WEIGHTS: dict[str, float] = {}
+STATIC_MEMBER_SUBROLE_WEIGHTS: dict[str, tuple[str, float]] = {}
+STATIC_MAX_ACADEMIC_MATCHES: int = 2
+STATIC_MAX_ACADEMIC_ACTOR_SLOTS: int = 3
 
 FEEDBACK_LEARNER = SCIPFeedbackLearner.from_project_root(PROJECT_DIR) if SCIPFeedbackLearner is not None else None
 OPPORTUNITY_HISTORY_PATH = PROJECT_DIR / "data" / "feedback" / "opportunity_history.json"
@@ -3317,9 +3322,10 @@ def _int_from_candidate_id(candidate_id: str, fallback: int) -> int:
 
 
 def _static_support_score_from_row(row_dict: dict[str, Any]) -> float:
-    quota_score = _float_cell(row_dict.get("role_balanced_score"), math.nan)
-    if not math.isnan(quota_score) and quota_score > 0:
-        return quota_score
+    for column in ["role_subrole_balanced_score", "subrole_balanced_score", "role_balanced_score"]:
+        quota_score = _float_cell(row_dict.get(column), math.nan)
+        if not math.isnan(quota_score) and quota_score > 0:
+            return quota_score
     explicit = _float_cell(row_dict.get("final_support_score"), math.nan)
     if not math.isnan(explicit) and explicit > 0:
         return explicit
@@ -3447,7 +3453,10 @@ def _merge_candidate_role_balance(path: Path, df: pd.DataFrame) -> pd.DataFrame:
         for column in [
             "candidate_id", "role_balanced_score", "pair_role_mass",
             "role_balance_multiplier", "weight_a_1_over_role",
-            "weight_b_1_over_role", "academic_or_uni_pair",
+            "weight_b_1_over_role", "subrole_a", "subrole_b",
+            "subrole_weight_a", "subrole_weight_b", "pair_subrole_mass",
+            "subrole_multiplier", "combined_role_subrole_multiplier",
+            "role_subrole_balanced_score", "academic_or_uni_pair",
         ]
         if column in balance.columns
     ]
@@ -3626,6 +3635,91 @@ def _load_role_quota_from_workbooks(paths: list[Path]) -> tuple[dict[str, float]
                     member_weights[normalize_search_text(member)] = (role, weight)
     return role_limits, role_inverse, member_weights
 
+
+def _load_subrole_quota_from_workbooks(paths: list[Path]) -> tuple[dict[str, float], dict[str, float], dict[str, tuple[str, float]]]:
+    subrole_limits: dict[str, float] = {}
+    subrole_inverse: dict[str, float] = {}
+    member_weights: dict[str, tuple[str, float]] = {}
+    for workbook in paths:
+        subroles_df = _read_excel_table_optional(
+            workbook,
+            "Subrole_Weights",
+            {"actor_subrole", "recommended_max_subrole_mass"},
+        )
+        if not subroles_df.empty:
+            for _, row in subroles_df.iterrows():
+                subrole = _clean_cell(row.get("actor_subrole"))
+                if not subrole:
+                    continue
+                limit = _float_cell(row.get("recommended_max_subrole_mass"), math.nan)
+                if not math.isnan(limit) and limit > 0:
+                    subrole_limits[subrole] = limit
+                inverse = _float_cell(row.get("member_inverse_weight = 1/n_subrole"), math.nan)
+                if math.isnan(inverse):
+                    inverse = _float_cell(row.get("subrole_weight"), math.nan)
+                if math.isnan(inverse):
+                    inverse = _float_cell(row.get("member_inverse_weight"), math.nan)
+                if not math.isnan(inverse) and inverse > 0:
+                    subrole_inverse[subrole] = inverse
+
+        members_df = _read_excel_table_optional(
+            workbook,
+            "Member_Subrole_Weights",
+            {"member_name", "actor_subrole", "subrole_weight"},
+        )
+        if members_df.empty:
+            members_df = _read_excel_table_optional(
+                workbook,
+                "Member_Subrole_Weights",
+                {"member_name", "actor_subrole", "member_inverse_weight"},
+            )
+        if not members_df.empty:
+            for _, row in members_df.iterrows():
+                member = _clean_cell(row.get("member_name"))
+                subrole = _clean_cell(row.get("actor_subrole"))
+                weight = _float_cell(row.get("subrole_weight"), math.nan)
+                if math.isnan(weight):
+                    weight = _float_cell(row.get("member_inverse_weight"), math.nan)
+                if member and subrole and not math.isnan(weight) and weight > 0:
+                    member_weights[normalize_search_text(member)] = (subrole, weight)
+    return subrole_limits, subrole_inverse, member_weights
+
+
+def _load_portfolio_constraints_from_workbooks(paths: list[Path]) -> tuple[int, int]:
+    max_academic_matches = STATIC_MAX_ACADEMIC_MATCHES
+    max_academic_actor_slots = STATIC_MAX_ACADEMIC_ACTOR_SLOTS
+    for workbook in paths:
+        df = _read_excel_table_optional(
+            workbook,
+            "SCIP_Portfolio_Constraints",
+            {"constraint_name", "limit_value"},
+        )
+        if df.empty:
+            df = _read_excel_table_optional(
+                workbook,
+                "SCIP_Portfolio_Constraints",
+                {"key", "value"},
+            )
+        if df.empty:
+            continue
+        for _, row in df.iterrows():
+            key = _clean_cell(row.get("constraint_name") or row.get("key")).lower()
+            if not key:
+                continue
+            enabled = _float_cell(row.get("enabled"), 1.0)
+            if not math.isnan(enabled) and enabled <= 0:
+                continue
+            value = _float_cell(row.get("limit_value"), math.nan)
+            if math.isnan(value):
+                value = _float_cell(row.get("value"), math.nan)
+            if math.isnan(value):
+                continue
+            if key == "max_academic_matches":
+                max_academic_matches = max(0, int(value))
+            elif key == "max_academic_actor_slots":
+                max_academic_actor_slots = max(0, int(value))
+    return max_academic_matches, max_academic_actor_slots
+
 def _member_event_rows(events_df: pd.DataFrame, member: str) -> pd.DataFrame:
     if events_df.empty or "mitglied" not in events_df.columns:
         return events_df.iloc[0:0]
@@ -3721,12 +3815,16 @@ def _static_candidate_live_evidence(
 def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFrame) -> list[MeetingPattern]:
     global STATIC_MEMBER_LIMITS, STATIC_CLUSTER_LIMITS, STATIC_ROLE_MASS_LIMITS
     global STATIC_ROLE_INVERSE_WEIGHTS, STATIC_MEMBER_ROLE_WEIGHTS
+    global STATIC_SUBROLE_MASS_LIMITS, STATIC_SUBROLE_INVERSE_WEIGHTS, STATIC_MEMBER_SUBROLE_WEIGHTS
+    global STATIC_MAX_ACADEMIC_MATCHES, STATIC_MAX_ACADEMIC_ACTOR_SLOTS
     df, used_paths, mode = _load_static_candidate_dataframe(path)
     if df.empty:
         raise FileNotFoundError(f"No static candidate patterns could be loaded from {path}")
 
     STATIC_MEMBER_LIMITS, STATIC_CLUSTER_LIMITS = _load_static_constraint_limits_from_workbooks(used_paths or [path])
     STATIC_ROLE_MASS_LIMITS, STATIC_ROLE_INVERSE_WEIGHTS, STATIC_MEMBER_ROLE_WEIGHTS = _load_role_quota_from_workbooks(used_paths or [path])
+    STATIC_SUBROLE_MASS_LIMITS, STATIC_SUBROLE_INVERSE_WEIGHTS, STATIC_MEMBER_SUBROLE_WEIGHTS = _load_subrole_quota_from_workbooks(used_paths or [path])
+    STATIC_MAX_ACADEMIC_MATCHES, STATIC_MAX_ACADEMIC_ACTOR_SLOTS = _load_portfolio_constraints_from_workbooks(used_paths or [path])
     cluster_keywords: dict[str, set[str]] = {}
     for workbook in used_paths or [path]:
         cluster_keywords.update(_static_cluster_keyword_map(workbook))
@@ -3803,7 +3901,9 @@ def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFram
     print(
         "Static Excel constraints: "
         f"member_limits={len(STATIC_MEMBER_LIMITS)}, cluster_limits={len(STATIC_CLUSTER_LIMITS)}, "
-        f"role_quota_limits={len(STATIC_ROLE_MASS_LIMITS)}"
+        f"role_quota_limits={len(STATIC_ROLE_MASS_LIMITS)}, "
+        f"subrole_quota_limits={len(STATIC_SUBROLE_MASS_LIMITS)}, "
+        f"academic_caps={STATIC_MAX_ACADEMIC_MATCHES}/{STATIC_MAX_ACADEMIC_ACTOR_SLOTS}"
     )
     return patterns
 
@@ -4233,6 +4333,39 @@ def role_mass_for_pattern(pattern: MeetingPattern, role: str) -> float:
     )
 
 
+def member_subrole_and_quota_weight(member_name: str) -> tuple[str, float]:
+    configured = STATIC_MEMBER_SUBROLE_WEIGHTS.get(normalize_search_text(member_name))
+    if configured:
+        return configured
+    subrole = ""
+    weight = 0.0
+    key = normalize_search_text(member_name)
+    if "hochschule" in key or "universitat" in key or "university" in key or "rptu" in key or "whu" in key:
+        subrole = "university_applied_sciences" if "hochschule" in key and "universitat" not in key else "university_research"
+        weight = STATIC_SUBROLE_INVERSE_WEIGHTS.get(subrole, 0.0)
+    return subrole, weight
+
+
+def subrole_mass_for_pattern(pattern: MeetingPattern, subrole: str) -> float:
+    return sum(
+        weight
+        for member_subrole, weight in (member_subrole_and_quota_weight(member) for member in pattern.members)
+        if member_subrole == subrole
+    )
+
+
+def academic_actor_slots_for_pattern(pattern: MeetingPattern) -> int:
+    return sum(
+        1
+        for member in pattern.members
+        if member_subrole_and_quota_weight(member)[0].startswith("university_")
+    )
+
+
+def has_academic_actor(pattern: MeetingPattern) -> bool:
+    return academic_actor_slots_for_pattern(pattern) > 0
+
+
 def export_scip_incidence_matrix(patterns: list[MeetingPattern], path: Path) -> None:
     members = sorted({member for pattern in patterns for member in pattern.members})
     clusters = sorted({cluster for pattern in patterns for cluster in pattern.concrete_clusters})
@@ -4343,6 +4476,36 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
                 cname = "role_quota_" + re.sub(r"[^A-Za-z0-9]+", "_", role)[:50]
                 f.write(f" {cname}: " + " + ".join(terms) + f" <= {limit:.6f}\n")
 
+        for subrole, limit in sorted(STATIC_SUBROLE_MASS_LIMITS.items()):
+            terms = []
+            for pattern in patterns:
+                coeff = subrole_mass_for_pattern(pattern, subrole)
+                if coeff > 0:
+                    terms.append(f"{coeff:.6f} {lp_var(pattern)}")
+            if terms:
+                cname = "subrole_quota_" + re.sub(r"[^A-Za-z0-9]+", "_", subrole)[:50]
+                f.write(f" {cname}: " + " + ".join(terms) + f" <= {limit:.6f}\n")
+
+        academic_match_vars = [lp_var(pattern) for pattern in patterns if has_academic_actor(pattern)]
+        if academic_match_vars and STATIC_MAX_ACADEMIC_MATCHES >= 0:
+            f.write(
+                " academic_match_cap: "
+                + " + ".join(academic_match_vars)
+                + f" <= {STATIC_MAX_ACADEMIC_MATCHES}\n"
+            )
+
+        academic_slot_terms = [
+            f"{academic_actor_slots_for_pattern(pattern)} {lp_var(pattern)}"
+            for pattern in patterns
+            if academic_actor_slots_for_pattern(pattern) > 0
+        ]
+        if academic_slot_terms and STATIC_MAX_ACADEMIC_ACTOR_SLOTS >= 0:
+            f.write(
+                " academic_actor_slot_cap: "
+                + " + ".join(academic_slot_terms)
+                + f" <= {STATIC_MAX_ACADEMIC_ACTOR_SLOTS}\n"
+            )
+
         f.write("Binary\n")
         for pattern in patterns:
             f.write(f" {lp_var(pattern)}\n")
@@ -4377,6 +4540,9 @@ def greedy_fallback(patterns: list[MeetingPattern]) -> set[int]:
     used_clusters = Counter()
     used_opportunities = Counter()
     used_role_mass = Counter()
+    used_subrole_mass = Counter()
+    used_academic_matches = 0
+    used_academic_actor_slots = 0
     selected: set[int] = set()
 
     for pattern in sorted(patterns, key=lambda p: (-final_pattern_score(p.score, p), len(p.members))):
@@ -4406,6 +4572,20 @@ def greedy_fallback(patterns: list[MeetingPattern]) -> set[int]:
         if any(used_role_mass[role] + mass > STATIC_ROLE_MASS_LIMITS[role] + 1e-9 for role, mass in role_masses.items()):
             continue
 
+        subrole_masses = {
+            subrole: subrole_mass_for_pattern(pattern, subrole)
+            for subrole in STATIC_SUBROLE_MASS_LIMITS
+        }
+        if any(used_subrole_mass[subrole] + mass > STATIC_SUBROLE_MASS_LIMITS[subrole] + 1e-9 for subrole, mass in subrole_masses.items()):
+            continue
+
+        academic_slots = academic_actor_slots_for_pattern(pattern)
+        if academic_slots:
+            if used_academic_matches + 1 > STATIC_MAX_ACADEMIC_MATCHES:
+                continue
+            if used_academic_actor_slots + academic_slots > STATIC_MAX_ACADEMIC_ACTOR_SLOTS:
+                continue
+
         selected.add(pattern.pattern_id)
 
         for member in pattern.members:
@@ -4417,6 +4597,11 @@ def greedy_fallback(patterns: list[MeetingPattern]) -> set[int]:
         used_opportunities[opportunity_id] += 1
         for role, mass in role_masses.items():
             used_role_mass[role] += mass
+        for subrole, mass in subrole_masses.items():
+            used_subrole_mass[subrole] += mass
+        if academic_slots:
+            used_academic_matches += 1
+            used_academic_actor_slots += academic_slots
 
     return selected
 
@@ -4814,6 +4999,9 @@ def write_model_summary(
         "max_selected_per_cluster": MAX_SELECTED_PER_CLUSTER,
         "max_selected_per_opportunity": MAX_SELECTED_PER_OPPORTUNITY,
         "role_quota_limits": STATIC_ROLE_MASS_LIMITS,
+        "subrole_quota_limits": STATIC_SUBROLE_MASS_LIMITS,
+        "max_academic_matches": STATIC_MAX_ACADEMIC_MATCHES,
+        "max_academic_actor_slots": STATIC_MAX_ACADEMIC_ACTOR_SLOTS,
         "min_final_pair_score": MIN_FINAL_PAIR_SCORE,
         "require_implementation_anchor": REQUIRE_IMPLEMENTATION_ANCHOR,
         "candidate_count": len(patterns),
@@ -4824,6 +5012,8 @@ def write_model_summary(
             "each concrete cluster appears in at most MAX_SELECTED_PER_CLUSTER selected matches",
             "each opportunity_id appears in at most MAX_SELECTED_PER_OPPORTUNITY selected matches",
             "role-weighted exposure mass stays within Role_Weights quota limits when present",
+            "subrole-weighted exposure mass stays within Subrole_Weights quota limits when present",
+            "academic_support/university matches and actor slots stay within SCIP_Portfolio_Constraints caps",
             "candidate pool is pre-filtered to strong bilateral matches",
         ],
     }
