@@ -29,7 +29,7 @@ except Exception as exc:  # pragma: no cover
 else:
     TORCH_IMPORT_ERROR = None
 
-from .build_training_data import build_training_dataset, load_feedback_examples
+from .build_training_data import build_training_dataset
 from .feature_encoder import CandidateFeatureEncoder
 from .model_registry import metrics_path as default_metrics_path
 from .model_registry import model_path as default_model_path
@@ -50,6 +50,22 @@ def _label_counts(examples: list[dict[str, Any]]) -> dict[str, int]:
     return counts
 
 
+def _load_training_dataset(path: Path) -> list[dict[str, Any]]:
+    examples: list[dict[str, Any]] = []
+    if not path.exists():
+        return examples
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            raw = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(raw, dict) and "target" in raw:
+            examples.append(raw)
+    return examples
+
+
 def train_feedback_ranker(
     *,
     project_root: Path | None = None,
@@ -65,7 +81,8 @@ def train_feedback_ranker(
     model_out = model_output_path or default_model_path(root)
     metrics_out = metrics_output_path or default_metrics_path(root)
     dataset_result = build_training_dataset(root)
-    examples = load_feedback_examples(root)
+    dataset_path = Path(str(dataset_result.get("path") or ""))
+    examples = _load_training_dataset(dataset_path)
 
     metrics_base: dict[str, Any] = {
         "created_at": datetime.now(timezone.utc).isoformat(),
