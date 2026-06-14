@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -18,6 +19,14 @@ LABEL_TO_TARGET = {
     "wrong_actors": 0.30,
     "wrong_connection": 0.10,
     "not_relevant": 0.0,
+}
+
+
+POOL_SAMPLE_CAPS = {
+    "pool_exact_feedback": None,
+    "pool_similar_feedback": 220,
+    "pool_word_memory": 180,
+    "pool_neutral": 100,
 }
 
 
@@ -73,6 +82,86 @@ def _target_from_adjustment(adjustment: float, feedback_count: int) -> float:
     return max(0.05, min(0.95, 0.50 + (float(adjustment) / 48.0)))
 
 
+def _stable_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _stable_hash(value: Any) -> str:
+    return hashlib.sha1(str(value or "").encode("utf-8", errors="ignore")).hexdigest()
+
+
+def _pool_example_priority(example: dict[str, Any]) -> tuple[float, float, float, str]:
+    """Rank pool examples by how much learning signal they carry."""
+    target = _stable_float(example.get("target"), 0.5)
+    human_delta = abs(_stable_float(example.get("human_feedback_adjustment")))
+    memory_delta = abs(_stable_float(example.get("memory_adjustment")))
+    human_count = _stable_float(example.get("human_feedback_count"))
+    exact_count = _stable_float(example.get("human_feedback_exact_count"))
+    similar_count = _stable_float(example.get("human_feedback_similar_count"))
+    evidence_count = _stable_float(example.get("feedback_evidence_count"))
+    features = example.get("features") if isinstance(example.get("features"), dict) else {}
+    score = _stable_float(example.get("score") or features.get("score") or features.get("final_scip_score"))
+    priority = (
+        abs(target - 0.5) * 100.0
+        + human_delta * 4.0
+        + memory_delta * 1.5
+        + exact_count * 10.0
+        + similar_count * 1.6
+        + evidence_count * 0.5
+        + min(20.0, max(0.0, score)) * 0.05
+    )
+    return (
+        priority,
+        human_count + evidence_count,
+        score,
+        _stable_hash(example.get("opportunity_id") or example.get("pool_pattern_id") or example.get("members")),
+    )
+
+
+def select_training_pool_examples(pool_examples: list[dict[str, Any]], sampling: str = "efficient") -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Keep feedback-rich examples and downsample repetitive pool-derived cards."""
+    if sampling == "full":
+        return pool_examples, {
+            "sampling": "full",
+            "available_pool_examples": len(pool_examples),
+            "used_pool_examples": len(pool_examples),
+        }
+
+    buckets: dict[str, list[dict[str, Any]]] = {}
+    for example in pool_examples:
+        buckets.setdefault(str(example.get("label") or "pool_unknown"), []).append(example)
+
+    selected: list[dict[str, Any]] = []
+    bucket_summary: dict[str, dict[str, int | str]] = {}
+    for label, rows in sorted(buckets.items()):
+        cap = POOL_SAMPLE_CAPS.get(label, 80)
+        ranked = sorted(rows, key=_pool_example_priority, reverse=True)
+        kept = ranked if cap is None else ranked[: int(cap)]
+        selected.extend(kept)
+        bucket_summary[label] = {
+            "available": len(rows),
+            "kept": len(kept),
+            "cap": "all" if cap is None else int(cap),
+        }
+
+    selected = sorted(
+        selected,
+        key=lambda row: (
+            str(row.get("label") or ""),
+            _stable_hash(row.get("opportunity_id") or row.get("pool_pattern_id") or row.get("members")),
+        ),
+    )
+    return selected, {
+        "sampling": "efficient",
+        "available_pool_examples": len(pool_examples),
+        "used_pool_examples": len(selected),
+        "bucket_summary": bucket_summary,
+    }
+
+
 def load_current_pool_examples(project_root: Path) -> list[dict[str, Any]]:
     """Build one training example for each current SCIP optimization-pool card."""
     if str(project_root) not in sys.path:
@@ -125,12 +214,17 @@ def load_current_pool_examples(project_root: Path) -> list[dict[str, Any]]:
     return examples
 
 
-def build_training_dataset(project_root: Path | None = None, output_path: Path | None = None) -> dict[str, Any]:
+def build_training_dataset(
+    project_root: Path | None = None,
+    output_path: Path | None = None,
+    pool_sampling: str = "efficient",
+) -> dict[str, Any]:
     root = project_root or project_root_from_here()
     out = output_path or training_dataset_path(root)
     explicit_examples = load_feedback_examples(root)
     pool_examples = load_current_pool_examples(root)
-    examples = explicit_examples + pool_examples
+    selected_pool_examples, sampling_summary = select_training_pool_examples(pool_examples, pool_sampling)
+    examples = explicit_examples + selected_pool_examples
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8") as handle:
         for example in examples:
@@ -143,7 +237,9 @@ def build_training_dataset(project_root: Path | None = None, output_path: Path |
         "path": str(out),
         "n_examples": len(examples),
         "explicit_feedback_examples": len(explicit_examples),
-        "current_pool_examples": len(pool_examples),
+        "current_pool_examples": len(selected_pool_examples),
+        "current_pool_examples_available": len(pool_examples),
+        "pool_sampling": sampling_summary,
         "labels": labels,
     }
 
@@ -152,8 +248,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build SCIP feedback training data.")
     parser.add_argument("--project-root", type=Path, default=project_root_from_here())
     parser.add_argument("--output", type=Path, default=None)
+    parser.add_argument("--pool-sampling", choices=["efficient", "full"], default="efficient")
     args = parser.parse_args(argv)
-    result = build_training_dataset(args.project_root, args.output)
+    result = build_training_dataset(args.project_root, args.output, pool_sampling=args.pool_sampling)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

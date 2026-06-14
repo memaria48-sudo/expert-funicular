@@ -76,11 +76,12 @@ def train_feedback_ranker(
     batch_size: int = 16,
     learning_rate: float = 0.001,
     seed: int = 42,
+    pool_sampling: str = "efficient",
 ) -> dict[str, Any]:
     root = project_root or project_root_from_here()
     model_out = model_output_path or default_model_path(root)
     metrics_out = metrics_output_path or default_metrics_path(root)
-    dataset_result = build_training_dataset(root)
+    dataset_result = build_training_dataset(root, pool_sampling=pool_sampling)
     dataset_path = Path(str(dataset_result.get("path") or ""))
     examples = _load_training_dataset(dataset_path)
 
@@ -193,6 +194,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--epochs", type=int, default=80)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--learning-rate", type=float, default=0.001)
+    parser.add_argument("--pool-sampling", choices=["efficient", "full"], default="efficient")
     args = parser.parse_args(argv)
     result = train_feedback_ranker(
         project_root=args.project_root,
@@ -200,6 +202,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate,
+        pool_sampling=args.pool_sampling,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
