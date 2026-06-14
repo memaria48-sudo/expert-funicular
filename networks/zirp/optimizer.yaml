@@ -1,0 +1,22 @@
+pair_only: true
+min_cluster_size: 2
+max_cluster_size: 2
+# TEMPORARY FEEDBACK MODE, 2026-06-02:
+# Loosen SCIP selection so pilot users can rate more candidate lines.
+# Later product mode should tighten this again:
+# max_matches: 6
+# max_public_cards: 6
+# max_matches_per_member: 1
+# max_candidate_patterns: 200
+# min_final_pair_score: 35
+# max_selected_per_cluster: 2
+# max_selected_per_opportunity: 1
+max_matches: 10
+max_public_cards: 10
+max_matches_per_member: 2
+max_candidate_patterns: 300
+min_final_pair_score: 25
+require_implementation_anchor: true
+max_selected_per_cluster: 4
+max_selected_per_opportunity: 2
+max_model_convening_cards: 10

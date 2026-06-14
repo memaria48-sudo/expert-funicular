@@ -1,0 +1,92 @@
+clusters:
+  arbeitsmarkt_fachkraefte:
+    field: wirtschaft
+    label: "Arbeitsmarkt, Fachkräfte und Qualifizierung"
+    problem: "Wie sichern Unternehmen, Hochschulen, Kammern und Arbeitsverwaltung Fachkräfte für Transformation, Pflege, Technik und Verwaltung?"
+    priority_weight: 8.6
+    signals:
+      - fachkräfte
+      - fachkraefte
+      - ausbildung
+      - weiterbildung
+      - qualifizierung
+      - duale ausbildung
+      - arbeitsmarkt
+      - personal
+      - recruiting
+      - integration
+      - zuwanderung
+      - nachwuchs
+
+  ki_daten_verwaltung_wirtschaft:
+    field: technologie
+    label: "KI, Daten und Verwaltungs-/Wirtschaftsanwendungen"
+    problem: "Wo können KI und Datenplattformen in Unternehmen, Verwaltung und öffentlicher Infrastruktur konkret Nutzen stiften?"
+    priority_weight: 7.9
+    signals:
+      - ki
+      - künstliche intelligenz
+      - kuenstliche intelligenz
+      - daten
+      - plattform
+      - automatisierung
+      - verwaltung
+      - e-government
+      - prozessdigitalisierung
+      - chatbot
+      - wissensmanagement
+
+  pflege_fachkraefte_sozialwirtschaft:
+    field: gesellschaft
+    label: "Pflege, Fachkräfte und Sozialwirtschaft"
+    problem: "Wie sichern Pflege- und Sozialträger Personal, Qualität und Versorgung in einer alternden Gesellschaft?"
+    priority_weight: 8.3
+    signals:
+      - pflege
+      - fachkräfte
+      - fachkraefte
+      - sozialwirtschaft
+      - versorgung
+      - teilhabe
+      - ausbildung
+      - personal
+      - gesundheitsberufe
+      - inklusion
+      - betreuung
+
+  energie_versorgungssicherheit:
+    field: nachhaltigkeit
+    label: "Energie, Netze und Versorgungssicherheit"
+    problem: "Wie bleiben Unternehmen, Kommunen und Infrastrukturträger in Rheinland-Pfalz investitions- und versorgungssicher?"
+    priority_weight: 8.8
+    signals:
+      - energiepreise
+      - strompreise
+      - wärme
+      - waerme
+      - netzausbau
+      - versorgungssicherheit
+      - erneuerbare energien
+      - speicher
+      - photovoltaik
+      - wasserstoff
+      - standortkosten
+      - energieintensive industrie
+
+  kreislaufwirtschaft_bau_ebv:
+    field: nachhaltigkeit
+    label: "Kreislaufwirtschaft, Bau und Ersatzbaustoffverordnung"
+    problem: "Wie können Bauwirtschaft, Rohstoffindustrie, Kommunen und Verwaltung Kreislaufwirtschaft praktisch und rechtssicher umsetzen?"
+    priority_weight: 9.0
+    signals:
+      - ersatzbaustoffverordnung
+      - ebv
+      - einbaukarte
+      - recyclingbaustoffe
+      - rohstoffindustrie
+      - bauwirtschaft
+      - kommunen
+      - verwaltung
+      - planungssicherheit
+      - regulierung
+      - genehmigung

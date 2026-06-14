@@ -57,10 +57,10 @@ RECENT_SIGNAL_WEIGHT = 1.35
 PAIR_ONLY = True
 MIN_CLUSTER_SIZE = 2
 MAX_CLUSTER_SIZE = 2
-MAX_MEETINGS = 6
-MAX_PUBLIC_CARDS = 6
-MIN_PUBLIC_CARDS = 6
-MIN_CANDIDATE_PATTERNS = 6
+MAX_MEETINGS = 10
+MAX_PUBLIC_CARDS = 10
+MIN_PUBLIC_CARDS = 10
+MIN_CANDIDATE_PATTERNS = 10
 MAX_MEETINGS_PER_MEMBER = 1
 MAX_CANDIDATE_PATTERNS = 200
 MIN_FINAL_PAIR_SCORE = 35
@@ -81,6 +81,17 @@ if not _DEFAULT_STATIC_CANDIDATE_PATH.exists():
 STATIC_CANDIDATE_PATH = Path(os.getenv("ZIRP_STATIC_CANDIDATE_PATH", str(_DEFAULT_STATIC_CANDIDATE_PATH)))
 STATIC_CANDIDATE_BASE_PATH = Path(os.getenv("ZIRP_STATIC_CANDIDATE_BASE_PATH", str(PROJECT_DIR / "sor_scip_full_static_zirp_dataset.xlsx")))
 STATIC_CANDIDATE_SHEET = os.getenv("ZIRP_STATIC_CANDIDATE_SHEET", "Candidate_Patterns")
+STATIC_ACTOR_VECTOR_SHEET = os.getenv("ZIRP_STATIC_ACTOR_VECTOR_SHEET", "Actor_Vector")
+STATIC_PAIR_VECTOR_SHEET = os.getenv("ZIRP_STATIC_PAIR_VECTOR_SHEET", "Pair_Vector")
+STATIC_PAIR_TOPIC_VECTOR_SHEET = os.getenv("ZIRP_STATIC_PAIR_TOPIC_VECTOR_SHEET", "Pair_Topic_Vector")
+STATIC_PAIR_EVIDENCE_VECTOR_SHEET = os.getenv("ZIRP_STATIC_PAIR_EVIDENCE_VECTOR_SHEET", "Pair_Evidence_Vector")
+STATIC_CARD_SHEET = os.getenv("ZIRP_STATIC_CARD_SHEET", "Opportunity_Cards")
+STATIC_FRONTIER_SHEET = os.getenv("ZIRP_STATIC_FRONTIER_SHEET", "SCIP_Frontier")
+STATIC_SCIP_INPUT_SHEET = os.getenv("ZIRP_STATIC_SCIP_INPUT_SHEET", "SCIP_Optimization_Pool")
+_DEFAULT_STATIC_OPTIMIZER_PATH = PROJECT_DIR / "zirp_nested_vector_space.xlsx"
+if not _DEFAULT_STATIC_OPTIMIZER_PATH.exists():
+    _DEFAULT_STATIC_OPTIMIZER_PATH = STATIC_CANDIDATE_PATH
+STATIC_OPTIMIZER_PATH = Path(os.getenv("ZIRP_STATIC_OPTIMIZER_PATH", str(_DEFAULT_STATIC_OPTIMIZER_PATH)))
 STATIC_FULL_PAIRING_SHEET = os.getenv("ZIRP_STATIC_FULL_PAIRING_SHEET", "All_Pairings_5253")
 USE_STATIC_FULL_PAIRING_UNIVERSE = os.getenv("ZIRP_USE_FULL_PAIRING_UNIVERSE", "1").strip().lower() not in {"0", "false", "no", "off"}
 STATIC_CLUSTER_SHEET = os.getenv("ZIRP_STATIC_CLUSTER_SHEET", "Static_Clusters")
@@ -102,12 +113,12 @@ STATIC_MEMBER_ROLE_WEIGHTS: dict[str, tuple[str, float]] = {}
 STATIC_SUBROLE_MASS_LIMITS: dict[str, float] = {}
 STATIC_SUBROLE_INVERSE_WEIGHTS: dict[str, float] = {}
 STATIC_MEMBER_SUBROLE_WEIGHTS: dict[str, tuple[str, float]] = {}
-STATIC_MAX_ACADEMIC_MATCHES: int = 2
-STATIC_MAX_ACADEMIC_ACTOR_SLOTS: int = 3
-STATIC_MIN_NON_ACADEMIC_PAIRS: int = int(os.getenv("ZIRP_MIN_NON_ACADEMIC_PAIRS", "4") or "4")
-STATIC_MAX_WEAK_EVIDENCE_MATCHES: int = int(os.getenv("ZIRP_MAX_WEAK_EVIDENCE_MATCHES", "2") or "2")
-STATIC_MAX_LOW_SCORE_MATCHES: int = int(os.getenv("ZIRP_MAX_LOW_SCORE_MATCHES", "1") or "1")
-STATIC_MIN_GEO_PROXIMITY_SUM: float = float(os.getenv("ZIRP_MIN_GEO_PROXIMITY_SUM", "3.3") or "3.3")
+STATIC_MAX_ACADEMIC_MATCHES: int = int(os.getenv("ZIRP_MAX_ACADEMIC_MATCHES", "3") or "3")
+STATIC_MAX_ACADEMIC_ACTOR_SLOTS: int = int(os.getenv("ZIRP_MAX_ACADEMIC_ACTOR_SLOTS", "4") or "4")
+STATIC_MIN_NON_ACADEMIC_PAIRS: int = int(os.getenv("ZIRP_MIN_NON_ACADEMIC_PAIRS", "7") or "7")
+STATIC_MAX_WEAK_EVIDENCE_MATCHES: int = int(os.getenv("ZIRP_MAX_WEAK_EVIDENCE_MATCHES", "3") or "3")
+STATIC_MAX_LOW_SCORE_MATCHES: int = int(os.getenv("ZIRP_MAX_LOW_SCORE_MATCHES", "2") or "2")
+STATIC_MIN_GEO_PROXIMITY_SUM: float = float(os.getenv("ZIRP_MIN_GEO_PROXIMITY_SUM", "5.5") or "5.5")
 STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS: int = int(os.getenv("ZIRP_MAX_ACADEMIC_ACADEMIC_PAIRS", "0") or "0")
 
 FEEDBACK_LEARNER = SCIPFeedbackLearner.from_project_root(PROJECT_DIR) if SCIPFeedbackLearner is not None else None
@@ -3356,7 +3367,7 @@ def _int_from_candidate_id(candidate_id: str, fallback: int) -> int:
 
 
 def _static_support_score_from_row(row_dict: dict[str, Any]) -> float:
-    for column in ["final_scip_score", "final_support_score"]:
+    for column in ["frontier_score", "card_score", "final_scip_score", "final_support_score", "legacy_score"]:
         explicit = _float_cell(row_dict.get(column), math.nan)
         if not math.isnan(explicit) and explicit > 0:
             return explicit
@@ -3414,7 +3425,8 @@ def _read_excel_sheet_optional(path: Path, sheet_name: str) -> pd.DataFrame:
         if path.exists():
             return pd.read_excel(path, sheet_name=sheet_name)
     except Exception as exc:
-        print(f"Excel static loader: could not read {sheet_name} from {path}: {exc}")
+        if "Worksheet named" not in str(exc):
+            print(f"Excel static loader: could not read {sheet_name} from {path}: {exc}")
     return pd.DataFrame()
 
 
@@ -3431,7 +3443,8 @@ def _read_excel_table_optional(path: Path, sheet_name: str, required_columns: se
     try:
         raw = pd.read_excel(path, sheet_name=sheet_name, header=None)
     except Exception as exc:
-        print(f"Excel static loader: could not read {sheet_name} from {path}: {exc}")
+        if "Worksheet named" not in str(exc):
+            print(f"Excel static loader: could not read {sheet_name} from {path}: {exc}")
         return pd.DataFrame()
     for idx in range(min(len(raw), 12)):
         headers = [_clean_cell(value) for value in raw.iloc[idx].tolist()]
@@ -3518,6 +3531,155 @@ def _normalize_full_pairing_universe_dataframe(df: pd.DataFrame) -> pd.DataFrame
     if "non_academic_pair_flag" not in df.columns and "academic_actor_slots" in df.columns:
         slots = pd.to_numeric(df["academic_actor_slots"], errors="coerce").fillna(0)
         df["non_academic_pair_flag"] = (slots == 0).astype(int)
+    return df
+
+
+def _fill_from_merge_column(df: pd.DataFrame, column: str, suffix: str = "_pairvec") -> pd.DataFrame:
+    merge_column = f"{column}{suffix}"
+    if merge_column not in df.columns:
+        return df
+    if column not in df.columns:
+        df[column] = df[merge_column]
+    else:
+        current = df[column]
+        missing = current.isna() | current.astype(str).str.strip().eq("")
+        df.loc[missing, column] = df.loc[missing, merge_column]
+    return df.drop(columns=[merge_column])
+
+
+def _normalize_nested_vector_space_dataframe(path: Path, df: pd.DataFrame, sheet_name: str) -> pd.DataFrame:
+    """Map the nested vector-space workbook into the optimizer's candidate schema."""
+    if df.empty:
+        return df
+    df = df.copy().reset_index(drop=True)
+
+    pair_vector = _read_excel_sheet_optional(path, STATIC_PAIR_VECTOR_SHEET)
+    if not pair_vector.empty and "pair_id" in df.columns and "pair_id" in pair_vector.columns:
+        keep_pair_cols = [
+            column
+            for column in [
+                "pair_id", "member_a_id", "member_b_id", "role_a", "role_b", "subrole_a", "subrole_b",
+                "distance_km", "same_geo_region", "geo_proximity_score", "geo_bridge_bonus", "geo_score_reason",
+                "shared_cluster_count", "weighted_cluster_overlap", "cluster_similarity_score", "top_cluster",
+                "top_cluster_label", "top_static_problem", "role_complementarity_score",
+                "subrole_complementarity_score", "old_candidate_max_score", "old_candidate_rows",
+                "base_structural_score", "evidence_gate_multiplier", "final_scip_score",
+                "academic_actor_slots", "includes_academic", "academic_academic_flag",
+                "non_academic_pair_flag", "legacy_candidate_id", "legacy_opportunity_key",
+            ]
+            if column in pair_vector.columns
+        ]
+        merged = df.merge(
+            pair_vector[keep_pair_cols].drop_duplicates("pair_id", keep="last"),
+            on="pair_id",
+            how="left",
+            suffixes=("", "_pairvec"),
+        )
+        for column in keep_pair_cols:
+            if column != "pair_id":
+                merged = _fill_from_merge_column(merged, column)
+        df = merged
+
+    cards = _read_excel_sheet_optional(path, STATIC_CARD_SHEET)
+    if not cards.empty and "card_id" in df.columns and "card_id" in cards.columns:
+        keep_card_cols = [
+            column
+            for column in [
+                "card_id", "topic_vector_id", "topic_label", "opportunity_key", "next_step_type",
+                "risk_type", "card_score", "card_explanation",
+            ]
+            if column in cards.columns
+        ]
+        merged = df.merge(
+            cards[keep_card_cols].drop_duplicates("card_id", keep="last"),
+            on="card_id",
+            how="left",
+            suffixes=("", "_card"),
+        )
+        for column in keep_card_cols:
+            if column != "card_id":
+                merged = _fill_from_merge_column(merged, column, suffix="_card")
+        df = merged
+
+    if "candidate_id" not in df.columns:
+        fallback_id = (
+            df["card_id"] if "card_id" in df.columns else
+            df["frontier_id"] if "frontier_id" in df.columns else
+            df["pair_id"] if "pair_id" in df.columns else
+            pd.Series([f"POOL_{i:04d}" for i in range(1, len(df) + 1)])
+        )
+        df["candidate_id"] = fallback_id
+        if "frontier_id" in df.columns:
+            missing = df["candidate_id"].isna() | df["candidate_id"].astype(str).str.strip().eq("")
+            df.loc[missing, "candidate_id"] = df.loc[missing, "frontier_id"]
+        if "pair_id" in df.columns:
+            missing = df["candidate_id"].isna() | df["candidate_id"].astype(str).str.strip().eq("")
+            df.loc[missing, "candidate_id"] = df.loc[missing, "pair_id"]
+    if "scip_variable" not in df.columns:
+        df["scip_variable"] = [f"x_pool_{i:04d}" for i in range(1, len(df) + 1)]
+    if "concrete_cluster" not in df.columns:
+        df["concrete_cluster"] = df.get("best_topic_label", df.get("topic_label", df.get("top_cluster_label", "")))
+    if "cluster_label" not in df.columns:
+        df["cluster_label"] = df.get("best_topic_label", df.get("topic_label", df.get("top_cluster_label", "")))
+    if "opportunity_key" not in df.columns:
+        df["opportunity_key"] = df.get("best_opportunity_key", df.get("pair_id", df["candidate_id"]))
+    else:
+        best = df.get("best_opportunity_key")
+        if best is not None:
+            missing = df["opportunity_key"].isna() | df["opportunity_key"].astype(str).str.strip().eq("")
+            df.loc[missing, "opportunity_key"] = best.loc[missing]
+    if "static_cluster_problem" not in df.columns:
+        df["static_cluster_problem"] = df.get("top_static_problem", "")
+    if "reasoning" not in df.columns:
+        parts = []
+        for column in ["pool_reason", "card_explanation", "filter_reason", "optimization_status"]:
+            if column in df.columns:
+                parts.append(df[column].fillna("").astype(str))
+        if parts:
+            reasoning = parts[0]
+            for part in parts[1:]:
+                reasoning = reasoning.str.cat(part, sep=" | ")
+            df["reasoning"] = reasoning.str.replace(r"( \| )+", " | ", regex=True).str.strip(" |")
+        else:
+            df["reasoning"] = ""
+    if "final_support_score" not in df.columns:
+        df["final_support_score"] = df.get("frontier_score", df.get("card_score", df.get("final_scip_score", 0.0)))
+    if "final_scip_score" not in df.columns:
+        df["final_scip_score"] = df["final_support_score"]
+    if "geo_proximity_score" not in df.columns and "geo_fit" in df.columns:
+        df["geo_proximity_score"] = df["geo_fit"]
+    if "geo_proximity_norm" not in df.columns and "geo_proximity_score" in df.columns:
+        df["geo_proximity_norm"] = pd.to_numeric(df["geo_proximity_score"], errors="coerce").fillna(0) / 100.0
+    if "role_complementarity_score" not in df.columns and "role_fit" in df.columns:
+        df["role_complementarity_score"] = df["role_fit"]
+    if "subrole_complementarity_score" not in df.columns and "subrole_fit" in df.columns:
+        df["subrole_complementarity_score"] = df["subrole_fit"]
+    if "old_candidate_max_score" not in df.columns and "legacy_score" in df.columns:
+        df["old_candidate_max_score"] = df["legacy_score"]
+    if "legacy_final_support_score" in df.columns and "legacy_score" not in df.columns:
+        df["legacy_score"] = df["legacy_final_support_score"]
+    if "weak_evidence_flag" not in df.columns:
+        df["weak_evidence_flag"] = 0
+    if "low_score_flag" not in df.columns:
+        score = pd.to_numeric(df.get("final_support_score", 0.0), errors="coerce").fillna(0.0)
+        df["low_score_flag"] = (score < MIN_FINAL_PAIR_SCORE).astype(int)
+    if "academic_pair_flag" not in df.columns:
+        slots = pd.to_numeric(df.get("academic_actor_slots", 0), errors="coerce").fillna(0)
+        df["academic_pair_flag"] = (slots > 0).astype(int)
+    if "academic_academic_flag" not in df.columns:
+        slots = pd.to_numeric(df.get("academic_actor_slots", 0), errors="coerce").fillna(0)
+        df["academic_academic_flag"] = (slots >= 2).astype(int)
+    if "non_academic_pair_flag" not in df.columns:
+        slots = pd.to_numeric(df.get("academic_actor_slots", 0), errors="coerce").fillna(0)
+        df["non_academic_pair_flag"] = (slots == 0).astype(int)
+    if "filter_reason" not in df.columns:
+        df["filter_reason"] = df.get("pool_reason", df.get("optimization_status", ""))
+    if "member_pair_key" not in df.columns and {"member_a", "member_b"}.issubset(df.columns):
+        df["member_pair_key"] = df.apply(
+            lambda row: " | ".join(sorted([_clean_cell(row.get("member_a")), _clean_cell(row.get("member_b"))])),
+            axis=1,
+        )
+    df["candidate_source_sheet"] = sheet_name
     return df
 
 
@@ -3613,11 +3775,29 @@ def _enrich_candidate_relevance_from_matrix(df: pd.DataFrame, paths: list[Path])
 def _load_static_candidate_dataframe(path: Path) -> tuple[pd.DataFrame, list[Path], str]:
     """Load the Excel-defined fixed pattern universe P.
 
-    The current workbook can expose the full 5,253-pair universe through
-    All_Pairings_5253. When present, that sheet becomes the main universe and
-    legacy Candidate_Patterns data is preserved through legacy_* columns in the
-    workbook instead of being used as a pre-filter.
+    New nested-vector workbooks expose Pair_Vector as the audit universe and
+    SCIP_Optimization_Pool as the bounded solver frontier. Older workbooks can
+    still expose All_Pairings_5253 or Candidate_Patterns as fallbacks.
     """
+    for sheet_name, mode in [
+        (STATIC_SCIP_INPUT_SHEET, "nested_scip_optimization_pool"),
+        (STATIC_FRONTIER_SHEET, "nested_scip_frontier"),
+        (STATIC_PAIR_VECTOR_SHEET, "nested_pair_vector_full_universe"),
+    ]:
+        nested = _read_excel_sheet_optional(path, sheet_name)
+        if nested.empty or not {"member_a", "member_b"}.issubset(nested.columns):
+            continue
+        df = _normalize_nested_vector_space_dataframe(path, nested, sheet_name)
+        used_paths = [path]
+        if not df.empty:
+            subset_cols = [c for c in ["member_a", "member_b", "concrete_cluster", "opportunity_key"] if c in df.columns]
+            if subset_cols and sheet_name != STATIC_SCIP_INPUT_SHEET:
+                df = df.drop_duplicates(subset=subset_cols, keep="last")
+            df = _unique_static_candidate_ids(df)
+            if STATIC_CANDIDATE_LIMIT > 0:
+                df = df.head(STATIC_CANDIDATE_LIMIT)
+        return df, used_paths, mode
+
     full_universe = _read_excel_sheet_optional(path, STATIC_FULL_PAIRING_SHEET) if USE_STATIC_FULL_PAIRING_UNIVERSE else pd.DataFrame()
     if not full_universe.empty and {"member_a", "member_b"}.issubset(full_universe.columns):
         df = _normalize_full_pairing_universe_dataframe(full_universe)
@@ -3972,7 +4152,10 @@ def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFram
         member_b = _clean_cell(row_dict.get("member_b"))
         if not member_a or not member_b:
             continue
-        if normalize_search_text(member_a) in STATIC_REMOVED_MEMBERS or normalize_search_text(member_b) in STATIC_REMOVED_MEMBERS:
+        if (
+            not mode.startswith("nested_")
+            and (normalize_search_text(member_a) in STATIC_REMOVED_MEMBERS or normalize_search_text(member_b) in STATIC_REMOVED_MEMBERS)
+        ):
             continue
 
         themenfeld = _clean_cell(row_dict.get("themenfeld"))
@@ -4018,7 +4201,7 @@ def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFram
             f"Validate the Excel-defined opportunity '{cluster_label}' against current evidence, roles and a concrete RLP application anchor."
         )
         patterns.append(MeetingPattern(
-            pattern_id=_int_from_candidate_id(candidate_id, fallback_id),
+            pattern_id=fallback_id if mode.startswith("nested_") else _int_from_candidate_id(candidate_id, fallback_id),
             members=members,
             score=score,
             shared_topics=tuple(t for t in [themenfeld, concrete_cluster] if t),
@@ -4715,6 +4898,31 @@ def export_scip_incidence_matrix(patterns: list[MeetingPattern], path: Path) -> 
     pd.DataFrame(rows).to_csv(path, index=False, encoding="utf-8-sig")
 
 
+def _write_lp_linear_constraint(
+    f: Any,
+    name: str,
+    terms: list[str],
+    sense: str,
+    rhs: str | int | float,
+    *,
+    max_line_chars: int = 900,
+) -> None:
+    if not terms:
+        return
+    line = f" {name}: "
+    first = True
+    for term in terms:
+        piece = term if first else f" + {term}"
+        if len(line) + len(piece) > max_line_chars:
+            f.write(line.rstrip() + "\n")
+            line = "  " + (term if first else f"+ {term}")
+        else:
+            line += piece
+        first = False
+    line += f" {sense} {rhs}"
+    f.write(line + "\n")
+
+
 def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], lp_path: Path) -> None:
     lp_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -4729,10 +4937,12 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
         f.write("Subject To\n")
 
         if patterns:
-            f.write(
-                " selected_meetings: "
-                + " + ".join(lp_var(pattern) for pattern in patterns)
-                + f" = {MAX_MEETINGS}\n"
+            _write_lp_linear_constraint(
+                f,
+                "selected_meetings",
+                [lp_var(pattern) for pattern in patterns],
+                "=",
+                MAX_MEETINGS,
             )
 
         for member in active_members:
@@ -4740,13 +4950,9 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if member_patterns:
                 member_limit = STATIC_MEMBER_LIMITS.get(normalize_search_text(member), MAX_MEETINGS_PER_MEMBER)
                 cname = "member_" + re.sub(r"[^A-Za-z0-9]+", "_", member)[:50]
-                f.write(
-                    f" {cname}: "
-                    + " + ".join(member_patterns)
-                    + f" <= {member_limit}\n"
-                )
+                _write_lp_linear_constraint(f, cname, member_patterns, "<=", member_limit)
 
-        # Limit how often the same concrete cluster appears in the selected Top 6.
+        # Limit how often the same concrete cluster appears in the selected portfolio.
         cluster_to_patterns: dict[str, list[str]] = defaultdict(list)
         for pattern in patterns:
             for cluster in pattern.concrete_clusters:
@@ -4757,11 +4963,7 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if len(vars_) <= cluster_limit:
                 continue
             cname = "cluster_" + re.sub(r"[^A-Za-z0-9]+", "_", cluster)[:50]
-            f.write(
-                f" {cname}: "
-                + " + ".join(vars_)
-                + f" <= {cluster_limit}\n"
-            )
+            _write_lp_linear_constraint(f, cname, vars_, "<=", cluster_limit)
 
         # Clique-style tightening: alternate rows for the same opportunity line
         # should not crowd out distinct matches.
@@ -4773,11 +4975,7 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if len(vars_) <= MAX_SELECTED_PER_OPPORTUNITY:
                 continue
             cname = "opportunity_" + re.sub(r"[^A-Za-z0-9]+", "_", opportunity_id)[:50]
-            f.write(
-                f" {cname}: "
-                + " + ".join(vars_)
-                + f" <= {MAX_SELECTED_PER_OPPORTUNITY}\n"
-            )
+            _write_lp_linear_constraint(f, cname, vars_, "<=", MAX_SELECTED_PER_OPPORTUNITY)
 
         for role, limit in sorted(STATIC_ROLE_MASS_LIMITS.items()):
             terms = []
@@ -4787,7 +4985,7 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
                     terms.append(f"{coeff:.6f} {lp_var(pattern)}")
             if terms:
                 cname = "role_quota_" + re.sub(r"[^A-Za-z0-9]+", "_", role)[:50]
-                f.write(f" {cname}: " + " + ".join(terms) + f" <= {limit:.6f}\n")
+                _write_lp_linear_constraint(f, cname, terms, "<=", f"{limit:.6f}")
 
         for subrole, limit in sorted(STATIC_SUBROLE_MASS_LIMITS.items()):
             terms = []
@@ -4797,15 +4995,11 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
                     terms.append(f"{coeff:.6f} {lp_var(pattern)}")
             if terms:
                 cname = "subrole_quota_" + re.sub(r"[^A-Za-z0-9]+", "_", subrole)[:50]
-                f.write(f" {cname}: " + " + ".join(terms) + f" <= {limit:.6f}\n")
+                _write_lp_linear_constraint(f, cname, terms, "<=", f"{limit:.6f}")
 
         academic_match_vars = [lp_var(pattern) for pattern in patterns if has_academic_actor(pattern)]
         if academic_match_vars and STATIC_MAX_ACADEMIC_MATCHES >= 0:
-            f.write(
-                " academic_match_cap: "
-                + " + ".join(academic_match_vars)
-                + f" <= {STATIC_MAX_ACADEMIC_MATCHES}\n"
-            )
+            _write_lp_linear_constraint(f, "academic_match_cap", academic_match_vars, "<=", STATIC_MAX_ACADEMIC_MATCHES)
 
         academic_slot_terms = [
             f"{academic_actor_slots_for_pattern(pattern)} {lp_var(pattern)}"
@@ -4813,10 +5007,12 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if academic_actor_slots_for_pattern(pattern) > 0
         ]
         if academic_slot_terms and STATIC_MAX_ACADEMIC_ACTOR_SLOTS >= 0:
-            f.write(
-                " academic_actor_slot_cap: "
-                + " + ".join(academic_slot_terms)
-                + f" <= {STATIC_MAX_ACADEMIC_ACTOR_SLOTS}\n"
+            _write_lp_linear_constraint(
+                f,
+                "academic_actor_slot_cap",
+                academic_slot_terms,
+                "<=",
+                STATIC_MAX_ACADEMIC_ACTOR_SLOTS,
             )
 
         non_academic_terms = [
@@ -4825,10 +5021,12 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if non_academic_pair_for_pattern(pattern) > 0
         ]
         if non_academic_terms and STATIC_MIN_NON_ACADEMIC_PAIRS > 0:
-            f.write(
-                " non_academic_pair_floor: "
-                + " + ".join(non_academic_terms)
-                + f" >= {STATIC_MIN_NON_ACADEMIC_PAIRS}\n"
+            _write_lp_linear_constraint(
+                f,
+                "non_academic_pair_floor",
+                non_academic_terms,
+                ">=",
+                STATIC_MIN_NON_ACADEMIC_PAIRS,
             )
 
         weak_evidence_terms = [
@@ -4837,10 +5035,12 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if weak_evidence_for_pattern(pattern) > 0
         ]
         if weak_evidence_terms and STATIC_MAX_WEAK_EVIDENCE_MATCHES >= 0:
-            f.write(
-                " weak_evidence_cap: "
-                + " + ".join(weak_evidence_terms)
-                + f" <= {STATIC_MAX_WEAK_EVIDENCE_MATCHES}\n"
+            _write_lp_linear_constraint(
+                f,
+                "weak_evidence_cap",
+                weak_evidence_terms,
+                "<=",
+                STATIC_MAX_WEAK_EVIDENCE_MATCHES,
             )
 
         low_score_terms = [
@@ -4849,11 +5049,7 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if low_score_for_pattern(pattern) > 0
         ]
         if low_score_terms and STATIC_MAX_LOW_SCORE_MATCHES >= 0:
-            f.write(
-                " low_score_cap: "
-                + " + ".join(low_score_terms)
-                + f" <= {STATIC_MAX_LOW_SCORE_MATCHES}\n"
-            )
+            _write_lp_linear_constraint(f, "low_score_cap", low_score_terms, "<=", STATIC_MAX_LOW_SCORE_MATCHES)
 
         geo_terms = [
             f"{geo_proximity_norm_for_pattern(pattern):.6f} {lp_var(pattern)}"
@@ -4861,10 +5057,12 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if geo_proximity_norm_for_pattern(pattern) > 0
         ]
         if geo_terms and STATIC_MIN_GEO_PROXIMITY_SUM > 0:
-            f.write(
-                " geo_proximity_floor: "
-                + " + ".join(geo_terms)
-                + f" >= {STATIC_MIN_GEO_PROXIMITY_SUM:.6f}\n"
+            _write_lp_linear_constraint(
+                f,
+                "geo_proximity_floor",
+                geo_terms,
+                ">=",
+                f"{STATIC_MIN_GEO_PROXIMITY_SUM:.6f}",
             )
 
         academic_academic_terms = [
@@ -4873,10 +5071,12 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
             if academic_academic_for_pattern(pattern) > 0
         ]
         if academic_academic_terms and STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS >= 0:
-            f.write(
-                " academic_academic_cap: "
-                + " + ".join(academic_academic_terms)
-                + f" <= {STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS}\n"
+            _write_lp_linear_constraint(
+                f,
+                "academic_academic_cap",
+                academic_academic_terms,
+                "<=",
+                STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS,
             )
 
         f.write("Binary\n")
@@ -5437,6 +5637,11 @@ def write_model_summary(
         "mathematical_framing": "maximum-weight set-packing / strategic opportunity matching",
         "network": NETWORK_NAME,
         "network_config_dir": NETWORK_CONFIG_DIR,
+        "static_optimizer_path": str(STATIC_OPTIMIZER_PATH),
+        "scip_input_sheet": STATIC_SCIP_INPUT_SHEET,
+        "frontier_sheet": STATIC_FRONTIER_SHEET,
+        "full_universe_sheet": STATIC_PAIR_VECTOR_SHEET,
+        "card_sheet": STATIC_CARD_SHEET,
         "optimizer_config": NETWORK_OPTIMIZER,
         "solver": solver_used,
         "scip_executable": str(find_scip_exe()) if solver_used == "SCIP" else "",
@@ -5475,7 +5680,8 @@ def write_model_summary(
             "weak-evidence and low-score matches stay within SCIP_Portfolio_Constraints caps",
             "selected portfolio reaches the workbook geo proximity floor",
             "academic-academic matches stay within the workbook cap",
-            "full All_Pairings_5253 universe is preferred when present; low-score rows are marked, not deleted",
+            "SCIP_Optimization_Pool is preferred as bounded SCIP input when present",
+            "Pair_Vector remains the full audit universe and Opportunity_Cards remains the card layer",
         ],
     }
     path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -7858,12 +8064,13 @@ def main() -> None:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
     profiles = build_member_profiles(members_df, events_df)
 
-    if USE_STATIC_CANDIDATES and STATIC_CANDIDATE_PATH.exists():
-        patterns = load_static_candidate_patterns_from_excel(STATIC_CANDIDATE_PATH, events_df)
-        print(f"Static Excel candidate universe P loaded: {len(patterns)} patterns from {STATIC_CANDIDATE_PATH}")
+    optimizer_workbook_path = STATIC_OPTIMIZER_PATH if STATIC_OPTIMIZER_PATH.exists() else STATIC_CANDIDATE_PATH
+    if USE_STATIC_CANDIDATES and optimizer_workbook_path.exists():
+        patterns = load_static_candidate_patterns_from_excel(optimizer_workbook_path, events_df)
+        print(f"Static Excel candidate universe P loaded: {len(patterns)} patterns from {optimizer_workbook_path}")
     else:
         if USE_STATIC_CANDIDATES:
-            print(f"Static candidate workbook missing; falling back to generated patterns: {STATIC_CANDIDATE_PATH}")
+            print(f"Static candidate workbook missing; falling back to generated patterns: {optimizer_workbook_path}")
         patterns = generate_meeting_patterns(profiles)
         patterns = filter_pair_only_patterns(patterns)
         print(f"Candidate pair patterns after filters: {len(patterns)}")
