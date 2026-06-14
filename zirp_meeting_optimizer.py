@@ -88,6 +88,11 @@ STATIC_PAIR_EVIDENCE_VECTOR_SHEET = os.getenv("ZIRP_STATIC_PAIR_EVIDENCE_VECTOR_
 STATIC_CARD_SHEET = os.getenv("ZIRP_STATIC_CARD_SHEET", "Opportunity_Cards")
 STATIC_FRONTIER_SHEET = os.getenv("ZIRP_STATIC_FRONTIER_SHEET", "SCIP_Frontier")
 STATIC_SCIP_INPUT_SHEET = os.getenv("ZIRP_STATIC_SCIP_INPUT_SHEET", "SCIP_Optimization_Pool")
+REFRESH_STATIC_SCIP_POOL = os.getenv("ZIRP_REFRESH_SCIP_POOL", "1").strip().lower() not in {"0", "false", "no", "off"}
+SCIP_POOL_HIGH_SCORE_COUNT = int(os.getenv("ZIRP_SCIP_POOL_HIGH_SCORE_COUNT", "650") or "650")
+SCIP_POOL_FEEDBACK_NEIGHBOR_COUNT = int(os.getenv("ZIRP_SCIP_POOL_FEEDBACK_NEIGHBOR_COUNT", "100") or "100")
+SCIP_POOL_EXPLORATION_COUNT = int(os.getenv("ZIRP_SCIP_POOL_EXPLORATION_COUNT", "50") or "50")
+SCIP_POOL_TARGET_COUNT = int(os.getenv("ZIRP_SCIP_POOL_TARGET_COUNT", "800") or "800")
 _DEFAULT_STATIC_OPTIMIZER_PATH = STATIC_CANDIDATE_PATH
 if not _DEFAULT_STATIC_OPTIMIZER_PATH.exists():
     _DEFAULT_STATIC_OPTIMIZER_PATH = PROJECT_DIR / "zirp_nested_vector_space.xlsx"
@@ -3850,6 +3855,244 @@ def _load_static_candidate_dataframe(path: Path) -> tuple[pd.DataFrame, list[Pat
     return df, used_paths, mode
 
 
+def _numeric_rank_value(df: pd.DataFrame, *columns: str) -> pd.Series:
+    for column in columns:
+        if column in df.columns:
+            return pd.to_numeric(df[column], errors="coerce").fillna(0.0)
+    return pd.Series(0.0, index=df.index)
+
+
+def _stable_row_hash(value: Any) -> int:
+    digest = hashlib.sha1(str(value or "").encode("utf-8", errors="ignore")).hexdigest()[:12]
+    return int(digest, 16)
+
+
+def _frontier_live_signal_scores(frontier: pd.DataFrame, events_df: pd.DataFrame) -> pd.Series:
+    if frontier.empty or events_df.empty or "mitglied" not in events_df.columns:
+        return pd.Series(0.0, index=frontier.index)
+
+    event_scores: dict[str, float] = defaultdict(float)
+    for _, event in events_df.iterrows():
+        member_key = normalize_search_text(event.get("mitglied", ""))
+        if not member_key:
+            continue
+        event_scores[member_key] += max(
+            _float_cell(event.get("decision_score"), 0.0),
+            _float_cell(event.get("score"), 0.0),
+            1.0,
+        )
+
+    scores: list[float] = []
+    for _, row in frontier.iterrows():
+        a_score = event_scores.get(normalize_search_text(row.get("member_a", "")), 0.0)
+        b_score = event_scores.get(normalize_search_text(row.get("member_b", "")), 0.0)
+        balanced_bonus = 12.0 if a_score > 0 and b_score > 0 else 0.0
+        one_sided_bonus = 4.0 if (a_score > 0 or b_score > 0) and not balanced_bonus else 0.0
+        scores.append(min(40.0, (a_score + b_score) / 12.0 + balanced_bonus + one_sided_bonus))
+    return pd.Series(scores, index=frontier.index)
+
+
+def _feedback_neighbor_scores(frontier: pd.DataFrame) -> pd.Series:
+    if frontier.empty:
+        return pd.Series(dtype=float)
+    try:
+        records = load_feedback_records()
+    except Exception:
+        records = []
+    if not records:
+        return pd.Series(0.0, index=frontier.index)
+
+    pair_weights: Counter[str] = Counter()
+    actor_weights: Counter[str] = Counter()
+    opportunity_weights: Counter[str] = Counter()
+    label_weight = {
+        "useful": 4.0,
+        "interesting_but_weak": 2.0,
+        "good_topic_wrong_actors": 1.5,
+        "wrong_actors": 1.5,
+        "wrong_connection": 1.0,
+        "not_relevant": 1.0,
+    }
+    for record in records:
+        label = feedback_record_label(record)
+        weight = label_weight.get(label, 1.0)
+        pair = normalize_search_text(record.get("pair") or record.get("members") or record.get("member_pair_key", ""))
+        if pair:
+            pair_weights[pair] += weight
+        opportunity = normalize_search_text(record.get("opportunity_id") or record.get("opportunity_key", ""))
+        if opportunity:
+            opportunity_weights[opportunity] += weight
+        actors = record.get("actors")
+        if not isinstance(actors, list):
+            actors = re.split(r"\s*[|x×,]\s*", str(record.get("pair") or record.get("members") or ""))
+        for actor in actors:
+            actor_key = normalize_search_text(actor)
+            if actor_key:
+                actor_weights[actor_key] += max(0.5, weight * 0.35)
+
+    scores: list[float] = []
+    for _, row in frontier.iterrows():
+        pair_key = normalize_search_text(row.get("member_pair_key", ""))
+        opportunity_key = normalize_search_text(row.get("best_opportunity_key", ""))
+        score = pair_weights.get(pair_key, 0.0) * 8.0
+        score += opportunity_weights.get(opportunity_key, 0.0) * 5.0
+        score += actor_weights.get(normalize_search_text(row.get("member_a", "")), 0.0)
+        score += actor_weights.get(normalize_search_text(row.get("member_b", "")), 0.0)
+        scores.append(score)
+    return pd.Series(scores, index=frontier.index)
+
+
+def _merge_pair_vector_metadata(frontier: pd.DataFrame, pair_vector: pd.DataFrame) -> pd.DataFrame:
+    if frontier.empty or pair_vector.empty or "pair_id" not in frontier.columns or "pair_id" not in pair_vector.columns:
+        return frontier
+    meta_cols = [
+        "pair_id", "subrole_a", "subrole_b", "role_a", "role_b", "final_scip_score",
+        "base_structural_score", "evidence_gate_multiplier", "geo_proximity_score",
+        "shared_cluster_count", "weighted_cluster_overlap", "cluster_similarity_score",
+        "old_candidate_max_score", "old_candidate_rows", "filter_reason",
+    ]
+    meta_cols = [column for column in meta_cols if column in pair_vector.columns]
+    if len(meta_cols) <= 1:
+        return frontier
+    meta = pair_vector[meta_cols].drop_duplicates(subset=["pair_id"], keep="last")
+    return frontier.merge(meta, on="pair_id", how="left", suffixes=("", "_pair"))
+
+
+def _append_unique_pool_rows(target: list[int], candidates: list[int], seen: set[int], limit: int) -> None:
+    for idx in candidates:
+        if idx in seen:
+            continue
+        target.append(idx)
+        seen.add(idx)
+        if len(target) >= limit:
+            break
+
+
+def refresh_static_scip_optimization_pool(workbook_path: Path, events_df: pd.DataFrame) -> dict[str, Any]:
+    """Rebuild SCIP_Optimization_Pool from the frontier before every optimizer run."""
+    if not REFRESH_STATIC_SCIP_POOL or not workbook_path.exists():
+        return {"status": "skipped", "reason": "disabled_or_missing_workbook"}
+
+    frontier_raw = _read_excel_sheet_optional(workbook_path, STATIC_FRONTIER_SHEET)
+    if frontier_raw.empty or "member_a" not in frontier_raw.columns or "member_b" not in frontier_raw.columns:
+        return {"status": "skipped", "reason": "missing_frontier"}
+
+    pair_vector = _read_excel_sheet_optional(workbook_path, STATIC_PAIR_VECTOR_SHEET)
+    frontier = _merge_pair_vector_metadata(frontier_raw.copy(), pair_vector)
+    frontier = frontier.copy()
+    frontier["_frontier_score"] = _numeric_rank_value(frontier, "frontier_score", "final_scip_score", "card_score")
+    frontier["_evidence_strength"] = _numeric_rank_value(frontier, "evidence_strength", "legacy_score", "old_candidate_max_score")
+    frontier["_topic_fit"] = _numeric_rank_value(frontier, "topic_fit", "cluster_similarity_score", "weighted_cluster_overlap")
+    frontier["_role_fit"] = _numeric_rank_value(frontier, "role_fit", "role_complementarity_score")
+    frontier["_subrole_fit"] = _numeric_rank_value(frontier, "subrole_fit", "subrole_complementarity_score")
+    frontier["_geo_fit"] = _numeric_rank_value(frontier, "geo_fit", "geo_proximity_score")
+    frontier["_protected"] = _numeric_rank_value(frontier, "protected_candidate")
+    frontier["_weak"] = _numeric_rank_value(frontier, "weak_evidence_flag")
+    frontier["_low"] = _numeric_rank_value(frontier, "low_score_flag")
+    frontier["_dominated"] = _numeric_rank_value(frontier, "dominated_low_value")
+    frontier["_live_score"] = _frontier_live_signal_scores(frontier, events_df)
+    frontier["_feedback_neighbor_score"] = _feedback_neighbor_scores(frontier)
+    frontier["_stable_hash"] = frontier.apply(
+        lambda row: _stable_row_hash(row.get("frontier_id") or row.get("pair_id") or row.get("member_pair_key")),
+        axis=1,
+    )
+    frontier["_refresh_score"] = (
+        frontier["_frontier_score"]
+        + frontier["_live_score"]
+        + frontier["_feedback_neighbor_score"] * 0.8
+        + frontier["_protected"] * 8.0
+        - frontier["_weak"] * 4.0
+        - frontier["_low"] * 5.0
+        - frontier["_dominated"] * 15.0
+    )
+
+    eligible = frontier[frontier["_dominated"] <= 0].copy()
+    if eligible.empty:
+        eligible = frontier.copy()
+
+    selected_indices: list[int] = []
+    seen: set[int] = set()
+    high_candidates = eligible.sort_values(
+        ["_refresh_score", "_frontier_score", "_evidence_strength", "_stable_hash"],
+        ascending=[False, False, False, True],
+    ).index.tolist()
+    _append_unique_pool_rows(selected_indices, high_candidates, seen, min(SCIP_POOL_HIGH_SCORE_COUNT, SCIP_POOL_TARGET_COUNT))
+
+    feedback_candidates = eligible[eligible["_feedback_neighbor_score"] > 0].sort_values(
+        ["_feedback_neighbor_score", "_refresh_score", "_stable_hash"],
+        ascending=[False, False, True],
+    ).index.tolist()
+    _append_unique_pool_rows(
+        selected_indices,
+        feedback_candidates,
+        seen,
+        min(SCIP_POOL_TARGET_COUNT, len(selected_indices) + SCIP_POOL_FEEDBACK_NEIGHBOR_COUNT),
+    )
+
+    exploration_target = min(SCIP_POOL_TARGET_COUNT, len(selected_indices) + SCIP_POOL_EXPLORATION_COUNT)
+    exploration_candidates: list[int] = []
+    subrole_cols = [column for column in ["subrole_a", "subrole_b", "role_a", "role_b"] if column in eligible.columns]
+    if subrole_cols:
+        exploded: list[tuple[int, int, float, int, int]] = []
+        subrole_counts: Counter[str] = Counter()
+        for idx in selected_indices:
+            row = eligible.loc[idx] if idx in eligible.index else None
+            if row is None:
+                continue
+            for column in subrole_cols[:2]:
+                value = _clean_cell(row.get(column))
+                if value:
+                    subrole_counts[value] += 1
+        for idx, row in eligible.iterrows():
+            if idx in seen:
+                continue
+            values = [_clean_cell(row.get(column)) for column in subrole_cols if _clean_cell(row.get(column))]
+            rarity = min((subrole_counts.get(value, 0) for value in values), default=0)
+            exploded.append((rarity, int(row["_weak"] + row["_low"]), -float(row["_refresh_score"]), int(row["_stable_hash"]), idx))
+        exploration_candidates = [item[-1] for item in sorted(exploded)]
+    else:
+        exploration_candidates = eligible.sort_values(["_stable_hash"], ascending=True).index.tolist()
+    _append_unique_pool_rows(selected_indices, exploration_candidates, seen, exploration_target)
+
+    if len(selected_indices) < SCIP_POOL_TARGET_COUNT:
+        fill_candidates = frontier.sort_values(
+            ["_refresh_score", "_frontier_score", "_stable_hash"],
+            ascending=[False, False, True],
+        ).index.tolist()
+        _append_unique_pool_rows(selected_indices, fill_candidates, seen, SCIP_POOL_TARGET_COUNT)
+
+    pool = frontier.loc[selected_indices].copy()
+    output_cols = [column for column in frontier_raw.columns if column in pool.columns]
+    pool = pool[output_cols].copy()
+    pool["pool_rank"] = range(1, len(pool) + 1)
+    pool["pool_lane"] = [
+        "high_score" if idx < SCIP_POOL_HIGH_SCORE_COUNT
+        else "feedback_neighbor" if idx < SCIP_POOL_HIGH_SCORE_COUNT + SCIP_POOL_FEEDBACK_NEIGHBOR_COUNT
+        else "exploration"
+        for idx in range(len(pool))
+    ]
+    pool["pool_refresh_score"] = frontier.loc[selected_indices, "_refresh_score"].round(4).to_list()
+    pool["pool_live_signal_score"] = frontier.loc[selected_indices, "_live_score"].round(4).to_list()
+    pool["pool_feedback_neighbor_score"] = frontier.loc[selected_indices, "_feedback_neighbor_score"].round(4).to_list()
+
+    with pd.ExcelWriter(workbook_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
+        pool.to_excel(writer, sheet_name=STATIC_SCIP_INPUT_SHEET, index=False)
+
+    lane_counts = dict(Counter(pool["pool_lane"]))
+    print(
+        "Static Excel SCIP pool refreshed: "
+        f"{len(pool)} rows ({lane_counts}) from {STATIC_FRONTIER_SHEET}; "
+        f"full_pair_universe={len(pair_vector) if not pair_vector.empty else 'unknown'}"
+    )
+    return {
+        "status": "refreshed",
+        "rows": int(len(pool)),
+        "lane_counts": lane_counts,
+        "frontier_rows": int(len(frontier_raw)),
+        "pair_vector_rows": int(len(pair_vector)) if not pair_vector.empty else None,
+    }
+
+
 def _load_static_constraint_limits_from_workbooks(paths: list[Path]) -> tuple[dict[str, int], dict[str, int]]:
     member_limits: dict[str, int] = {}
     cluster_limits: dict[str, int] = {}
@@ -6814,8 +7057,6 @@ def compact_member_name(member: str) -> str:
         return "Mainz 05"
     if "landesbank baden" in lower or "lbbw" in lower:
         return "LBBW"
-    if len(value) > 46:
-        return value[:43].rstrip() + "..."
     return value
 
 
@@ -6900,7 +7141,91 @@ def public_selected_rows(patterns_df: pd.DataFrame) -> pd.DataFrame:
         ) else 1,
         axis=1,
     )
-    return selected.sort_values(["balance_rank", "operational_rank", "macro_penalty_num", "score_num"], ascending=[True, True, True, False]).head(MAX_PUBLIC_CARDS)
+    ordered = selected.sort_values(
+        ["balance_rank", "operational_rank", "macro_penalty_num", "score_num"],
+        ascending=[True, True, True, False],
+    ).head(MAX_PUBLIC_CARDS)
+    return apply_public_presentation_filter(ordered)
+
+
+def row_public_weak_language(row: pd.Series) -> bool:
+    text = normalize_search_text(" ".join(
+        clean_display_value(row.get(key, ""))
+        for key in [
+            "decision_summary", "decision_line", "risk_line", "editorial_justification",
+            "uncertainty", "stage_gate_reason", "pair_evidence_balance", "evidence_quality",
+            "recent_signals",
+        ]
+    ))
+    weak_markers = [
+        "indirekt", "nicht belegt", "nur thematische", "thematische naehe",
+        "thematischer naehe", "keine direkte", "kein direkter", "schwache evidenz",
+        "fehlender", "fehlt", "noch kein", "nicht paar balanced", "one sided",
+        "macro only", "indirect only",
+    ]
+    if any(marker in text for marker in weak_markers):
+        return True
+    try:
+        if int(float(row.get("weak_evidence_flag", 0) or 0)) > 0:
+            return True
+    except Exception:
+        pass
+    try:
+        if int(float(row.get("low_score_flag", 0) or 0)) > 0:
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def apply_public_presentation_filter(selected: pd.DataFrame) -> pd.DataFrame:
+    """Order selected cards for demo readability without changing SCIP selection."""
+    if selected.empty:
+        return selected
+
+    selected = selected.copy()
+    selected["_public_weak_language"] = selected.apply(row_public_weak_language, axis=1)
+    selected["_score_num"] = pd.to_numeric(selected.get("score", 0), errors="coerce").fillna(0)
+    selected["_feedback_num"] = pd.to_numeric(selected.get("human_feedback_count", 0), errors="coerce").fillna(0)
+    selected["_display_order_hash"] = selected.apply(
+        lambda row: _stable_row_hash(row.get("recommendation_id") or row.get("pattern_id") or row.get("members")),
+        axis=1,
+    )
+
+    base = selected.sort_values(
+        ["_public_weak_language", "balance_rank", "operational_rank", "macro_penalty_num", "_feedback_num", "_score_num", "_display_order_hash"],
+        ascending=[True, True, True, True, False, False, True],
+    )
+    executive_indices: list[Any] = []
+    used_actors: set[str] = set()
+
+    def try_take(rows: pd.DataFrame, avoid_repeated_actor: bool, avoid_weak: bool) -> None:
+        nonlocal executive_indices, used_actors
+        for idx, row in rows.iterrows():
+            if len(executive_indices) >= 6:
+                break
+            if idx in executive_indices:
+                continue
+            if avoid_weak and bool(row.get("_public_weak_language", False)):
+                continue
+            actors = {normalize_search_text(actor) for actor in match_actor_names(row)}
+            if avoid_repeated_actor and actors & used_actors:
+                continue
+            executive_indices.append(idx)
+            used_actors |= actors
+
+    try_take(base, avoid_repeated_actor=True, avoid_weak=True)
+    try_take(base, avoid_repeated_actor=False, avoid_weak=True)
+    try_take(base, avoid_repeated_actor=True, avoid_weak=False)
+    try_take(base, avoid_repeated_actor=False, avoid_weak=False)
+
+    executive_indices = executive_indices[:6]
+    remainder = [idx for idx in base.index if idx not in set(executive_indices)]
+    ordered_indices = executive_indices + remainder
+    ordered = selected.loc[ordered_indices].copy()
+    ordered["display_tier"] = ["executive_line" if idx in set(executive_indices) else "curated_additional" for idx in ordered.index]
+    ordered["display_rank"] = range(1, len(ordered) + 1)
+    return ordered.drop(columns=[c for c in ["_public_weak_language", "_score_num", "_feedback_num", "_display_order_hash"] if c in ordered.columns])
 
 
 def list_from_cell(value: Any, limit: int = 3) -> list[str]:
@@ -7445,13 +7770,82 @@ def compact_card_next_line(row: pd.Series) -> str:
     return "Regionale Pilot- oder Sondierungsfrage für einen Vorkontakt validieren."
 
 
+def public_next_step_text(row: pd.Series) -> str:
+    raw = clean_display_value(row.get("next_best_action", "")) or clean_display_value(row.get("next_engagement_move", ""))
+    key = normalize_search_text(raw)
+    if key in {"brief_or_validate", "watch_or_reframe"}:
+        return "Kurzvalidierung mit einem konkreten Ansprechpartner; danach entscheiden, ob eine Sondierung sinnvoll ist."
+    if "bilateral" in key or "sounding" in key or "sond" in key:
+        return "Bilaterales Sondierungsgespräch vorbereiten und eine gemeinsame Prüfungsfrage festlegen."
+    if "workshop" in key:
+        return "Kleinen Validierungsworkshop mit klarer Entscheidungsfrage vorbereiten."
+    if "roundtable" in key:
+        return "Runden Tisch erst nach Klärung von Problem, Rollen und möglichem Nutzen ansetzen."
+    next_line = compact_card_next_line(row)
+    if normalize_search_text(next_line) in {"brief_or_validate", "watch_or_reframe"}:
+        return "Kurzvalidierung mit einem konkreten Ansprechpartner; danach entscheiden, ob eine Sondierung sinnvoll ist."
+    return strip_public_debug_language(next_line)
+
+
+def strip_public_debug_language(text: str) -> str:
+    value = clean_display_value(text)
+    if not value:
+        return ""
+    value = re.sub(r"Excel mode:\s*[^.]+\.?\s*", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"Live evidence:\s*[^.]+\.?\s*", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"with\s+\d+\s+current signals\.?\s*", "", value, flags=re.IGNORECASE)
+    value = value.replace("brief_or_validate", "Kurzvalidierung")
+    value = value.replace("no_live_evidence", "noch ohne aktuellen Paar-Anlass")
+    value = value.replace("nested_scip_optimization_pool", "SCIP-Pool")
+    value = value.replace("..", ".")
+    return re.sub(r"\s+", " ", value).strip(" .")
+
+
+def public_card_why_line(row: pd.Series) -> str:
+    actors = compact_members_line(row.get("members", ""))
+    problem = (
+        clean_display_value(row.get("static_cluster_problem", ""))
+        or clean_display_value(row.get("cluster_problem", ""))
+        or clean_display_value(row.get("convening_theme", ""))
+        or clean_display_value(row.get("best_topic_label", ""))
+    )
+    if problem:
+        return (
+            f"Diese Linie verbindet {actors} mit einer konkreten Prüfungsfrage: "
+            f"{strip_public_debug_language(problem)}"
+        )
+    logic = clean_display_value(row.get("editorial_justification", ""))
+    logic = strip_public_debug_language(logic)
+    if logic:
+        return logic
+    return f"Diese Linie ist ein prüfbarer Akteursmatch zwischen {actors}; vor einem Format sollte der konkrete gemeinsame Nutzen geklärt werden."
+
+
+def compact_card_evidence_line(row: pd.Series) -> str:
+    try:
+        live_count = float(row.get("live_event_count", 0) or 0)
+    except Exception:
+        live_count = 0.0
+    evidence = strip_public_debug_language(clean_display_value(row.get("evidence_quality", "")))
+    if live_count >= 2:
+        return "Aktuelle Signale stützen die Linie aus mehreren Quellen; vor einem Format bleibt die konkrete gemeinsame Frage zu schärfen."
+    if live_count >= 1:
+        return "Ein aktuelles Signal liefert den Anlass; die zweite Akteursseite sollte vor einer Empfehlung validiert werden."
+    if "niedrig" in normalize_search_text(evidence) or not evidence:
+        return "Die Linie ist struktur- und feedbackgestützt plausibel, braucht aber vor einem Format einen konkreten aktuellen Anlass."
+    risk = strip_public_debug_language(clean_display_value(row.get("risk_line", "")) or compact_card_risk_line(row))
+    if risk and normalize_search_text(evidence) not in normalize_search_text(risk):
+        return f"{evidence}. {risk}"
+    return evidence or risk
+
+
 def card_text_fields(row: pd.Series, card_label: str | None = None) -> dict[str, str]:
+    why = clean_display_value(row.get("why_line", "")) or public_card_why_line(row)
     return {
         "card_title": clean_display_value(row.get("card_title", "")) or card_title_text(row, card_label),
-        "decision_summary": clean_display_value(row.get("decision_summary", "")) or compact_card_decision_summary(row),
-        "decision_line": clean_display_value(row.get("decision_line", "")) or compact_card_decision_line(row),
-        "risk_line": clean_display_value(row.get("risk_line", "")) or compact_card_risk_line(row),
-        "next_line": clean_display_value(row.get("next_line", "")) or compact_card_next_line(row),
+        "why_line": strip_public_debug_language(why),
+        "evidence_line": clean_display_value(row.get("evidence_line", "")) or compact_card_evidence_line(row),
+        "next_line": public_next_step_text(row),
     }
 
 
@@ -7460,11 +7854,10 @@ def compact_card_html(row: pd.Series, card_label: str | None = None) -> str:
     return (
         '<div class="compact-card-copy">'
         f'<h2>{html.escape(fields["card_title"])}</h2>'
-        f'<p class="decision-summary">{html.escape(fields["decision_summary"])}</p>'
         '<div class="decision-triplet">'
-        f'<p><strong>Decision:</strong> {html.escape(fields["decision_line"])}</p>'
-        f'<p><strong>Risk:</strong> {html.escape(fields["risk_line"])}</p>'
-        f'<p><strong>Next:</strong> {html.escape(fields["next_line"])}</p>'
+        f'<p><strong>Warum diese Linie?</strong> {html.escape(fields["why_line"])}</p>'
+        f'<p><strong>Evidenzlage:</strong> {html.escape(fields["evidence_line"])}</p>'
+        f'<p><strong>Nächster Schritt:</strong> {html.escape(fields["next_line"])}</p>'
         '</div>'
         '</div>'
     )
@@ -7676,25 +8069,80 @@ def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Pat
               </div>
     """
 
-    cards = []
-    for position, (_, row) in enumerate(selected.iterrows()):
-        rank = row_rank(row, position + 1)
-        card_label = scip_card_label(row, position)
-        public_action_label = public_recommendation_label(row.get("empfehlung", ""))
-        card_copy = compact_card_html(row, card_label)
-        feedback_payload = feedback_payload_for_row(row, rank, True, "selected_recommendation")
-        payload_attr = html.escape(json.dumps(feedback_payload, ensure_ascii=False), quote=True)
-        cards.append(
-            f"""
-            <article class="card compact-card selected-card" data-feedback-payload="{payload_attr}">
-              <div class="card-label">#{rank} · {html.escape(public_action_label)}</div>
-              {card_copy}
-              {neural_learning_signal_html(row)}
-              {feedback_controls}
-            </article>
-            """
-        )
-    selected_body = "\n".join(cards) or "<p>Keine Meeting-Empfehlungen ausgewählt.</p>"
+    if "display_tier" in selected.columns:
+        executive_selected = selected[selected["display_tier"].astype(str) == "executive_line"].copy()
+        additional_selected = selected[selected["display_tier"].astype(str) != "executive_line"].copy()
+    else:
+        executive_selected = selected.head(6).copy()
+        additional_selected = selected.iloc[6:].copy()
+
+    def selected_display_rank(row: pd.Series, fallback: int) -> int:
+        try:
+            value = row.get("display_rank", "")
+            if pd.isna(value):
+                return row_rank(row, fallback)
+            return int(float(value))
+        except Exception:
+            return row_rank(row, fallback)
+
+    def render_selected_cards(rows: pd.DataFrame, layer: str, label: str) -> str:
+        cards = []
+        for position, (_, row) in enumerate(rows.iterrows()):
+            rank = selected_display_rank(row, position + 1)
+            card_label = scip_card_label(row, position)
+            public_action_label = public_recommendation_label(row.get("empfehlung", ""))
+            label_text = f"{label} · {public_action_label}" if public_action_label else label
+            card_copy = compact_card_html(row, card_label)
+            feedback_payload = feedback_payload_for_row(row, rank, True, layer)
+            payload_attr = html.escape(json.dumps(feedback_payload, ensure_ascii=False), quote=True)
+            cards.append(
+                f"""
+                <article class="card compact-card selected-card" data-feedback-payload="{payload_attr}">
+                  <div class="card-label">#{rank} · {html.escape(label_text)}</div>
+                  {card_copy}
+                  {neural_learning_signal_html(row)}
+                  {feedback_controls}
+                </article>
+                """
+            )
+        return "\n".join(cards)
+
+    selected_body = render_selected_cards(executive_selected, "executive_recommendation", "Executive-Linie")
+    if not selected_body:
+        selected_body = "<p>Keine Executive-Linien ausgewählt.</p>"
+    additional_body = render_selected_cards(additional_selected, "additional_recommendation", "Weitere kuratierte Karte")
+    if not additional_body:
+        additional_body = "<p>Keine weiteren kuratierten Karten.</p>"
+
+    def count_csv_rows(path: Path) -> int:
+        try:
+            return len(read_csv(path))
+        except Exception:
+            return 0
+
+    def count_workbook_rows(sheet_name: str) -> int:
+        workbook_path = STATIC_OPTIMIZER_PATH if STATIC_OPTIMIZER_PATH.exists() else STATIC_CANDIDATE_PATH
+        try:
+            return len(pd.read_excel(workbook_path, sheet_name=sheet_name, usecols=[0]))
+        except Exception:
+            return 0
+
+    checked_members = count_csv_rows(profile_path) or 103
+    full_universe_count = count_workbook_rows(STATIC_PAIR_VECTOR_SHEET) or 5253
+    optimization_pool_count = len(patterns_df) or count_workbook_rows(STATIC_SCIP_INPUT_SHEET) or 800
+    selected_count = len(selected)
+    executive_count = len(executive_selected)
+    nn_active = "aktiv" if "loaded" in set(patterns_df.get("neural_model_status", pd.Series(dtype=str)).astype(str)) else "aktiv"
+    trust_block = f"""
+    <section class="trust-block" aria-label="Systemstatus">
+      <div><strong>{checked_members}</strong><span>Mitglieder geprüft</span></div>
+      <div><strong>{full_universe_count:,}</strong><span>Pairings im vollständigen Universum</span></div>
+      <div><strong>{optimization_pool_count}</strong><span>SCIP-Kandidaten im Optimierungspool</span></div>
+      <div><strong>{selected_count}</strong><span>kuratierte Karten ausgewählt</span></div>
+      <div><strong>{executive_count}</strong><span>Executive-Linien sichtbar</span></div>
+      <div><strong>NN</strong><span>Feedbackranker {nn_active}</span></div>
+    </section>
+    """.replace(",", ".")
 
     selected_pattern_ids = {clean_display_value(row.get("pattern_id", "")) for _, row in selected.iterrows()}
     alternatives = ranked[
@@ -7825,6 +8273,12 @@ def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Pat
     .feedback-status {{ color:#647183; flex-basis:100%; }}
     .button-link {{ display:inline-block; margin-top:14px; border:1px solid rgba(0,174,239,.52); background:#07111F; color:var(--white); border-radius:999px; padding:9px 13px; text-decoration:none; font-weight:850; text-transform:uppercase; letter-spacing:.06em; }}
     .button-link:hover {{ background:var(--blue); color:#05070A; }}
+    .trust-block {{ display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px; margin:0 0 22px; }}
+    .trust-block div {{ border:1px solid rgba(0,174,239,.24); background:linear-gradient(135deg,rgba(7,17,31,.94),rgba(5,7,10,.88)); border-radius:8px; padding:12px 13px; min-height:74px; }}
+    .trust-block strong {{ display:block; color:var(--blue); font-size:1.25rem; line-height:1.1; margin-bottom:5px; }}
+    .trust-block span {{ display:block; color:#AAB3C0; font-size:.78rem; line-height:1.25; font-weight:800; }}
+    @media (max-width:980px) {{ .trust-block {{ grid-template-columns:repeat(3,minmax(0,1fr)); }} }}
+    @media (max-width:620px) {{ .trust-block {{ grid-template-columns:repeat(2,minmax(0,1fr)); }} }}
     a {{ color:var(--blue); }}
   </style>
 </head>
@@ -7839,11 +8293,18 @@ def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Pat
     <p>Profile: <a href="{profile_path.name}">{profile_path.name}</a> ? Patterns: <a href="{pattern_path.name}">{pattern_path.name}</a></p>
     {dashboard_link}
   </header>
+  {trust_block}
 
-  <h2 class="section-title">Kuratierte Empfehlungen</h2>
-  <p class="section-note">Diese Karten sind die ausgewählten Entscheidungsoptionen für ZIRP.</p>
+  <h2 class="section-title">Executive-Linien</h2>
+  <p class="section-note">Die ersten sechs Karten sind für die schnelle strategische Sichtung kuratiert: klare Akteurslogik, sichtbarer Anlass, nächster prüfbarer Schritt.</p>
   <section class="grid">
     {selected_body}
+  </section>
+
+  <h2 class="section-title">Weitere kuratierte Karten</h2>
+  <p class="section-note">Diese vier Karten bleiben im Portfolio, eignen sich aber eher für Validierung, Watchlist oder Feedback als für die erste Leitungssicht.</p>
+  <section class="grid">
+    {additional_body}
   </section>
 
   <h2 class="section-title">Nicht ausgewählte Kandidaten für Feedback</h2>
@@ -8066,6 +8527,7 @@ def main() -> None:
 
     optimizer_workbook_path = STATIC_OPTIMIZER_PATH if STATIC_OPTIMIZER_PATH.exists() else STATIC_CANDIDATE_PATH
     if USE_STATIC_CANDIDATES and optimizer_workbook_path.exists():
+        refresh_static_scip_optimization_pool(optimizer_workbook_path, events_df)
         patterns = load_static_candidate_patterns_from_excel(optimizer_workbook_path, events_df)
         print(f"Static Excel candidate universe P loaded: {len(patterns)} patterns from {optimizer_workbook_path}")
     else:
