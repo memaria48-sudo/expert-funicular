@@ -81,6 +81,8 @@ if not _DEFAULT_STATIC_CANDIDATE_PATH.exists():
 STATIC_CANDIDATE_PATH = Path(os.getenv("ZIRP_STATIC_CANDIDATE_PATH", str(_DEFAULT_STATIC_CANDIDATE_PATH)))
 STATIC_CANDIDATE_BASE_PATH = Path(os.getenv("ZIRP_STATIC_CANDIDATE_BASE_PATH", str(PROJECT_DIR / "sor_scip_full_static_zirp_dataset.xlsx")))
 STATIC_CANDIDATE_SHEET = os.getenv("ZIRP_STATIC_CANDIDATE_SHEET", "Candidate_Patterns")
+STATIC_FULL_PAIRING_SHEET = os.getenv("ZIRP_STATIC_FULL_PAIRING_SHEET", "All_Pairings_5253")
+USE_STATIC_FULL_PAIRING_UNIVERSE = os.getenv("ZIRP_USE_FULL_PAIRING_UNIVERSE", "1").strip().lower() not in {"0", "false", "no", "off"}
 STATIC_CLUSTER_SHEET = os.getenv("ZIRP_STATIC_CLUSTER_SHEET", "Static_Clusters")
 STATIC_MEMBER_SHEET = os.getenv("ZIRP_STATIC_MEMBER_SHEET", "All_ZIRP_Members")
 STATIC_MEMBER_CLUSTER_MATRIX_SHEET = os.getenv("ZIRP_STATIC_MEMBER_CLUSTER_MATRIX_SHEET", "Member_Cluster_Matrix")
@@ -102,6 +104,11 @@ STATIC_SUBROLE_INVERSE_WEIGHTS: dict[str, float] = {}
 STATIC_MEMBER_SUBROLE_WEIGHTS: dict[str, tuple[str, float]] = {}
 STATIC_MAX_ACADEMIC_MATCHES: int = 2
 STATIC_MAX_ACADEMIC_ACTOR_SLOTS: int = 3
+STATIC_MIN_NON_ACADEMIC_PAIRS: int = int(os.getenv("ZIRP_MIN_NON_ACADEMIC_PAIRS", "4") or "4")
+STATIC_MAX_WEAK_EVIDENCE_MATCHES: int = int(os.getenv("ZIRP_MAX_WEAK_EVIDENCE_MATCHES", "2") or "2")
+STATIC_MAX_LOW_SCORE_MATCHES: int = int(os.getenv("ZIRP_MAX_LOW_SCORE_MATCHES", "1") or "1")
+STATIC_MIN_GEO_PROXIMITY_SUM: float = float(os.getenv("ZIRP_MIN_GEO_PROXIMITY_SUM", "3.3") or "3.3")
+STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS: int = int(os.getenv("ZIRP_MAX_ACADEMIC_ACADEMIC_PAIRS", "0") or "0")
 
 FEEDBACK_LEARNER = SCIPFeedbackLearner.from_project_root(PROJECT_DIR) if SCIPFeedbackLearner is not None else None
 USE_NEURAL_FEEDBACK_RANKER = os.getenv("SOR_NEURAL_FEEDBACK_RANKER", "1").strip().lower() not in {"0", "false", "no", "off"}
@@ -1497,6 +1504,22 @@ class MeetingPattern:
     live_signal_titles: tuple[str, ...] = ()
     live_signal_urls: tuple[str, ...] = ()
     live_evidence_status: str = ""
+    geo_proximity_score: float = 0.0
+    geo_proximity_norm: float = 0.0
+    distance_km: float = 0.0
+    same_geo_region: bool = False
+    geo_score_reason: str = ""
+    candidate_status: str = ""
+    filter_reason: str = ""
+    weak_evidence_flag: int = 0
+    low_score_flag: int = 0
+    academic_pair_flag: int = 0
+    academic_academic_flag: int = 0
+    non_academic_pair_flag: int = 0
+    legacy_candidate_id: str = ""
+    legacy_opportunity_key: str = ""
+    old_candidate_max_score: float = 0.0
+    old_candidate_rows: int = 0
 
 
 def latest_file(prefix: str, directory: Path = REPORT_DIR) -> Path:
@@ -3333,13 +3356,14 @@ def _int_from_candidate_id(candidate_id: str, fallback: int) -> int:
 
 
 def _static_support_score_from_row(row_dict: dict[str, Any]) -> float:
+    for column in ["final_scip_score", "final_support_score"]:
+        explicit = _float_cell(row_dict.get(column), math.nan)
+        if not math.isnan(explicit) and explicit > 0:
+            return explicit
     for column in ["role_subrole_balanced_score", "subrole_balanced_score", "role_balanced_score"]:
         quota_score = _float_cell(row_dict.get(column), math.nan)
         if not math.isnan(quota_score) and quota_score > 0:
             return quota_score
-    explicit = _float_cell(row_dict.get("final_support_score"), math.nan)
-    if not math.isnan(explicit) and explicit > 0:
-        return explicit
     base_score = _float_cell(row_dict.get("base_support_score"), math.nan)
     if not math.isnan(base_score) and base_score > 0:
         return base_score
@@ -3449,6 +3473,54 @@ def _unique_static_candidate_ids(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def _normalize_full_pairing_universe_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Make the 5,253-pair universe compatible with the legacy static candidate pipeline."""
+    if df.empty:
+        return df
+    df = df.copy().reset_index(drop=True)
+    if "candidate_id" not in df.columns:
+        df["candidate_id"] = df.get("pair_id", pd.Series(dtype=object))
+    if "scip_variable" not in df.columns:
+        df["scip_variable"] = [f"x_pair_{i:04d}" for i in range(1, len(df) + 1)]
+    if "concrete_cluster" not in df.columns and "top_cluster" in df.columns:
+        df["concrete_cluster"] = df["top_cluster"]
+    if "cluster_label" not in df.columns and "top_cluster_label" in df.columns:
+        df["cluster_label"] = df["top_cluster_label"]
+    if "static_cluster_problem" not in df.columns and "top_static_problem" in df.columns:
+        df["static_cluster_problem"] = df["top_static_problem"]
+    if "final_support_score" not in df.columns and "final_scip_score" in df.columns:
+        df["final_support_score"] = df["final_scip_score"]
+    if "geo_proximity_norm" not in df.columns and "geo_proximity_score" in df.columns:
+        df["geo_proximity_norm"] = pd.to_numeric(df["geo_proximity_score"], errors="coerce").fillna(0) / 100.0
+    if "opportunity_key" not in df.columns:
+        pair_id = df.get("pair_id", df["candidate_id"]).astype(str)
+        cluster = df.get("concrete_cluster", "").astype(str) if "concrete_cluster" in df.columns else ""
+        df["opportunity_key"] = pair_id + "__" + cluster
+    if "reasoning" not in df.columns:
+        status = df.get("candidate_status", "").astype(str) if "candidate_status" in df.columns else ""
+        reason = df.get("filter_reason", "").astype(str) if "filter_reason" in df.columns else ""
+        geo = df.get("geo_score_reason", "").astype(str) if "geo_score_reason" in df.columns else ""
+        df["reasoning"] = (status + " | " + reason + " | " + geo).str.strip(" |")
+    if "weak_evidence_flag" not in df.columns:
+        gate_source = df["evidence_gate_multiplier"] if "evidence_gate_multiplier" in df.columns else pd.Series([1.0] * len(df))
+        gate = pd.to_numeric(gate_source, errors="coerce").fillna(1.0)
+        df["weak_evidence_flag"] = (gate < 0.75).astype(int)
+    if "low_score_flag" not in df.columns:
+        score_source = df["final_support_score"] if "final_support_score" in df.columns else pd.Series([0.0] * len(df))
+        score = pd.to_numeric(score_source, errors="coerce").fillna(0.0)
+        status = df["candidate_status"].astype(str).str.lower() if "candidate_status" in df.columns else pd.Series([""] * len(df))
+        df["low_score_flag"] = ((score < MIN_FINAL_PAIR_SCORE) | status.str.startswith("low")).astype(int)
+    if "academic_pair_flag" not in df.columns and "includes_academic" in df.columns:
+        df["academic_pair_flag"] = pd.to_numeric(df["includes_academic"], errors="coerce").fillna(0).astype(int)
+    if "academic_academic_flag" not in df.columns and "academic_actor_slots" in df.columns:
+        slots = pd.to_numeric(df["academic_actor_slots"], errors="coerce").fillna(0)
+        df["academic_academic_flag"] = (slots >= 2).astype(int)
+    if "non_academic_pair_flag" not in df.columns and "academic_actor_slots" in df.columns:
+        slots = pd.to_numeric(df["academic_actor_slots"], errors="coerce").fillna(0)
+        df["non_academic_pair_flag"] = (slots == 0).astype(int)
+    return df
+
+
 def _merge_candidate_role_balance(path: Path, df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
@@ -3539,12 +3611,29 @@ def _enrich_candidate_relevance_from_matrix(df: pd.DataFrame, paths: list[Path])
 
 
 def _load_static_candidate_dataframe(path: Path) -> tuple[pd.DataFrame, list[Path], str]:
-    """Load Candidate_Patterns as the fixed pattern universe P.
+    """Load the Excel-defined fixed pattern universe P.
 
-    If the preferred workbook is only a small update/patch workbook, merge it
-    into the full base workbook and drop removed members. This keeps the v2
-    optimizer robust while preserving the Excel-first architecture.
+    The current workbook can expose the full 5,253-pair universe through
+    All_Pairings_5253. When present, that sheet becomes the main universe and
+    legacy Candidate_Patterns data is preserved through legacy_* columns in the
+    workbook instead of being used as a pre-filter.
     """
+    full_universe = _read_excel_sheet_optional(path, STATIC_FULL_PAIRING_SHEET) if USE_STATIC_FULL_PAIRING_UNIVERSE else pd.DataFrame()
+    if not full_universe.empty and {"member_a", "member_b"}.issubset(full_universe.columns):
+        df = _normalize_full_pairing_universe_dataframe(full_universe)
+        df = _candidate_rows_without_removed_members(df)
+        used_paths = [path]
+        mode = "full_pairing_universe"
+        if not df.empty:
+            df = _enrich_candidate_relevance_from_matrix(df, used_paths)
+            subset_cols = [c for c in ["member_a", "member_b", "concrete_cluster", "opportunity_key"] if c in df.columns]
+            if subset_cols:
+                df = df.drop_duplicates(subset=subset_cols, keep="last")
+            df = _unique_static_candidate_ids(df)
+            if STATIC_CANDIDATE_LIMIT > 0:
+                df = df.head(STATIC_CANDIDATE_LIMIT)
+        return df, used_paths, mode
+
     preferred = _read_excel_sheet_optional(path, STATIC_CANDIDATE_SHEET)
     used_paths: list[Path] = []
     mode = "preferred_workbook"
@@ -3696,9 +3785,14 @@ def _load_subrole_quota_from_workbooks(paths: list[Path]) -> tuple[dict[str, flo
     return subrole_limits, subrole_inverse, member_weights
 
 
-def _load_portfolio_constraints_from_workbooks(paths: list[Path]) -> tuple[int, int]:
+def _load_portfolio_constraints_from_workbooks(paths: list[Path]) -> tuple[int, int, int, int, int, float, int]:
     max_academic_matches = STATIC_MAX_ACADEMIC_MATCHES
     max_academic_actor_slots = STATIC_MAX_ACADEMIC_ACTOR_SLOTS
+    min_non_academic_pairs = STATIC_MIN_NON_ACADEMIC_PAIRS
+    max_weak_evidence_matches = STATIC_MAX_WEAK_EVIDENCE_MATCHES
+    max_low_score_matches = STATIC_MAX_LOW_SCORE_MATCHES
+    min_geo_proximity_sum = STATIC_MIN_GEO_PROXIMITY_SUM
+    max_academic_academic_pairs = STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS
     for workbook in paths:
         df = _read_excel_table_optional(
             workbook,
@@ -3729,7 +3823,25 @@ def _load_portfolio_constraints_from_workbooks(paths: list[Path]) -> tuple[int, 
                 max_academic_matches = max(0, int(value))
             elif key == "max_academic_actor_slots":
                 max_academic_actor_slots = max(0, int(value))
-    return max_academic_matches, max_academic_actor_slots
+            elif key == "min_non_academic_pairs":
+                min_non_academic_pairs = max(0, int(value))
+            elif key == "max_weak_evidence_matches":
+                max_weak_evidence_matches = max(0, int(value))
+            elif key == "max_low_score_matches":
+                max_low_score_matches = max(0, int(value))
+            elif key == "min_geo_proximity_sum":
+                min_geo_proximity_sum = max(0.0, float(value))
+            elif key == "max_academic_academic_pairs":
+                max_academic_academic_pairs = max(0, int(value))
+    return (
+        max_academic_matches,
+        max_academic_actor_slots,
+        min_non_academic_pairs,
+        max_weak_evidence_matches,
+        max_low_score_matches,
+        min_geo_proximity_sum,
+        max_academic_academic_pairs,
+    )
 
 def _member_event_rows(events_df: pd.DataFrame, member: str) -> pd.DataFrame:
     if events_df.empty or "mitglied" not in events_df.columns:
@@ -3828,6 +3940,9 @@ def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFram
     global STATIC_ROLE_INVERSE_WEIGHTS, STATIC_MEMBER_ROLE_WEIGHTS
     global STATIC_SUBROLE_MASS_LIMITS, STATIC_SUBROLE_INVERSE_WEIGHTS, STATIC_MEMBER_SUBROLE_WEIGHTS
     global STATIC_MAX_ACADEMIC_MATCHES, STATIC_MAX_ACADEMIC_ACTOR_SLOTS
+    global STATIC_MIN_NON_ACADEMIC_PAIRS, STATIC_MAX_WEAK_EVIDENCE_MATCHES
+    global STATIC_MAX_LOW_SCORE_MATCHES, STATIC_MIN_GEO_PROXIMITY_SUM
+    global STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS
     df, used_paths, mode = _load_static_candidate_dataframe(path)
     if df.empty:
         raise FileNotFoundError(f"No static candidate patterns could be loaded from {path}")
@@ -3835,7 +3950,15 @@ def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFram
     STATIC_MEMBER_LIMITS, STATIC_CLUSTER_LIMITS = _load_static_constraint_limits_from_workbooks(used_paths or [path])
     STATIC_ROLE_MASS_LIMITS, STATIC_ROLE_INVERSE_WEIGHTS, STATIC_MEMBER_ROLE_WEIGHTS = _load_role_quota_from_workbooks(used_paths or [path])
     STATIC_SUBROLE_MASS_LIMITS, STATIC_SUBROLE_INVERSE_WEIGHTS, STATIC_MEMBER_SUBROLE_WEIGHTS = _load_subrole_quota_from_workbooks(used_paths or [path])
-    STATIC_MAX_ACADEMIC_MATCHES, STATIC_MAX_ACADEMIC_ACTOR_SLOTS = _load_portfolio_constraints_from_workbooks(used_paths or [path])
+    (
+        STATIC_MAX_ACADEMIC_MATCHES,
+        STATIC_MAX_ACADEMIC_ACTOR_SLOTS,
+        STATIC_MIN_NON_ACADEMIC_PAIRS,
+        STATIC_MAX_WEAK_EVIDENCE_MATCHES,
+        STATIC_MAX_LOW_SCORE_MATCHES,
+        STATIC_MIN_GEO_PROXIMITY_SUM,
+        STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS,
+    ) = _load_portfolio_constraints_from_workbooks(used_paths or [path])
     cluster_keywords: dict[str, set[str]] = {}
     for workbook in used_paths or [path]:
         cluster_keywords.update(_static_cluster_keyword_map(workbook))
@@ -3862,6 +3985,24 @@ def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFram
         static_score = _static_support_score_from_row(row_dict)
         opportunity_key = _clean_cell(row_dict.get("opportunity_key"))
         member_pair_key = _clean_cell(row_dict.get("member_pair_key"))
+        candidate_status = _clean_cell(row_dict.get("candidate_status"))
+        filter_reason = _clean_cell(row_dict.get("filter_reason"))
+        geo_score_reason = _clean_cell(row_dict.get("geo_score_reason"))
+        geo_proximity_score = _float_cell(row_dict.get("geo_proximity_score"), 0.0)
+        geo_proximity_norm = _float_cell(row_dict.get("geo_proximity_norm"), math.nan)
+        if math.isnan(geo_proximity_norm):
+            geo_proximity_norm = geo_proximity_score / 100.0 if geo_proximity_score > 1.0 else geo_proximity_score
+        distance_km = _float_cell(row_dict.get("distance_km"), 0.0)
+        same_geo_region = bool(_float_cell(row_dict.get("same_geo_region"), 0.0) > 0)
+        weak_evidence_flag = int(_float_cell(row_dict.get("weak_evidence_flag"), 0.0) > 0)
+        low_score_flag = int(_float_cell(row_dict.get("low_score_flag"), 0.0) > 0)
+        academic_pair_flag = int(_float_cell(row_dict.get("academic_pair_flag"), _float_cell(row_dict.get("includes_academic"), 0.0)) > 0)
+        academic_academic_flag = int(_float_cell(row_dict.get("academic_academic_flag"), 0.0) > 0)
+        non_academic_pair_flag = int(_float_cell(row_dict.get("non_academic_pair_flag"), 0.0) > 0)
+        legacy_candidate_id = _clean_cell(row_dict.get("legacy_candidate_id") or row_dict.get("old_candidate_id"))
+        legacy_opportunity_key = _clean_cell(row_dict.get("legacy_opportunity_key"))
+        old_candidate_max_score = _float_cell(row_dict.get("old_candidate_max_score"), 0.0)
+        old_candidate_rows = int(_float_cell(row_dict.get("old_candidate_rows"), 0.0))
         live = _static_candidate_live_evidence(member_a, member_b, concrete_cluster, themenfeld, events_df, cluster_keywords)
         score = max(0.0, static_score + float(live["boost"]))
         members = tuple(sorted([member_a, member_b]))
@@ -3902,8 +4043,24 @@ def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFram
             live_signal_titles=tuple(live["titles"]),
             live_signal_urls=tuple(live["urls"]),
             live_evidence_status=str(live["status"]),
+            geo_proximity_score=geo_proximity_score,
+            geo_proximity_norm=geo_proximity_norm,
+            distance_km=distance_km,
+            same_geo_region=same_geo_region,
+            geo_score_reason=geo_score_reason,
+            candidate_status=candidate_status,
+            filter_reason=filter_reason,
+            weak_evidence_flag=weak_evidence_flag,
+            low_score_flag=low_score_flag,
+            academic_pair_flag=academic_pair_flag,
+            academic_academic_flag=academic_academic_flag,
+            non_academic_pair_flag=non_academic_pair_flag,
+            legacy_candidate_id=legacy_candidate_id,
+            legacy_opportunity_key=legacy_opportunity_key,
+            old_candidate_max_score=old_candidate_max_score,
+            old_candidate_rows=old_candidate_rows,
         ))
-    patterns.sort(key=lambda p: (-final_pattern_score(p.score, p), p.candidate_id or str(p.pattern_id)))
+    patterns.sort(key=lambda p: (-p.score, p.candidate_id or str(p.pattern_id)))
     print(
         "Static Excel loader: "
         f"mode={mode}, rows={len(df)}, patterns={len(patterns)}, "
@@ -3914,7 +4071,12 @@ def load_static_candidate_patterns_from_excel(path: Path, events_df: pd.DataFram
         f"member_limits={len(STATIC_MEMBER_LIMITS)}, cluster_limits={len(STATIC_CLUSTER_LIMITS)}, "
         f"role_quota_limits={len(STATIC_ROLE_MASS_LIMITS)}, "
         f"subrole_quota_limits={len(STATIC_SUBROLE_MASS_LIMITS)}, "
-        f"academic_caps={STATIC_MAX_ACADEMIC_MATCHES}/{STATIC_MAX_ACADEMIC_ACTOR_SLOTS}"
+        f"academic_caps={STATIC_MAX_ACADEMIC_MATCHES}/{STATIC_MAX_ACADEMIC_ACTOR_SLOTS}, "
+        f"non_academic_min={STATIC_MIN_NON_ACADEMIC_PAIRS}, "
+        f"weak_evidence_cap={STATIC_MAX_WEAK_EVIDENCE_MATCHES}, "
+        f"low_score_cap={STATIC_MAX_LOW_SCORE_MATCHES}, "
+        f"geo_floor={STATIC_MIN_GEO_PROXIMITY_SUM:.2f}, "
+        f"academic_academic_cap={STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS}"
     )
     return patterns
 
@@ -4045,6 +4207,22 @@ def generate_meeting_patterns(profiles: dict[str, MemberProfile]) -> list[Meetin
             live_signal_titles=p.live_signal_titles,
             live_signal_urls=p.live_signal_urls,
             live_evidence_status=p.live_evidence_status,
+            geo_proximity_score=p.geo_proximity_score,
+            geo_proximity_norm=p.geo_proximity_norm,
+            distance_km=p.distance_km,
+            same_geo_region=p.same_geo_region,
+            geo_score_reason=p.geo_score_reason,
+            candidate_status=p.candidate_status,
+            filter_reason=p.filter_reason,
+            weak_evidence_flag=p.weak_evidence_flag,
+            low_score_flag=p.low_score_flag,
+            academic_pair_flag=p.academic_pair_flag,
+            academic_academic_flag=p.academic_academic_flag,
+            non_academic_pair_flag=p.non_academic_pair_flag,
+            legacy_candidate_id=p.legacy_candidate_id,
+            legacy_opportunity_key=p.legacy_opportunity_key,
+            old_candidate_max_score=p.old_candidate_max_score,
+            old_candidate_rows=p.old_candidate_rows,
         )
         for i, p in enumerate(patterns[:MAX_CANDIDATE_PATTERNS])
     ]
@@ -4278,6 +4456,21 @@ def neural_feedback_adjustment_for_pattern(base_score: float, pattern: MeetingPa
             "nn_max_delta": 0.0,
             "nn_model_status": "unavailable",
         }
+    if (
+        pattern.candidate_source == "static_excel"
+        and low_score_for_pattern(pattern)
+        and weak_evidence_for_pattern(pattern)
+        and not pattern.legacy_candidate_id
+        and not pattern.legacy_opportunity_key
+        and base_score < MIN_FINAL_PAIR_SCORE
+    ):
+        return 0.0, {
+            "nn_probability_useful": 0.5,
+            "nn_delta": 0.0,
+            "nn_model_examples": getattr(NEURAL_FEEDBACK_RERANKER, "n_examples", 0),
+            "nn_max_delta": getattr(NEURAL_FEEDBACK_RERANKER, "max_delta", 0.0),
+            "nn_model_status": "skipped_low_weak_full_universe_row",
+        }
     result = NEURAL_FEEDBACK_RERANKER.score_delta(neural_candidate_payload(base_score, pattern))
     return float(result.get("nn_delta", 0.0) or 0.0), result
 
@@ -4346,11 +4539,27 @@ def critical_action_penalty(pattern: MeetingPattern) -> float:
 
 
 def final_pattern_score(base_score: float, pattern: MeetingPattern) -> float:
+    cached = getattr(pattern, "_cached_final_pattern_score", None)
+    if cached is not None:
+        return float(cached)
+    if (
+        pattern.candidate_source == "static_excel"
+        and low_score_for_pattern(pattern)
+        and weak_evidence_for_pattern(pattern)
+        and not pattern.legacy_candidate_id
+        and not pattern.legacy_opportunity_key
+        and float(base_score) < MIN_FINAL_PAIR_SCORE
+    ):
+        value = min(100.0, max(0.0, float(base_score)))
+        setattr(pattern, "_cached_final_pattern_score", value)
+        return value
     rule_score = float(base_score) if pattern.candidate_source == "static_excel" else rule_pattern_score(base_score, pattern)
     learner_adjustment, _ = feedback_adjustment_for_pattern(rule_score, pattern)
     human_adjustment, _ = explicit_human_feedback_adjustment_for_pattern(pattern)
     neural_adjustment, _ = neural_feedback_adjustment_for_pattern(rule_score, pattern)
-    return min(100.0, max(0.0, rule_score + learner_adjustment + human_adjustment + neural_adjustment - critical_action_penalty(pattern)))
+    value = min(100.0, max(0.0, rule_score + learner_adjustment + human_adjustment + neural_adjustment - critical_action_penalty(pattern)))
+    setattr(pattern, "_cached_final_pattern_score", value)
+    return value
 
 
 def structural_bonus_amount(base_score: float, pattern: MeetingPattern) -> float:
@@ -4426,6 +4635,10 @@ def subrole_mass_for_pattern(pattern: MeetingPattern, subrole: str) -> float:
 
 
 def academic_actor_slots_for_pattern(pattern: MeetingPattern) -> int:
+    if pattern.academic_pair_flag and pattern.academic_academic_flag:
+        return max(2, sum(1 for member in pattern.members if member_subrole_and_quota_weight(member)[0].startswith("university_")))
+    if pattern.academic_pair_flag and not any(member_subrole_and_quota_weight(member)[0].startswith("university_") for member in pattern.members):
+        return 1
     return sum(
         1
         for member in pattern.members
@@ -4434,7 +4647,35 @@ def academic_actor_slots_for_pattern(pattern: MeetingPattern) -> int:
 
 
 def has_academic_actor(pattern: MeetingPattern) -> bool:
-    return academic_actor_slots_for_pattern(pattern) > 0
+    return bool(pattern.academic_pair_flag) or academic_actor_slots_for_pattern(pattern) > 0
+
+
+def non_academic_pair_for_pattern(pattern: MeetingPattern) -> int:
+    if pattern.non_academic_pair_flag:
+        return 1
+    return int(academic_actor_slots_for_pattern(pattern) == 0 and not has_academic_actor(pattern))
+
+
+def weak_evidence_for_pattern(pattern: MeetingPattern) -> int:
+    return int(pattern.weak_evidence_flag > 0)
+
+
+def low_score_for_pattern(pattern: MeetingPattern) -> int:
+    return int(pattern.low_score_flag > 0)
+
+
+def academic_academic_for_pattern(pattern: MeetingPattern) -> int:
+    if pattern.academic_academic_flag:
+        return 1
+    return int(academic_actor_slots_for_pattern(pattern) >= 2)
+
+
+def geo_proximity_norm_for_pattern(pattern: MeetingPattern) -> float:
+    if pattern.geo_proximity_norm > 0:
+        return min(1.0, max(0.0, pattern.geo_proximity_norm))
+    if pattern.geo_proximity_score > 1.0:
+        return min(1.0, max(0.0, pattern.geo_proximity_score / 100.0))
+    return min(1.0, max(0.0, pattern.geo_proximity_score))
 
 
 def export_scip_incidence_matrix(patterns: list[MeetingPattern], path: Path) -> None:
@@ -4489,9 +4730,9 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
 
         if patterns:
             f.write(
-                " max_meetings: "
+                " selected_meetings: "
                 + " + ".join(lp_var(pattern) for pattern in patterns)
-                + f" <= {MAX_MEETINGS}\n"
+                + f" = {MAX_MEETINGS}\n"
             )
 
         for member in active_members:
@@ -4578,6 +4819,66 @@ def write_scip_model(patterns: list[MeetingPattern], active_members: list[str], 
                 + f" <= {STATIC_MAX_ACADEMIC_ACTOR_SLOTS}\n"
             )
 
+        non_academic_terms = [
+            lp_var(pattern)
+            for pattern in patterns
+            if non_academic_pair_for_pattern(pattern) > 0
+        ]
+        if non_academic_terms and STATIC_MIN_NON_ACADEMIC_PAIRS > 0:
+            f.write(
+                " non_academic_pair_floor: "
+                + " + ".join(non_academic_terms)
+                + f" >= {STATIC_MIN_NON_ACADEMIC_PAIRS}\n"
+            )
+
+        weak_evidence_terms = [
+            lp_var(pattern)
+            for pattern in patterns
+            if weak_evidence_for_pattern(pattern) > 0
+        ]
+        if weak_evidence_terms and STATIC_MAX_WEAK_EVIDENCE_MATCHES >= 0:
+            f.write(
+                " weak_evidence_cap: "
+                + " + ".join(weak_evidence_terms)
+                + f" <= {STATIC_MAX_WEAK_EVIDENCE_MATCHES}\n"
+            )
+
+        low_score_terms = [
+            lp_var(pattern)
+            for pattern in patterns
+            if low_score_for_pattern(pattern) > 0
+        ]
+        if low_score_terms and STATIC_MAX_LOW_SCORE_MATCHES >= 0:
+            f.write(
+                " low_score_cap: "
+                + " + ".join(low_score_terms)
+                + f" <= {STATIC_MAX_LOW_SCORE_MATCHES}\n"
+            )
+
+        geo_terms = [
+            f"{geo_proximity_norm_for_pattern(pattern):.6f} {lp_var(pattern)}"
+            for pattern in patterns
+            if geo_proximity_norm_for_pattern(pattern) > 0
+        ]
+        if geo_terms and STATIC_MIN_GEO_PROXIMITY_SUM > 0:
+            f.write(
+                " geo_proximity_floor: "
+                + " + ".join(geo_terms)
+                + f" >= {STATIC_MIN_GEO_PROXIMITY_SUM:.6f}\n"
+            )
+
+        academic_academic_terms = [
+            lp_var(pattern)
+            for pattern in patterns
+            if academic_academic_for_pattern(pattern) > 0
+        ]
+        if academic_academic_terms and STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS >= 0:
+            f.write(
+                " academic_academic_cap: "
+                + " + ".join(academic_academic_terms)
+                + f" <= {STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS}\n"
+            )
+
         f.write("Binary\n")
         for pattern in patterns:
             f.write(f" {lp_var(pattern)}\n")
@@ -4615,6 +4916,11 @@ def greedy_fallback(patterns: list[MeetingPattern]) -> set[int]:
     used_subrole_mass = Counter()
     used_academic_matches = 0
     used_academic_actor_slots = 0
+    used_non_academic_pairs = 0
+    used_weak_evidence_matches = 0
+    used_low_score_matches = 0
+    used_geo_proximity_sum = 0.0
+    used_academic_academic_pairs = 0
     selected: set[int] = set()
 
     for pattern in sorted(patterns, key=lambda p: (-final_pattern_score(p.score, p), len(p.members))):
@@ -4658,6 +4964,29 @@ def greedy_fallback(patterns: list[MeetingPattern]) -> set[int]:
             if used_academic_actor_slots + academic_slots > STATIC_MAX_ACADEMIC_ACTOR_SLOTS:
                 continue
 
+        non_academic_pair = non_academic_pair_for_pattern(pattern)
+        weak_evidence = weak_evidence_for_pattern(pattern)
+        low_score = low_score_for_pattern(pattern)
+        academic_academic = academic_academic_for_pattern(pattern)
+        geo_score = geo_proximity_norm_for_pattern(pattern)
+
+        if used_weak_evidence_matches + weak_evidence > STATIC_MAX_WEAK_EVIDENCE_MATCHES:
+            continue
+        if used_low_score_matches + low_score > STATIC_MAX_LOW_SCORE_MATCHES:
+            continue
+        if used_academic_academic_pairs + academic_academic > STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS:
+            continue
+
+        remaining_after = MAX_MEETINGS - (len(selected) + 1)
+        needed_non_academic_after = max(
+            0,
+            STATIC_MIN_NON_ACADEMIC_PAIRS - (used_non_academic_pairs + non_academic_pair),
+        )
+        if needed_non_academic_after > remaining_after:
+            continue
+        if used_geo_proximity_sum + geo_score + remaining_after < STATIC_MIN_GEO_PROXIMITY_SUM:
+            continue
+
         selected.add(pattern.pattern_id)
 
         for member in pattern.members:
@@ -4674,6 +5003,11 @@ def greedy_fallback(patterns: list[MeetingPattern]) -> set[int]:
         if academic_slots:
             used_academic_matches += 1
             used_academic_actor_slots += academic_slots
+        used_non_academic_pairs += non_academic_pair
+        used_weak_evidence_matches += weak_evidence
+        used_low_score_matches += low_score
+        used_geo_proximity_sum += geo_score
+        used_academic_academic_pairs += academic_academic
 
     return selected
 
@@ -4703,6 +5037,11 @@ def export_patterns(patterns: list[MeetingPattern], selected_ids: set[int], path
         "recommendation_id", "opportunity_id", "opportunity_key", "member_pair_key", "score", "display_points",
         "public_status", "raw_score", "static_support_score", "live_signal_boost",
         "live_event_count", "live_evidence_status", "live_signal_titles", "live_signal_urls",
+        "geo_proximity_score", "geo_proximity_norm", "distance_km", "same_geo_region",
+        "geo_score_reason", "candidate_status", "filter_reason",
+        "weak_evidence_flag", "low_score_flag", "academic_pair_flag",
+        "academic_academic_flag", "non_academic_pair_flag",
+        "legacy_candidate_id", "legacy_opportunity_key", "old_candidate_max_score", "old_candidate_rows",
         "rule_final_score",
         "final_score", "structural_bonus", "memory_adjustment", "nn_adjustment",
         "neural_probability_useful", "neural_delta", "neural_model_examples",
@@ -4849,6 +5188,22 @@ def export_patterns(patterns: list[MeetingPattern], selected_ids: set[int], path
             "live_evidence_status": pattern.live_evidence_status,
             "live_signal_titles": " | ".join(pattern.live_signal_titles),
             "live_signal_urls": " | ".join(pattern.live_signal_urls),
+            "geo_proximity_score": round(pattern.geo_proximity_score, 3),
+            "geo_proximity_norm": round(geo_proximity_norm_for_pattern(pattern), 4),
+            "distance_km": round(pattern.distance_km, 2),
+            "same_geo_region": int(pattern.same_geo_region),
+            "geo_score_reason": pattern.geo_score_reason,
+            "candidate_status": pattern.candidate_status,
+            "filter_reason": pattern.filter_reason,
+            "weak_evidence_flag": weak_evidence_for_pattern(pattern),
+            "low_score_flag": low_score_for_pattern(pattern),
+            "academic_pair_flag": int(has_academic_actor(pattern)),
+            "academic_academic_flag": academic_academic_for_pattern(pattern),
+            "non_academic_pair_flag": non_academic_pair_for_pattern(pattern),
+            "legacy_candidate_id": pattern.legacy_candidate_id,
+            "legacy_opportunity_key": pattern.legacy_opportunity_key,
+            "old_candidate_max_score": round(pattern.old_candidate_max_score, 3),
+            "old_candidate_rows": pattern.old_candidate_rows,
             "rule_final_score": round(rule_final_score, 3),
             "final_score": round(final_score_value, 3),
             "structural_bonus": round(structural_bonus, 3),
@@ -5098,20 +5453,29 @@ def write_model_summary(
         "subrole_quota_limits": STATIC_SUBROLE_MASS_LIMITS,
         "max_academic_matches": STATIC_MAX_ACADEMIC_MATCHES,
         "max_academic_actor_slots": STATIC_MAX_ACADEMIC_ACTOR_SLOTS,
+        "min_non_academic_pairs": STATIC_MIN_NON_ACADEMIC_PAIRS,
+        "max_weak_evidence_matches": STATIC_MAX_WEAK_EVIDENCE_MATCHES,
+        "max_low_score_matches": STATIC_MAX_LOW_SCORE_MATCHES,
+        "min_geo_proximity_sum": STATIC_MIN_GEO_PROXIMITY_SUM,
+        "max_academic_academic_pairs": STATIC_MAX_ACADEMIC_ACADEMIC_PAIRS,
         "neural_feedback_ranker": neural_summary,
         "min_final_pair_score": MIN_FINAL_PAIR_SCORE,
         "require_implementation_anchor": REQUIRE_IMPLEMENTATION_ANCHOR,
         "candidate_count": len(patterns),
         "selected_count": len(selected_ids),
         "constraints": [
-            "at most MAX_MEETINGS selected matches",
+            "exactly MAX_MEETINGS selected matches",
             "each member appears in at most MAX_MEETINGS_PER_MEMBER selected match",
             "each concrete cluster appears in at most MAX_SELECTED_PER_CLUSTER selected matches",
             "each opportunity_id appears in at most MAX_SELECTED_PER_OPPORTUNITY selected matches",
             "role-weighted exposure mass stays within Role_Weights quota limits when present",
             "subrole-weighted exposure mass stays within Subrole_Weights quota limits when present",
             "academic_support/university matches and actor slots stay within SCIP_Portfolio_Constraints caps",
-            "candidate pool is pre-filtered to strong bilateral matches",
+            "at least min_non_academic_pairs selected matches have no academic actor",
+            "weak-evidence and low-score matches stay within SCIP_Portfolio_Constraints caps",
+            "selected portfolio reaches the workbook geo proximity floor",
+            "academic-academic matches stay within the workbook cap",
+            "full All_Pairings_5253 universe is preferred when present; low-score rows are marked, not deleted",
         ],
     }
     path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
