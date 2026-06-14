@@ -5195,168 +5195,104 @@ class ZIRPWeeklyAnalyzer:
 
     def strategic_opportunity_briefing_prompt(self, payload: dict[str, Any]) -> str:
         return f"""
-Du bist Senior Partner beim McKinsey Global Institute und schreibst ein kurzes Strategic Opportunity Briefing fÃ¼r ZIRP.
+Du schreibst einen klaren, nüchternen und strategischen Projekttext für eine ZIRP-Projektleitung.
 
-Deine Aufgabe ist es, aus SCIP-Matchings, News-Signalen und Kontextinformationen einen strategischen Interpretationstext zu schreiben.
+Aus SCIP-Matchings, News-Signalen und Kontextinformationen soll ein Briefing entstehen, das erklärt:
+warum das Thema relevant ist, wo der konkrete Engpass liegt, welche vorhandenen Potenziale genutzt werden können,
+welche realistische Rolle ZIRP übernehmen kann und welcher nächste pragmatische Umsetzungsschritt sinnvoll wäre.
 
-Wichtig:
-SCIP-Matchings sind die Evidenzebene.
-Das Briefing ist die Bedeutungsebene.
+SCIP-Matchings sind nur die Evidenzebene. Das Briefing ist die Bedeutungsebene.
+Wiederhole die Matchings nicht mechanisch. Nutze sie, um eine konkrete Projekt- oder Umsetzungsfrage sichtbar zu machen.
 
-Wiederhole die Matchings nicht mechanisch. Nutze sie nur, um eine grÃ¶ÃŸere strategische Entwicklung sichtbar zu machen.
-
-Der Text soll nicht wie ein Monitoring-Report, Newsletter oder Netzwerkbericht klingen, sondern wie ein Executive Briefing: prÃ¤gnant, analytisch, hypothesengetrieben, nÃ¼chtern und entscheidungsorientiert.
-
-ZIELLOGIK
-Der Text muss folgende Logik haben:
-1. Es gibt mehrere Signale oder Matchings, die auf dasselbe Muster hinweisen.
-2. Dieses Muster zeigt eine strategische Spannung oder Engstelle.
-3. Nicht nur das hÃ¶chste Matching zÃ¤hlt: mindestens drei ausgewÃ¤hlte SCIP-Karten mÃ¼ssen als Portfolio gelesen werden.
-4. ErklÃ¤re je zentraler Karte kurz, welche Convening-Stufe und welcher nÃ¤chste Move daraus folgt.
-5. Zeige, welche Karten sofortige Sondierung tragen und welche nur Validierung, Lagebild oder Beobachtung rechtfertigen.
-6. Daraus entsteht eine klare Implikation fÃ¼r ZIRP.
-7. Der Text endet mit einem konkreten nÃ¤chsten Schritt, der aus der Portfolio-Logik folgt.
-
-Die zentrale Frage lautet nicht: Welche Akteure wurden gefunden?
-Sondern: Welche grÃ¶ÃŸere regionale Entwicklung wird durch diese Akteurskonstellationen sichtbar?
+TON UND STIL
+Schreibe klar, direkt und nüchtern. Keine Floskeln. Keine übertriebene Beratersprache.
+Keine abstrakten Begriffe ohne Erklärung. Jeder Absatz trägt einen konkreten Gedanken.
+Der Text soll strategisch, aber natürlich klingen.
 
 AUSGABEFORMAT
-Gib ausschliesslich das finale Briefing aus.
+Gib ausschließlich das finale Briefing aus.
 
 Format:
-# [Deutscher Titel als strategische Frage]
+# [Titel als deutsche strategische Frage]
 
-**[Executive Summary in einem Satz, maximal 25-35 WÃ¶rter.]**
+[Absatz 1: klare Leitthese. Beginne mit einer direkten Einordnung und formuliere, unter welcher Bedingung das Thema erfolgreich bearbeitet werden kann.]
 
-[Absatz 1: Muster]
+[Absatz 2: konkreter Engpass. Benenne nüchtern, woran Umsetzung derzeit scheitert oder wo der zentrale Handlungsbedarf liegt.]
 
-[Absatz 2: strategische Spannung / Engstelle]
+[Absatz 3: systemische Einordnung und vorhandene Ausgangsbasis. Erkläre kurz, warum einfache Einzelmaßnahmen nicht reichen, und zeige vorhandene Kompetenzen, Akteure, Initiativen, Bedarfe oder Ressourcen.]
 
-[Absatz 3: Portfolio der 3-6 wichtigsten Matchings, nicht nur der HÃ¶chstscore]
+[Absatz 4: strategischer Hebel. Beschreibe, wo Wirkung entstehen kann: durch Bündelung, Priorisierung, Rollenklärung, Pilotierung oder bessere Umsetzung.]
 
-[Absatz 4: Stufenlogik: was ist Sondierung, Validierung, Lagebild oder Pfad-nach-vorn]
+[Absatz 5: Rolle von ZIRP und nächster Schritt. Formuliere eine realistische Rolle und schlage einen begrenzten Umsetzungsschritt vor, idealerweise ein 90-Tage-Testfeld, eine Pilotphase oder ein Validierungsprozess.]
 
-[Absatz 5: Implikation fÃ¼r ZIRP und konkreter nÃ¤chster Schritt]
+[Letzter Satz: klare, merkfähige Verdichtung.]
 
-Keine Bulletpoints. Keine ZwischenÃ¼berschriften. Keine MethodenerklÃ¤rung.
+Keine Bulletpoints. Keine Zwischenüberschriften nach dem Titel. Keine Methodenerklärung. Kein Quellen- oder Evidenzdump.
+Zielumfang: etwa 500 bis 700 Wörter, wenn die Evidenz dafür reicht. Bei schwacher Evidenz lieber kürzer und präzise bleiben.
 
 TITELREGEL
-Der Titel muss eine starke deutsche strategische Frage sein. Er darf nicht das offensichtliche Thema wiederholen.
+Der Titel muss eine Frage sein und die eigentliche Engstelle oder Projektchance der Woche beschreiben.
+Digitalisierung darf nur dann die Klammer bilden, wenn mehrere konkrete Signale digitale Anwendung, Prozessumsetzung, Dateninfrastruktur oder digitale Verwaltungspraxis belegen.
+Wenn die Signale eher Versorgung, Fachkräfte, Bau, Kultur, Finanzierung, Nachhaltigkeit, Führung, Kooperation oder Umsetzung betreffen, muss genau dieses Muster im Titel stehen.
 
-Vermeide generische Titel wie:
-- Wird die digitale Transformation zum zentralen Treiber der regionalen Wirtschaftsentwicklung?
-- Kooperation und Wissenstransfer im ZIRP-Netzwerk
-- Opportunity Line der Woche
-- Wochenanalyse
-- Signale aus dem Netzwerk
+Gute Titelrichtungen:
+- Können regionale Kooperationen die Umsetzungslücke schließen?
+- Wird Wissenstransfer zum Beschleuniger konkreter Pilotvorhaben?
+- Welche Akteurskonstellation kann aus regionalen Kompetenzen Umsetzung machen?
+- Wird Fachkräftequalifizierung zur gemeinsamen Umsetzungsfrage?
+- Welche Rolle kann ZIRP bei der Validierung eines Pilotfelds übernehmen?
 
-Der Titel soll die eigentliche Spannung oder Engstelle der Woche beschreiben.
+FORMULIERUNGSREGELN
+Schreibe direkte Sätze.
+Vermeide Satzmuster wie: "Es fehlt nicht an ..., sondern ..."
+Besser: "Die Region verfügt bereits über ... Der Engpass liegt in ..."
+Vermeide unklare Wörter wie "Ansätze", wenn nicht erklärt wird, was gemeint ist.
+Nutze konkrete Begriffe: Initiativen, Kooperationen, Kompetenzen, Bedarfe, Pilotvorhaben, Rollen, Nutzen, Ressourcen, Umsetzung.
+Jeder Absatz hat maximal 3 bis 4 Sätze.
+Der Text bleibt kompakt, aber nicht stichpunktartig.
 
-Gute Titelbeispiele:
-- KÃ¶nnen Kooperationen die UmsetzungslÃ¼cke schlieÃŸen?
-- Wird Wissenstransfer zum Beschleuniger regionaler Transformation?
-- Entsteht ein neues Ã–kosystem fÃ¼r regionale Umsetzung?
-- Wird Resilienz zum neuen Standortfaktor?
-- Wird VersorgungskapazitÃ¤t zur neuen regionalen Engstelle?
-- Werden FachkrÃ¤fte, Infrastruktur und Finanzierung zum gemeinsamen Standortproblem?
-- Wird konkrete Umsetzung wichtiger als neue Programmatik?
-
-WÃ¤hle den Titel aus der tatsÃ¤chlichen Evidenz der Woche. Digitalisierung darf nur dann die Klammer bilden,
-wenn mehrere konkrete Signale digitale Anwendung, Prozessumsetzung, Dateninfrastruktur oder digitale Verwaltungspraxis belegen.
-Wenn die Signale eher Versorgung, FachkrÃ¤fte, Bau, Kultur, Finanzierung, Nachhaltigkeit oder FÃ¼hrung betreffen, muss genau dieses Muster im Titel stehen.
-
-EXECUTIVE SUMMARY
-Direkt unter dem Titel folgt eine fett gesetzte Kernaussage mit maximal 25-35 WÃ¶rtern. Sie muss eine These sein, keine Zusammenfassung.
-
-Gute Form:
-**Die aktuellen SCIP-Matchings legen nahe, dass regionale Transformation weniger an fehlenden Ideen scheitert als an der Ãœbersetzung vorhandener Kompetenzen in konkrete Anwendungen.**
-
-Schlechte Form:
-**Die digitale Transformation bietet Chancen fÃ¼r die regionale Wirtschaftsentwicklung, aber ihre Umsetzung bleibt eine Herausforderung.**
-
-Die schlechte Form ist zu generisch und darf nicht verwendet werden.
-
-INHALTLICHE SCHÃ„RFUNG
-Vermeide generische Dachbegriffe, wenn ein spezifischerer Begriff mÃ¶glich ist.
-
-Nicht: digitale Transformation.
-Besser: digitale Umsetzung, regionale Anwendung, PilotfÃ¤higkeit, UmsetzungslÃ¼cke, digitale Resilienz, kommunale Infrastruktur, mittelstÃ¤ndische ProduktivitÃ¤t, Transfer in Anwendungspraxis.
-
-Der Text muss klar unterscheiden zwischen:
-Thema: z. B. Versorgung, FachkrÃ¤fte, Resilienz, Forschung, Finanzierung, Bau, Kultur, Kooperation oder Digitalisierung.
-Strategische Spannung: Benenne die konkrete Engstelle der Woche, nicht automatisch digitale Transformation.
-Opportunity: ZIRP kann aus SCIP-Matchings kuratierte Sondierungs- oder Pilotkonstellationen formen, wenn die Evidenz dafÃ¼r reicht.
-
-ABSATZLOGIK
-Absatz 1: Benenne das Ã¼bergeordnete Muster. Starte nicht mit Statistik.
-Das Muster muss aus den ausgewÃ¤hlten Signalen kommen, nicht aus einem Standardthema.
-
-Absatz 2: Formuliere die Engstelle.
-Besser als generische TransformationssÃ¤tze: Die zentrale Frage ist nicht das Dachthema selbst, sondern welche konkrete UmsetzungslÃ¼cke, KapazitÃ¤tsfrage oder Koordinationsaufgabe sichtbar wird.
-
-Absatz 3: Nutze die wichtigsten ausgewÃ¤hlten SCIP-Karten als Portfolio. Das hÃ¶chste Matching darf der Einstieg sein, aber mindestens zwei weitere Karten mÃ¼ssen mit eigener Rolle vorkommen. ErklÃ¤re prÃ¤zise: Akteure, KomplementaritÃ¤t, Convening-Stufe, nÃ¤chster Move.
-Beispiel: Zahnen und Hochschule Mainz kÃ¶nnen eine bilaterale Sondierung fÃ¼r ein Testfeld tragen; IQIB und UniversitÃ¤t Trier markieren eher Pfadfindung zu kommunaler Resilienz; eine Medien- oder Finanzierungskarte kann zunÃ¤chst Validierung oder Briefing erfordern.
-
-Absatz 4: ErklÃ¤re die Stufenlogik. Welche Karten rechtfertigen Sondierung, welche nur Validierung, Lagebild oder Beobachtung? Vermeide, alle Karten in dieselbe Empfehlung zu pressen. Wenn eine Karte noch keine Umsetzung trÃ¤gt, sage klar, was ZIRP noch nicht verlangen sollte.
-Beginne Absatz 4 nicht mit einer Formel wie "Weitere Matchings erweitern diese Logik", wenn diese Logik bereits vorher genannt wurde. Verdichte die Belege ohne Wiederholung.
-
-Absatz 5: Leite die Implikation fÃ¼r ZIRP ab. Schreibe nicht: ZIRP kann als Plattform fÃ¼r Austausch und Kooperation dienen.
-Besser: FÃ¼r ZIRP ergibt sich daraus eine klarere Rolle: nicht Akteure allgemein zu vernetzen, sondern komplementÃ¤re FÃ¤higkeiten in entscheidungsfÃ¤hige Pilotkonstellationen zu Ã¼bersetzen.
-
-Der letzte Satz muss einen konkreten nÃ¤chsten Schritt enthalten: kuratiertes SondierungsgesprÃ¤ch, klarer Teilnehmerkreis, eine konkrete Leitfrage und genau ein mÃ¶gliches Pilotfeld, idealerweise als 90-Tage-Test.
-Vermeide breite Mehrfachfelder wie "Bau, Industrie oder Verwaltung". WÃ¤hle eine scharfe Pilot-Lane, z. B. regionale Infrastruktur, kommunale Resilienz, mittelstÃ¤ndische Prozessdigitalisierung oder digitale Verwaltungspraxis.
+INHALTLICHE LOGIK
+Die Leitthese beantwortet direkt, warum das Thema relevant ist.
+Der Engpass benennt eine konkrete Umsetzungs-, Koordinations-, Kapazitäts-, Rollen- oder Validierungsfrage.
+Die systemische Einordnung erklärt, warum ein einzelner Akteur das Thema nicht allein lösen kann.
+Die vorhandene Ausgangsbasis nennt konkrete Akteure oder Ressourcen aus den übergebenen Signalen und SCIP-Karten.
+Der strategische Hebel beschreibt, welche Bündelung, Priorisierung, Rollenklärung oder Pilotierung Wirkung erzeugen kann.
+Die Rolle von ZIRP ist realistisch: ZIRP löst das Problem nicht allein, sondern bringt Akteure, Bedarfe und Umsetzung in eine entscheidungsfähige Konstellation.
+Der nächste Schritt ist begrenzt: ein kuratiertes Sondierungsgespräch, eine 90-Tage-Pilotphase oder ein Validierungsprozess mit klarer Leitfrage.
 
 VERBOTENE FORMULIERUNGEN
 Vermeide unbedingt:
 - Die Analyse zeigt
 - Es wurden X Signale identifiziert
-- Besonders auffÃ¤llig ist
+- Besonders auffällig ist
 - Actor Anchors
-- Warum fÃ¼r ZIRP
+- Warum für ZIRP
 - Opportunity Line
-- NÃ¤chster Schritt
+- Nächster Schritt:
 - Das Signal deutet darauf hin
-- Im Mittelpunkt steht
 - Diese Meldung zeigt
 - strategisch sichtbar wird
 - belastbare Signale herausgefiltert
-- ZIRP kann als Plattform fÃ¼r Austausch und Kooperation dienen
+- ZIRP kann als Plattform für Austausch und Kooperation dienen
 - Beide Akteure bringen ihre Expertise ein
 - Die digitale Transformation ist ein zentrales Thema
 - allgemeiner Austausch
 - Networking
 - Vernetzung ist wichtig
 
-GUTE FORMULIERUNGEN
-Nutze Formulierungen wie:
-- Damit verschiebt sich die zentrale Frage ...
-- Die strategische Chance liegt nicht in ..., sondern in ...
-- In mehreren Konstellationen verdichtet sich derselbe Befund ...
-- Die zentrale Engstelle liegt weniger in ..., als in ...
-- Zusammengenommen entsteht daraus ...
-- Die weiteren Matchings erweitern diese Logik ...
-- FÃ¼r ZIRP ergibt sich daraus eine klarere Rolle ...
-- Entscheidend ist nicht ..., sondern ...
-- Ein erster Schritt kÃ¶nnte ein kuratiertes SondierungsgesprÃ¤ch sein ...
+QUALITÄTSSTANDARD
+Der Text ist gut, wenn eine Projektleitung nach dem Lesen drei Dinge klar versteht:
+Warum ist das Thema relevant?
+Wo liegt der konkrete Umsetzungsengpass?
+Was kann ZIRP realistisch als nächstes tun?
 
-SPRACHLICHE PRÃ„ZISION
-Verwende die Begriffe Ãœbersetzung, FÃ¤higkeiten und entscheidungsfÃ¤hig nur, wenn sie wirklich nÃ¶tig sind. Wenn sie mehrfach vorkommen, ersetze sie durch prÃ¤zisere Begriffe wie Transfer, Kompetenzen, Anwendung, Pilotkonstellation, testbar, belastbar oder umsetzbar.
-Wiederhole keine Kernaussage aus Absatz 1 in Absatz 3 oder Absatz 4. Jeder Absatz muss eine neue argumentative Funktion erfÃ¼llen.
-
-QUALITÃ„TSPRÃœFUNG VOR AUSGABE
-PrÃ¼fe vor der Ausgabe:
-1. Ist der Titel eine strategische Frage mit echter Spannung?
-2. Ist die Executive Summary eine These und keine Floskel?
-3. Startet der Text mit einem Muster statt mit Statistik?
-4. Wird eine konkrete Engstelle sichtbar?
-5. Werden Matchings als Evidenz genutzt statt als Liste?
-6. Wird pro zentralem Matching echte KomplementaritÃ¤t erklÃ¤rt?
-7. Wird das Thema der Woche konkretisiert zu Umsetzung, Anwendung, KapazitÃ¤t, Entscheidung oder PilotfÃ¤higkeit?
-8. Wird ZIRP nicht als allgemeine Plattform beschrieben, sondern als Ãœbersetzer in Pilotkonstellationen?
-9. Endet der Text mit einem konkreten nÃ¤chsten Schritt?
-10. Klingt der Text wie ein Executive Briefing und nicht wie ein Monitoring-Report?
-
-Wenn eine Antwort Nein ist, Ã¼berarbeite den Text vor der Ausgabe.
+Prüfe vor der Ausgabe:
+Ist der Titel eine Frage?
+Ist die Leitthese konkret?
+Wird ein Engpass benannt?
+Werden vorhandene Potenziale aus den Daten genutzt?
+Ist die ZIRP-Rolle realistisch und umsetzungsnah?
+Endet der Text mit einem konkreten begrenzten Schritt?
 
 INPUT:
 {json.dumps(payload, ensure_ascii=False, indent=2)}
@@ -5373,26 +5309,22 @@ INPUT:
             "Du bist Redakteur:in fÃ¼r eine strategische Wochenanalyse der ZIRP. "
             "Gib valides JSON zurueck, aber das Feld narrative_analysis muss wie ein fertiger deutscher Redaktionstext klingen. "
             "Die Crawler-Funde sind die Hauptgrundlage der Analyse. "
-            "Der SCIP-Convening-Radar ist nur eine zusaetzliche Linse fÃ¼r mÃ¶gliche Vernetzungs- oder Sondierungsmuster, nicht das Rueckgrat des Berichts.\n\n"
+            "Der SCIP-Convening-Radar ist eine zusaetzliche Linse fuer moegliche Projekt- oder Sondierungsmuster, nicht automatisch das Rueckgrat des Berichts.\n\n"
             "In narrative_analysis steht keine Beratungsfolie, kein Action Plan und keine Liste von SCIP Cards. "
             "Schreibe keine englischen Ueberschriften wie High-Priority, Why This Matters, Next Best Action, Outcome Goal oder Key Takeaways. "
             "Schreibe keine nummerierte Prioritaetenliste und keine Markdown-Trennlinien. "
             "Der fertige Text darf die Labels DO:, WATCH:, MAYBE:, Wozu: oder Zusammenfassung nicht enthalten.\n\n"
             "Aufbau von narrative_analysis:\n"
-            "Wochenanalyse\n"
-            "1. Ein Hauptabsatz mit genau einer Opportunity Line: Welche Entwicklung wird diese Woche strategisch sichtbar?\n"
-            "2. Ein Absatz mit 3 bis 6 konkreten Actor Anchors aus dem SCIP-Portfolio: Welche Mitglieder tragen diese Linie, mit welcher Convening-Stufe und welchem nÃ¤chsten Move?\n"
-            "3. Ein Absatz 'Warum das fÃ¼r ZIRP relevant ist': Warum ist das mehr als PR, sondern ein Transfer-, Standort-, Versorgungs- oder Convening-Anlass? Unterscheide Sondierung, Validierung, Lagebild und Pfad-nach-vorn.\n"
-            "4. Ein Absatz 'NÃ¤chster Schritt': genau ein konkreter nÃ¤chster Schritt fÃ¼r ZIRP, aber begrÃ¼ndet aus dem Portfolio, nicht nur aus dem HÃ¶chstscore. Keine DO/WATCH/MAYBE-Labels, keine Bullet-Liste, keine Wir-Perspektive.\n"
-            "Eine SCIP-Verbindung darf nur dann die Klammer bilden, wenn mehrere starke Crawler-Signale sie tragen. Bei nur einem duennen Pattern bleibt SCIP Nebenhinweis.\n\n"
+            "Titel als Frage. Danach Fliesstext mit klaren Absaetzen: Leitthese, konkreter Engpass, systemische Einordnung, vorhandene Ausgangsbasis, strategischer Hebel, Rolle von ZIRP und naechster begrenzter Schritt.\n"
+            "Eine SCIP-Verbindung darf nur dann die Klammer bilden, wenn mehrere starke Crawler-Signale sie tragen. Bei nur einem duennen Pattern bleibt SCIP ein Nebenhinweis.\n\n"
             "Stil: strategisch, nÃ¼chtern, redaktionell, menschlich. Nicht werblich, nicht Ã¼berzogen, nicht mechanisch. "
-            "Begriffe wie pruefbar, Anschlussfrage, Transfer, Sondierung und Umsetzungspraxis gezielt verwenden. "
+            "Verwende konkrete Begriffe wie Initiativen, Kompetenzen, Bedarfe, Pilotvorhaben, Rollen, Nutzen, Ressourcen und Umsetzung. "
             "Schreibe normale deutsche Umlaute. Arbeite ausschliesslich mit dem Input; erfinde keine Fakten, Akteure, Termine oder Kausalitaeten. "
             "Verwende niemals das Wort Signalien; korrekt ist Signale. "
             "Zentrale Projektnamen und Akronyme muessen bei erster Nennung kurz erklÃ¤rt werden, sofern explanation_context oder summary genug Kontext liefern. "
             "Wenn der Kontext fehlt, nicht so tun, als sei das Akronym erklÃ¤rt. "
             "Unklare Begriffe wie Bio-Treppe nur verwenden, wenn sie aus dem Input eindeutig erklÃ¤rt sind.\n\n"
-            "Wichtige Leitfrage: Welche Entwicklung erklaeren die Crawler-Funde insgesamt - und liefert SCIP dazu eine brauchbare Zusatzperspektive oder nur einen separaten Convening-Hinweis?\n\n"
+            "Wichtige Leitfragen: Warum ist das Thema relevant? Wo liegt der konkrete Umsetzungsengpass? Was kann ZIRP realistisch als naechstes tun?\n\n"
             f"INPUT:\n{json.dumps(prompt_payload, ensure_ascii=False, indent=2)}"
         )
 
@@ -5413,16 +5345,16 @@ INPUT:
             "PrÃ¼fe danach, ob SCIP ein belastbares Convening-Muster dazu liefert. Nutze SCIP nur als Klammer, wenn mehrere starke Crawler-Signale dieselbe Verbindung tragen. "
             "Wenn SCIP nur ein schmales Pattern findet, erwaehne es hoechstens als Anschlussoption und schreibe den Bericht breiter aus den Funden.\n\n"
             "So muss der fertige Text aussehen:\n"
-            "Wochenanalyse\n"
-            "Danach genau vier kurze, gut lesbare Bloecke: "
-            "1. eine klare Opportunity Line zur Woche; "
-            "2. zwei bis vier konkrete Actor Anchors mit Mitglied und Fund; "
-            "3. warum diese Linie fÃ¼r ZIRP relevant ist; "
-            "4. genau ein konkreter nÃ¤chster Schritt. "
+            "Titel als Frage. Danach fuenf kurze, gut lesbare Absaetze: "
+            "1. klare Leitthese; "
+            "2. konkreter Engpass; "
+            "3. systemische Einordnung und vorhandene Ausgangsbasis; "
+            "4. strategischer Hebel; "
+            "5. realistische Rolle von ZIRP und ein begrenzter naechster Schritt. "
             "Die Bloecke sollen wie ein internes Leitungsmemo klingen: menschlich, konkret, mit sauberer Urteilskraft. "
             "Schreibe nicht Ã¼ber Scores, Prioritaetsstufen, High-Priority/Mid-Priority, Outcome Goals oder Next Best Actions. "
             "Keine englischen ZwischenÃ¼berschriften. Keine Markdown-Trennlinien. Keine nummerierte Liste. Keine Bullet-Liste. Kein 'Below is'. Kein 'Key Takeaways'.\n\n"
-            "Der letzte Block soll mit 'NÃ¤chster Schritt:' beginnen und nur einen plausiblen nÃ¤chsten Schritt enthalten. "
+            "Der letzte Absatz soll einen plausiblen naechsten Schritt enthalten, aber nicht mit einem sichtbaren Label beginnen. "
             "Keine Labels wie DO, WATCH oder MAYBE.\n\n"
             "Stil:\n"
             "Strategisch, nÃ¼chtern, redaktionell, aber menschlich. Der Text soll gelesen klingen, nicht generiert. "
@@ -5776,9 +5708,9 @@ INPUT:
         if not value:
             return "leer"
         words = re.findall(r"\b\w+\b", value, flags=re.UNICODE)
-        if len(words) < 200:
+        if len(words) < 280:
             return f"zu kurz ({len(words)} WÃ¶rter)"
-        if len(words) > 750:
+        if len(words) > 850:
             return f"zu lang ({len(words)} WÃ¶rter)"
         completion_issue = self.report_completion_issue(value)
         if completion_issue:
@@ -5824,7 +5756,7 @@ INPUT:
         if not value:
             return False
         words = re.findall(r"\b\w+\b", value, flags=re.UNICODE)
-        if len(words) < 250 or len(words) > 550:
+        if len(words) < 280 or len(words) > 780:
             return False
         if self.report_completion_issue(value):
             return False
@@ -5895,7 +5827,7 @@ INPUT:
         if not value:
             return False
         words = re.findall(r"\b\w+\b", value, flags=re.UNICODE)
-        if len(words) < 230 or len(words) > 620:
+        if len(words) < 260 or len(words) > 780:
             return False
         if self.report_completion_issue(value):
             return False
@@ -5984,9 +5916,9 @@ INPUT:
         if self.report_openai_client is not None:
             narrative = self.request_report_plain_text(
                 system_prompt=(
-                    "Du bist Senior Partner beim McKinsey Global Institute und schreibst ein einseitiges Strategic Opportunity Briefing "
-                    "fÃ¼r Entscheidungstraeger. Schreibe analytisch, hypothesengeleitet, nÃ¼chtern und entscheidungsorientiert. "
-                    "Keine Newsletter-Sprache, keine Bulletpoints, keine alten Labels wie Opportunity Line, Actor Anchors, Warum fÃ¼r ZIRP oder NÃ¤chster Schritt."
+                    "Du schreibst einen klaren, nuechternen und strategischen Projekttext fuer eine ZIRP-Projektleitung. "
+                    "Benenne Relevanz, konkreten Umsetzungsengpass, vorhandene Potenziale, strategischen Hebel, ZIRP-Rolle und naechsten begrenzten Schritt. "
+                    "Titel als Frage, danach Fliesstext. Keine Bulletpoints, keine Floskeln, keine alten Labels."
                 ),
                 user_prompt=self.build_draft_rewrite_prompt(
                     draft=fallback["narrative_analysis"],
@@ -6013,9 +5945,9 @@ INPUT:
             )
             draft = self.request_local_plain_text(
                 system_prompt=(
-                    "Du bist Senior Partner beim McKinsey Global Institute und schreibst ein kompaktes deutsches Strategic Opportunity Briefing. "
-                    "Priorisiere eine starke strategische Frage, eine fette Executive Summary und vier bis fÃ¼nf analytische Absaetze. "
-                    "Keine Newsletter-Sprache, keine Bulletpoints, keine alten Labels wie Opportunity Line, Actor Anchors, Warum fÃ¼r ZIRP oder NÃ¤chster Schritt."
+                    "Du schreibst einen kompakten deutschen Projekttext fuer eine ZIRP-Projektleitung. "
+                    "Priorisiere eine klare Leitthese, den konkreten Engpass, die vorhandene Ausgangsbasis, den strategischen Hebel, die Rolle von ZIRP und einen pragmatischen naechsten Schritt. "
+                    "Titel als Frage, danach klare Absaetze. Keine Newsletter-Sprache, keine Bulletpoints, keine alten Labels."
                 ),
                 user_prompt=self.build_draft_rewrite_prompt(
                     draft=fallback["narrative_analysis"],
@@ -6029,9 +5961,9 @@ INPUT:
                 fallback["narrative_analysis"] = self.normalize_editorial_report_text(draft)
                 polish = self.request_local_plain_text(
                     system_prompt=(
-                        "Du bist Schlussredakteur im Stil des McKinsey Global Institute. "
+                        "Du bist Schlussredakteur fuer einen nuechternen ZIRP-Projekttext. "
                         "Poliere nur Stil, Gewichtung und Lesefluss. Keine neuen Fakten, keine sichtbaren Denkprozesse. "
-                        "Bewahre das Format: strategische Frage als Titel, fette Executive Summary, vier bis fÃ¼nf kurze Absaetze."
+                        "Bewahre das Format: Titel als Frage, danach Fliesstext mit klaren Absaetzen."
                     ),
                     user_prompt=self.build_polish_report_prompt(
                         draft=draft,
@@ -6053,8 +5985,8 @@ INPUT:
                 print("Report editorial: schneller Qwen-Entwurf zu kurz oder unpassend; versuche Qwen-Erweiterung")
                 expanded = self.request_local_plain_text(
                     system_prompt=(
-                        "Du bist Senior Partner beim McKinsey Global Institute. "
-                        "Erweitere den vorhandenen Entwurf zu einem einseitigen Strategic Opportunity Briefing. "
+                        "Du schreibst einen einseitigen strategischen Projekttext fuer ZIRP. "
+                        "Erweitere den vorhandenen Entwurf entlang von Relevanz, Engpass, Potenzialen, ZIRP-Rolle und naechstem begrenztem Schritt. "
                         "Keine neuen Fakten, keine sichtbaren Denkprozesse, keine alten Abschnittslabels."
                     ),
                     user_prompt=self.build_polish_report_prompt(
@@ -6084,8 +6016,8 @@ INPUT:
         if self.openai_client is not None and self.openai_base_url:
             narrative = self.request_local_plain_text(
                 system_prompt=(
-                    "Du bist Senior Partner beim McKinsey Global Institute und schreibst ein deutsches Strategic Opportunity Briefing. "
-                    "Bewahre Fakten, korrigiere Gewichtung und mache die strategische Spannung sichtbar. "
+                    "Du schreibst einen deutschen strategischen Projekttext fuer ZIRP. "
+                    "Bewahre Fakten, korrigiere Gewichtung und mache Relevanz, Engpass, Potenziale, ZIRP-Rolle und naechsten Umsetzungsschritt sichtbar. "
                     "Keine Newsletter-Sprache, keine Bulletpoints, keine alten Labels."
                 ),
                 user_prompt=self.build_draft_rewrite_prompt(
@@ -6105,9 +6037,9 @@ INPUT:
 
             narrative = self.request_local_plain_text(
                 system_prompt=(
-                    "Du bist Senior Partner beim McKinsey Global Institute und machst aus Rohsignalen ein prÃ¤zises deutsches Strategic Opportunity Briefing. "
+                    "Du machst aus Rohsignalen einen praezisen deutschen Projekttext fuer eine ZIRP-Projektleitung. "
                     "Schreibe mit normalem Deutsch, ohne Modell- oder Verwaltungssprache. "
-                    "Keine Newsletter-Sprache, keine Bulletpoints, keine alten Labels."
+                    "Titel als Frage, danach Fliesstext. Keine Newsletter-Sprache, keine Bulletpoints, keine alten Labels."
                 ),
                 user_prompt=self.build_fast_direct_report_prompt(weekly_events),
                 call_name="weekly_fast_direct",
@@ -6228,12 +6160,12 @@ INPUT:
             for section in sorted({event.get("hauptsektion", "beobachtung") for event in selected})
         ])
 
+        title = "Können aktuelle Signale in ein konkretes ZIRP-Testfeld übersetzt werden?"
         opportunity_line = (
-            "Opportunity Line: "
-            f"Die Auswertung der letzten {PUBLIC_REPORT_DAYS} Tage hat {searched_member_count} Mitglieder geprueft "
-            f"und {len(selected)} belastbare Signale bei {member_count} Mitgliedern herausgefiltert. "
-            f"Strategisch sichtbar wird eine Linie, in der {section_titles} nicht nur als Einzelmeldungen erscheinen, "
-            "sondern als mÃ¶glicher Anlass fÃ¼r Transfer, Umsetzung oder ein gezieltes ZIRP-GesprÃ¤ch."
+            f"# {title}\n\n"
+            f"Die aktuellen Funde bei {member_count} Mitgliedern legen nahe, dass {section_titles} als gemeinsame Projektfrage gelesen werden können. "
+            f"Die Region verfügt bereits über sichtbare Akteure, Programme und Kooperationsanlässe. "
+            "Der Nutzen entsteht, wenn diese Hinweise nicht als Einzelmeldungen behandelt werden, sondern in eine prüfbare Umsetzungskonstellation führen."
         )
 
         anchor_sentences = []
@@ -6243,20 +6175,21 @@ INPUT:
                 f"{prefix}: {self.compact_event_reference(event)}. "
                 f"Relevant ist der Fund, weil er auf {self.event_implication_phrase(event)} verweist."
             )
-        actor_anchors = "Actor Anchors: " + " ".join(anchor_sentences)
+        actor_anchors = " ".join(anchor_sentences)
 
         zirp_relevance = (
-            "Warum das fÃ¼r ZIRP relevant ist: "
-            "Der Wert liegt nicht in der Sichtbarkeit einzelner Mitglieder, sondern in der AnschlussfÃ¤higkeit der Linie. "
+            "Für ZIRP liegt der Wert in der Anschlussfähigkeit dieser Funde. "
             "Wenn mehrere Funde auf institutionelle Entscheidungen, Programme, Partnerschaften oder regionale Umsetzungspraxis zeigen, "
-            "kann ZIRP daraus eine konkrete Convening- oder Transferfrage ableiten."
+            "kann daraus eine konkrete Convening- oder Transferfrage entstehen. "
+            "Der Engpass liegt in der Rollenklärung: Welche Akteure bringen Bedarf, Kompetenz, Legitimation und Umsetzungskapazität in eine gemeinsame Prüfung ein?"
         )
 
         action_target = self.join_german_list(sorted({event["mitglied"] for event in anchors[:3]}))
         next_step = (
-            "NÃ¤chster Schritt: "
-            f"ZIRP sollte mit {action_target} ein kleines Sondierungsformat pruefen und darin genau eine Frage klaeren: "
-            "Welche konkrete Transfer-, Umsetzungs- oder GesprÃ¤chschance laesst sich aus den aktuellen Signalen realistisch ableiten?"
+            f"Ein pragmatischer nächster Schritt wäre ein kuratiertes Sondierungsformat mit {action_target}. "
+            "Dieses Format sollte in einem begrenzten 90-Tage-Rahmen genau eine Frage klären: "
+            "welche konkrete Transfer-, Umsetzungs- oder Gesprächschance lässt sich aus den aktuellen Signalen realistisch ableiten? "
+            "Damit wird aus Beobachtung eine belastbare Projektprüfung."
         )
 
         return "\n\n".join([opportunity_line, actor_anchors, zirp_relevance, next_step])
@@ -6271,32 +6204,29 @@ INPUT:
         ][:4]
 
         opportunity_line = (
-            "Opportunity Line: "
+            "# Welche Funde rechtfertigen bereits eine Projektprüfung?\n\n"
             f"Die Auswertung vom {period_start.strftime('%d.%m.%Y')} bis {self.today.strftime('%d.%m.%Y')} "
-            f"hat {searched_member_count} Mitglieder geprueft, liefert aber nur wenige robuste Leitungsimpulse. "
-            "Diese Woche ist deshalb eher als Monitoring-Lage zu lesen, nicht als fertiger Convening-Anlass."
+            f"hat {searched_member_count} Mitglieder geprüft und liefert nur wenige robuste Leitungsimpulse. "
+            "Die vorhandenen Hinweise reichen für eine gezielte Nachprüfung, aber noch nicht für eine breite Convening-Initiative."
         )
 
         if candidate_events:
-            actor_anchors = (
-                "Actor Anchors: "
-                + " ".join(self.event_evidence_sentence(event) for event in candidate_events[:4])
-            )
+            actor_anchors = " ".join(self.event_evidence_sentence(event) for event in candidate_events[:4])
         else:
             actor_anchors = (
-                "Actor Anchors: Es gibt keine ausreichend belastbaren Anker, die eine oeffentliche Opportunity Line tragen."
+                "Es gibt noch keine ausreichend belastbaren Anker für eine öffentliche Projektlinie."
             )
 
         zirp_relevance = (
-            "Warum das fÃ¼r ZIRP relevant ist: "
-            "Gerade ein schwaches Wochenbild ist fÃ¼r den Radar wichtig, weil es verhindert, dass einzelne PR-Funde kuenstlich aufgewertet werden. "
-            "Relevanz entsteht erst, wenn ein Thema wiederkehrt oder durch weitere Akteure, Programme oder Umsetzungsschritte konkreter wird."
+            "Für ZIRP ist ein schwaches Wochenbild trotzdem nützlich, weil es die Grenze zwischen Beobachtung und Projektanlass markiert. "
+            "Relevanz entsteht erst, wenn ein Thema wiederkehrt oder durch weitere Akteure, Programme oder Umsetzungsschritte konkreter wird. "
+            "Der Engpass liegt deshalb nicht in der Aufmerksamkeit, sondern in der belastbaren Validierung."
         )
 
         next_step = (
-            "NÃ¤chster Schritt: "
-            "ZIRP sollte diese Woche keine grÃ¶ÃŸere Convening-Initiative ableiten, sondern die belastbaren Einzelfunde nachrecherchieren "
-            "und erst bei einem weiteren starken Signal ein kleines SondierungsgesprÃ¤ch pruefen."
+            "Der nächste sinnvolle Schritt ist ein begrenzter Validierungsprozess: ZIRP sollte die belastbaren Einzelfunde nachrecherchieren "
+            "und erst bei einem weiteren starken Signal ein kleines Sondierungsgespräch prüfen. "
+            "So bleibt der Radar handlungsfähig, ohne schwache Evidenz zu überschätzen."
         )
 
         return "\n\n".join([opportunity_line, actor_anchors, zirp_relevance, next_step])
@@ -6660,7 +6590,7 @@ INPUT:
         )
         return (
             f"- **{event['titel']}** ({event['mitglied']})  **{strength}**. "
-            f"{zirp_relevance} **NÃ¤chster Schritt:** {next_step}."
+            f"{zirp_relevance} Daraus folgt als begrenzter Prüfschritt: {next_step}."
         )
 
     def render_condensation_line_from_frame(
