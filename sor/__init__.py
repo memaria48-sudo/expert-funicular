@@ -1,0 +1,1 @@
+"""Strategic Opportunity Radar package."""

@@ -82,6 +82,26 @@ The optimizer reads that file on later runs and applies a small learned
 adjustment to SCIP pattern scores. If the feedback server is not running, the
 dashboard keeps feedback in browser local storage as a fallback.
 
+Train the neural feedback reranker after collecting feedback:
+
+```powershell
+C:\Users\memar\PyCharmMiscProject\.venv\Scripts\python.exe -m sor.learning.train_feedback_ranker --project-root "C:\Users\memar\PyCharmMiscProject\full project"
+```
+
+Then run the optimizer/pipeline normally. The trained model is stored in:
+
+```text
+data/models/scip_feedback_ranker.pt
+```
+
+The neural ranker is a bounded score adjustment before SCIP selection. It never
+overrides workbook governance, role/subrole quotas, academic caps, or weak
+evidence penalties. Disable it with:
+
+```powershell
+$env:SOR_NEURAL_FEEDBACK_RANKER="0"
+```
+
 ## NN Plan
 
 The NN should not replace SCIP. It should become a learned adjustment layer:

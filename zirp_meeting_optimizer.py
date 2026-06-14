@@ -35,6 +35,11 @@ except Exception:
     stable_recommendation_id = None
 
 try:
+    from sor.learning.neural_reranker import NeuralFeedbackReranker
+except Exception:
+    NeuralFeedbackReranker = None
+
+try:
     from sor.app.network_config import load_network_config
 except Exception:
     load_network_config = None
@@ -99,6 +104,12 @@ STATIC_MAX_ACADEMIC_MATCHES: int = 2
 STATIC_MAX_ACADEMIC_ACTOR_SLOTS: int = 3
 
 FEEDBACK_LEARNER = SCIPFeedbackLearner.from_project_root(PROJECT_DIR) if SCIPFeedbackLearner is not None else None
+USE_NEURAL_FEEDBACK_RANKER = os.getenv("SOR_NEURAL_FEEDBACK_RANKER", "1").strip().lower() not in {"0", "false", "no", "off"}
+NEURAL_FEEDBACK_RERANKER = (
+    NeuralFeedbackReranker.from_project_root(PROJECT_DIR, enabled=USE_NEURAL_FEEDBACK_RANKER)
+    if NeuralFeedbackReranker is not None
+    else None
+)
 OPPORTUNITY_HISTORY_PATH = PROJECT_DIR / "data" / "feedback" / "opportunity_history.json"
 DYNAMIC_TERM_MEMORY_PATH = PROJECT_DIR / "data" / "feedback" / "dynamic_term_memory.json"
 
@@ -4212,6 +4223,65 @@ def feedback_adjustment_for_pattern(base_score: float, pattern: MeetingPattern) 
     )
 
 
+def neural_candidate_payload(base_score: float, pattern: MeetingPattern) -> dict[str, Any]:
+    role_counts = actor_role_counts(pattern.members)
+    actor_roles = [actor_role(member) for member in pattern.members]
+    actor_subroles = [member_subrole_and_quota_weight(member)[0] for member in pattern.members]
+    actor_types = {member: actor_role(member) for member in pattern.members}
+    words = pattern_feedback_words(pattern)
+    return {
+        "recommendation_id": pattern_recommendation_id(pattern),
+        "opportunity_id": opportunity_id_for_pattern(pattern),
+        "opportunity_key": pattern.opportunity_key,
+        "pair": " x ".join(pattern.members),
+        "actors": list(pattern.members),
+        "actor_types": actor_types,
+        "actor_roles": actor_roles,
+        "actor_subroles": [subrole for subrole in actor_subroles if subrole],
+        "topic": pattern.convening_theme,
+        "cluster": ", ".join(pattern.concrete_clusters),
+        "cluster_label": ", ".join(pattern.concrete_clusters),
+        "words": words,
+        "reason": " ".join([
+            pattern.reason,
+            pattern.why_these_members,
+            pattern.editorial_justification,
+            pattern.possible_agenda,
+        ]),
+        "base_score": base_score,
+        "score": pattern.score,
+        "raw_score": pattern.score,
+        "rule_final_score": base_score,
+        "static_support_score": pattern.static_support_score,
+        "live_signal_boost": pattern.live_signal_boost,
+        "evidence_count": len(pattern.recent_signals),
+        "live_event_count": pattern.live_event_count,
+        "academic_evidence_count": role_counts["academic_support"],
+        "company_evidence_count": role_counts["profit_anchor"] + role_counts["implementation_anchor"],
+        "freshness_days": 0 if pattern.live_event_count else 365,
+        "academic_flag": role_counts["academic_support"] > 0,
+        "academic_only_flag": role_counts["academic_support"] == len(pattern.members),
+        "company_need_confirmed": pattern_has_application_capability_bridge(pattern),
+        "profit_anchor_count": role_counts["profit_anchor"],
+        "implementation_anchor_count": role_counts["implementation_anchor"],
+        "academic_support_count": role_counts["academic_support"],
+        "context_actor_count": role_counts["context_actor"],
+    }
+
+
+def neural_feedback_adjustment_for_pattern(base_score: float, pattern: MeetingPattern) -> tuple[float, dict[str, Any]]:
+    if NEURAL_FEEDBACK_RERANKER is None:
+        return 0.0, {
+            "nn_probability_useful": 0.5,
+            "nn_delta": 0.0,
+            "nn_model_examples": 0,
+            "nn_max_delta": 0.0,
+            "nn_model_status": "unavailable",
+        }
+    result = NEURAL_FEEDBACK_RERANKER.score_delta(neural_candidate_payload(base_score, pattern))
+    return float(result.get("nn_delta", 0.0) or 0.0), result
+
+
 def macro_context_penalty(pattern: MeetingPattern) -> float:
     text = normalize_search_text(" ".join(pattern.recent_signals))
     macro_hits = normalized_hit_count(MACRO_TERMS | MARKET_NOISE_TERMS, text)
@@ -4279,7 +4349,8 @@ def final_pattern_score(base_score: float, pattern: MeetingPattern) -> float:
     rule_score = float(base_score) if pattern.candidate_source == "static_excel" else rule_pattern_score(base_score, pattern)
     learner_adjustment, _ = feedback_adjustment_for_pattern(rule_score, pattern)
     human_adjustment, _ = explicit_human_feedback_adjustment_for_pattern(pattern)
-    return min(100.0, max(0.0, rule_score + learner_adjustment + human_adjustment - critical_action_penalty(pattern)))
+    neural_adjustment, _ = neural_feedback_adjustment_for_pattern(rule_score, pattern)
+    return min(100.0, max(0.0, rule_score + learner_adjustment + human_adjustment + neural_adjustment - critical_action_penalty(pattern)))
 
 
 def structural_bonus_amount(base_score: float, pattern: MeetingPattern) -> float:
@@ -4388,6 +4459,7 @@ def export_scip_incidence_matrix(patterns: list[MeetingPattern], path: Path) -> 
                 + explicit_human_feedback_adjustment_for_pattern(pattern)[0],
                 3,
             ),
+            "neural_delta": round(neural_feedback_adjustment_for_pattern(pattern.score, pattern)[0], 3),
             "critical_action_penalty": round(critical_action_penalty(pattern), 3),
             "objective_score": round(final_pattern_score(pattern.score, pattern), 3),
         }
@@ -4632,8 +4704,11 @@ def export_patterns(patterns: list[MeetingPattern], selected_ids: set[int], path
         "public_status", "raw_score", "static_support_score", "live_signal_boost",
         "live_event_count", "live_evidence_status", "live_signal_titles", "live_signal_urls",
         "rule_final_score",
-        "final_score", "structural_bonus", "nn_adjustment", "human_feedback_adjustment",
-        "feedback_adjustment", "feedback_count", "human_feedback_count",
+        "final_score", "structural_bonus", "memory_adjustment", "nn_adjustment",
+        "neural_probability_useful", "neural_delta", "neural_model_examples",
+        "neural_max_delta", "neural_model_status",
+        "human_feedback_adjustment", "feedback_adjustment", "total_learning_adjustment",
+        "feedback_count", "human_feedback_count",
         "human_feedback_exact_count", "human_feedback_similar_count",
         "human_feedback_label_adjustment", "human_feedback_reason_adjustment",
         "human_feedback_target_adjustment", "human_feedback_selection_adjustment",
@@ -4667,9 +4742,11 @@ def export_patterns(patterns: list[MeetingPattern], selected_ids: set[int], path
     for pattern in patterns:
         raw_score = float(pattern.score)
         rule_final_score = raw_score if pattern.candidate_source == "static_excel" else rule_pattern_score(raw_score, pattern)
-        nn_adjustment, feedback_meta = feedback_adjustment_for_pattern(rule_final_score, pattern)
+        memory_adjustment, feedback_meta = feedback_adjustment_for_pattern(rule_final_score, pattern)
         human_feedback_adjustment, human_feedback_meta = explicit_human_feedback_adjustment_for_pattern(pattern)
-        feedback_adjustment_total = nn_adjustment + human_feedback_adjustment
+        neural_adjustment, neural_meta = neural_feedback_adjustment_for_pattern(rule_final_score, pattern)
+        feedback_adjustment_total = memory_adjustment + human_feedback_adjustment
+        total_learning_adjustment = feedback_adjustment_total + neural_adjustment
         critical_penalty = critical_action_penalty(pattern)
         final_score_value = final_pattern_score(pattern.score, pattern)
         environment_multiplier = pattern_environment_multiplier(pattern)
@@ -4775,9 +4852,16 @@ def export_patterns(patterns: list[MeetingPattern], selected_ids: set[int], path
             "rule_final_score": round(rule_final_score, 3),
             "final_score": round(final_score_value, 3),
             "structural_bonus": round(structural_bonus, 3),
-            "nn_adjustment": round(nn_adjustment, 3),
+            "memory_adjustment": round(memory_adjustment, 3),
+            "nn_adjustment": round(neural_adjustment, 3),
+            "neural_probability_useful": round(float(neural_meta.get("nn_probability_useful", 0.5) or 0.5), 4),
+            "neural_delta": round(neural_adjustment, 3),
+            "neural_model_examples": int(neural_meta.get("nn_model_examples", 0) or 0),
+            "neural_max_delta": round(float(neural_meta.get("nn_max_delta", 0.0) or 0.0), 3),
+            "neural_model_status": neural_meta.get("nn_model_status", ""),
             "human_feedback_adjustment": round(human_feedback_adjustment, 3),
             "feedback_adjustment": round(feedback_adjustment_total, 3),
+            "total_learning_adjustment": round(total_learning_adjustment, 3),
             "feedback_count": int(feedback_meta.get("feedback_count", 0) or 0),
             "human_feedback_count": int(human_feedback_meta.get("human_feedback_count", 0) or 0),
             "human_feedback_exact_count": int(human_feedback_meta.get("human_feedback_exact_count", 0) or 0),
@@ -4978,6 +5062,18 @@ def write_model_summary(
         solver_output: str,
 ) -> None:
     solver_used = "greedy_fallback" if "used greedy fallback" in solver_output.lower() else "SCIP"
+    neural_summary = {
+        "enabled": USE_NEURAL_FEEDBACK_RANKER,
+        "available": NEURAL_FEEDBACK_RERANKER is not None,
+        "status": getattr(NEURAL_FEEDBACK_RERANKER, "status", "unavailable") if NEURAL_FEEDBACK_RERANKER is not None else "unavailable",
+        "model_examples": getattr(NEURAL_FEEDBACK_RERANKER, "n_examples", 0) if NEURAL_FEEDBACK_RERANKER is not None else 0,
+        "max_delta": getattr(NEURAL_FEEDBACK_RERANKER, "max_delta", 0.0) if NEURAL_FEEDBACK_RERANKER is not None else 0.0,
+        "dynamic_max_delta": (
+            NEURAL_FEEDBACK_RERANKER.dynamic_max_delta()
+            if NEURAL_FEEDBACK_RERANKER is not None
+            else 0.0
+        ),
+    }
     summary = {
         "run_id": timestamp,
         "created_at": datetime.now().isoformat(timespec="seconds"),
@@ -5002,6 +5098,7 @@ def write_model_summary(
         "subrole_quota_limits": STATIC_SUBROLE_MASS_LIMITS,
         "max_academic_matches": STATIC_MAX_ACADEMIC_MATCHES,
         "max_academic_actor_slots": STATIC_MAX_ACADEMIC_ACTOR_SLOTS,
+        "neural_feedback_ranker": neural_summary,
         "min_final_pair_score": MIN_FINAL_PAIR_SCORE,
         "require_implementation_anchor": REQUIRE_IMPLEMENTATION_ANCHOR,
         "candidate_count": len(patterns),
@@ -6855,6 +6952,26 @@ def card_memory_badge(row: pd.Series) -> str:
     return " · ".join(parts)
 
 
+def neural_learning_signal_html(row: pd.Series) -> str:
+    status = clean_display_value(row.get("neural_model_status", ""))
+    if status not in {"loaded"}:
+        return ""
+    try:
+        delta = float(row.get("neural_delta", 0) or 0)
+        probability = float(row.get("neural_probability_useful", 0.5) or 0.5)
+        examples = int(float(row.get("neural_model_examples", 0) or 0))
+    except Exception:
+        return ""
+    direction = "positiv" if delta > 0.05 else ("negativ" if delta < -0.05 else "neutral")
+    sign = "+" if delta > 0 else ""
+    return (
+        f'<div class="learning-signal learning-signal-{direction}">'
+        f'Lernsignal: {sign}{delta:.1f} · Modellschätzung: {probability * 100:.0f}% nützlich'
+        f' · gelernt aus {examples} Feedbacks'
+        '</div>'
+    )
+
+
 def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Path, html_path: Path) -> None:
     patterns_df = attach_history_columns(patterns_df)
     selected = public_selected_rows(patterns_df)
@@ -6881,6 +6998,16 @@ def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Pat
 
     def feedback_payload_for_row(row: pd.Series, rank: int, selected_status: bool, layer: str) -> dict[str, Any]:
         actors = row_actors(row)
+        actor_types = {actor: actor_role(actor) for actor in actors}
+        actor_subroles = [member_subrole_and_quota_weight(actor)[0] for actor in actors]
+        def payload_float(key: str, default: float = 0.0) -> float:
+            try:
+                value = row.get(key, default)
+                if pd.isna(value):
+                    return default
+                return float(value)
+            except Exception:
+                return default
         return {
             "recommendation_id": clean_display_value(row.get("recommendation_id", "")),
             "opportunity_id": clean_display_value(row.get("opportunity_id", "")),
@@ -6891,8 +7018,30 @@ def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Pat
             "display_points": scip_display_points(row),
             "pair": " x ".join(actors),
             "actors": actors,
+            "actor_types": actor_types,
+            "actor_roles": list(actor_types.values()),
+            "actor_subroles": [subrole for subrole in actor_subroles if subrole],
             "topic": clean_display_value(row.get("convening_theme", "")),
+            "cluster": clean_display_value(row.get("concrete_clusters", "")),
             "reason": clean_display_value(row.get("editorial_justification", "")) or clean_display_value(row.get("reason", "")),
+            "features": {
+                "base_score": payload_float("raw_score", payload_float("score")),
+                "score": payload_float("score"),
+                "rule_final_score": payload_float("rule_final_score"),
+                "static_support_score": payload_float("static_support_score"),
+                "live_signal_boost": payload_float("live_signal_boost"),
+                "evidence_count": len(clean_display_value(row.get("recent_signals", "")).split("||")) if clean_display_value(row.get("recent_signals", "")) else 0,
+                "live_event_count": payload_float("live_event_count"),
+                "critical_action_penalty": payload_float("critical_action_penalty"),
+                "memory_adjustment": payload_float("memory_adjustment"),
+                "explicit_feedback_delta": payload_float("human_feedback_adjustment"),
+                "feedback_count": payload_float("feedback_count"),
+                "word_memory_hits": payload_float("word_memory_hits"),
+                "profit_anchor_count": payload_float("profit_anchor_count"),
+                "implementation_anchor_count": payload_float("implementation_anchor_count"),
+                "academic_support_count": payload_float("academic_support_count"),
+                "context_actor_count": payload_float("context_actor_count"),
+            },
             "selection_reason": clean_display_value(row.get("why_selected", "")),
             "non_selection_reason": clean_display_value(row.get("why_not_selected", "")) or clean_display_value(row.get("non_selection_reason", "")),
             "critical_judgment": {
@@ -6970,6 +7119,7 @@ def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Pat
             <article class="card compact-card selected-card" data-feedback-payload="{payload_attr}">
               <div class="card-label">#{rank} · {html.escape(public_action_label)}</div>
               {card_copy}
+              {neural_learning_signal_html(row)}
               {feedback_controls}
             </article>
             """
@@ -7008,6 +7158,7 @@ def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Pat
                 <div class="candidate-title">#{rank} · {html.escape(candidate_title)}</div>
                 <div class="candidate-meta">{html.escape(" · ".join(meta_bits))}</div>
                 <p>{html.escape(reason)}</p>
+                {neural_learning_signal_html(row)}
               </div>
               {feedback_controls}
             </article>
@@ -7087,6 +7238,10 @@ def render_html(patterns_df: pd.DataFrame, profile_path: Path, pattern_path: Pat
     .candidate-title {{ color:#172033; font-weight:900; line-height:1.35; }}
     .candidate-meta {{ color:#647183; font-weight:820; font-size:.84rem; margin-top:3px; text-transform:uppercase; letter-spacing:.04em; }}
     .candidate-row p {{ margin:7px 0 0; color:#344257; line-height:1.45; }}
+    .learning-signal {{ display:inline-flex; width:max-content; max-width:100%; margin:8px 0 2px; border-radius:999px; padding:6px 10px; font-size:.78rem; font-weight:850; border:1px solid #d6e2ef; color:#263348; background:#f7fafc; }}
+    .learning-signal-positiv {{ border-color:rgba(34,197,94,.42); background:rgba(34,197,94,.11); color:#14532d; }}
+    .learning-signal-neutral {{ border-color:rgba(245,158,11,.42); background:rgba(245,158,11,.12); color:#78350f; }}
+    .learning-signal-negativ {{ border-color:rgba(239,68,68,.38); background:rgba(239,68,68,.10); color:#7f1d1d; }}
     .feedback-box {{ border-top:1px solid #d9e1ea; margin-top:14px; padding-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }}
     .candidate-row .feedback-box {{ margin-top:4px; }}
     .feedback-box span {{ color:#647183; font-weight:850; margin-right:2px; }}
