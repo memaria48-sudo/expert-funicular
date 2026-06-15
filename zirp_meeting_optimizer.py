@@ -107,7 +107,7 @@ STATIC_CLUSTER_CONSTRAINT_SHEET = os.getenv("ZIRP_STATIC_CLUSTER_CONSTRAINT_SHEE
 STATIC_CANDIDATE_LIMIT = int(os.getenv("ZIRP_STATIC_CANDIDATE_LIMIT", "0") or "0")
 STATIC_PATCH_MIN_CANDIDATES = int(os.getenv("ZIRP_STATIC_PATCH_MIN_CANDIDATES", "50") or "50")
 STATIC_REMOVED_MEMBER_NAMES_RAW = [
-    name for name in os.getenv("ZIRP_STATIC_REMOVED_MEMBERS", "Alexianer GmbH").split("|") if name.strip()
+    name for name in os.getenv("ZIRP_STATIC_REMOVED_MEMBERS", "").split("|") if name.strip()
 ]
 STATIC_REMOVED_MEMBERS: set[str] = set()
 STATIC_MEMBER_LIMITS: dict[str, int] = {}

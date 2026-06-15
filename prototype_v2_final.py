@@ -803,7 +803,7 @@ def apply_member_patch(
     """
     delete_keys = {
         member_key(x)
-        for x in os.getenv("STATIC_EXCEL_DELETE_MEMBERS", "Alexianer GmbH;Alexianer").split(";")
+        for x in os.getenv("STATIC_EXCEL_DELETE_MEMBERS", "").split(";")
         if member_key(x)
     }
 
@@ -827,7 +827,7 @@ def apply_member_patch(
 def configured_deleted_member_keys() -> set[str]:
     return {
         member_key(x)
-        for x in os.getenv("STATIC_EXCEL_DELETE_MEMBERS", "Alexianer GmbH;Alexianer").split(";")
+        for x in os.getenv("STATIC_EXCEL_DELETE_MEMBERS", "").split(";")
         if member_key(x)
     }
 
