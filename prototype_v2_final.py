@@ -187,7 +187,7 @@ PUBLIC_SCIP_CARDS_MIN = int(os.getenv("PUBLIC_SCIP_CARDS_MIN", "4") or "4")
 PUBLIC_SCIP_CARDS_MAX = int(os.getenv("PUBLIC_SCIP_CARDS_MAX", "8") or "8")
 PUBLIC_SCIP_SIGNAL_RATIO = float(os.getenv("PUBLIC_SCIP_SIGNAL_RATIO", "0.35") or "0.35")
 SCIP_PROMPT_CARDS_MIN = int(os.getenv("SCIP_PROMPT_CARDS_MIN", "2") or "2")
-SCIP_PROMPT_CARDS_MAX = int(os.getenv("SCIP_PROMPT_CARDS_MAX", "4") or "4")
+SCIP_PROMPT_CARDS_MAX = int(os.getenv("SCIP_PROMPT_CARDS_MAX", "5") or "5")
 SCIP_ARCHIVE_CARDS_MAX = int(os.getenv("SCIP_ARCHIVE_CARDS_MAX", "15") or "15")
 
 DISCOVERY_SEED_PATHS = [
@@ -5193,6 +5193,49 @@ class ZIRPWeeklyAnalyzer:
             "cards": cards,
         }
 
+    def scip_cards_for_briefing(self, limit: int = 5) -> list[dict[str, Any]]:
+        radar = self.scip_convening_radar_for_prompt()
+        cards = radar.get("cards", [])
+        if not isinstance(cards, list):
+            return []
+        return cards[:max(0, int(limit))]
+
+    def scip_card_members_text(self, card: dict[str, Any]) -> str:
+        members = self.clean_dashboard_value(card.get("members", ""))
+        members = members.replace("|", " x ").replace("  ", " ")
+        return members or "eine kuratierte Akteurskonstellation"
+
+    def scip_card_theme_text(self, card: dict[str, Any]) -> str:
+        return (
+            self.clean_dashboard_value(card.get("theme", ""))
+            or self.clean_dashboard_value(card.get("shared_tension", ""))
+            or "eine konkrete Umsetzungsfrage"
+        )
+
+    def scip_card_next_step_text(self, card: dict[str, Any]) -> str:
+        raw = (
+            self.clean_dashboard_value(card.get("next_best_action", ""))
+            or self.clean_dashboard_value(card.get("next_engagement_move", ""))
+            or self.clean_dashboard_value(card.get("format", ""))
+        )
+        key = re.sub(r"\s+", "_", raw.strip().lower().replace("-", "_"))
+        if key in {"brief_or_validate", "watch_or_reframe"}:
+            return "zunächst eine kurze Validierung mit einem konkreten Ansprechpartner durchführen"
+        if "sounding" in key or "sond" in key or "bilateral" in key:
+            return "ein begrenztes Sondierungsgespräch mit klarer Prüfungsfrage vorbereiten"
+        if "workshop" in key:
+            return "einen kleinen Validierungsworkshop mit Entscheidungsfrage vorbereiten"
+        return raw or "eine begrenzte Validierung der Rollen, Bedarfe und nächsten Schritte durchführen"
+
+    def scip_anchor_sentence(self, card: dict[str, Any]) -> str:
+        members = self.scip_card_members_text(card)
+        theme = self.scip_card_theme_text(card)
+        next_step = self.scip_card_next_step_text(card)
+        return (
+            f"Die SCIP-Kuratierung setzt hier bei {members} an: "
+            f"Die Konstellation bündelt Rollen für {theme} und sollte {next_step}."
+        )
+
     def strategic_opportunity_briefing_prompt(self, payload: dict[str, Any]) -> str:
         return f"""
 Du schreibst einen klaren, nüchternen und strategischen Projekttext für eine ZIRP-Projektleitung.
@@ -5201,8 +5244,13 @@ Aus SCIP-Matchings, News-Signalen und Kontextinformationen soll ein Briefing ent
 warum das Thema relevant ist, wo der konkrete Engpass liegt, welche vorhandenen Potenziale genutzt werden können,
 welche realistische Rolle ZIRP übernehmen kann und welcher nächste pragmatische Umsetzungsschritt sinnvoll wäre.
 
-SCIP-Matchings sind nur die Evidenzebene. Das Briefing ist die Bedeutungsebene.
-Wiederhole die Matchings nicht mechanisch. Nutze sie, um eine konkrete Projekt- oder Umsetzungsfrage sichtbar zu machen.
+Der Text muss aus zwei gleich starken Hälften gebaut sein:
+1. Kontext und Crawler-Funde erklären das reale Wochenbild, die Themenlage und die vorhandene Ausgangsbasis.
+2. SCIP-kuratierte Karten erklären die Akteurskonstellationen, Rollen, Engpässe und nächsten Umsetzungsschritte.
+
+Beide Ebenen tragen jeweils ungefähr 50 Prozent der Geschichte. Schreibe also weder einen generischen Kontextaufsatz
+noch eine mechanische Liste von SCIP-Karten. Nutze die kuratierten Karten als konkretes Rückgrat für Akteure,
+Rollenklärung und nächsten Schritt; nutze die Crawler-Funde als Evidenz und Kontext, warum diese Linien jetzt relevant sind.
 
 TON UND STIL
 Schreibe klar, direkt und nüchtern. Keine Floskeln. Keine übertriebene Beratersprache.
@@ -5221,9 +5269,9 @@ Format:
 
 [Absatz 3: systemische Einordnung und vorhandene Ausgangsbasis. Erkläre kurz, warum einfache Einzelmaßnahmen nicht reichen, und zeige vorhandene Kompetenzen, Akteure, Initiativen, Bedarfe oder Ressourcen.]
 
-[Absatz 4: strategischer Hebel. Beschreibe, wo Wirkung entstehen kann: durch Bündelung, Priorisierung, Rollenklärung, Pilotierung oder bessere Umsetzung.]
+[Absatz 4: SCIP-kuratierte Akteurslinien. Greife mindestens zwei konkrete SCIP-Karten auf und erkläre, welche Rollen die Akteure in einer prüfbaren Umsetzungskonstellation übernehmen könnten.]
 
-[Absatz 5: Rolle von ZIRP und nächster Schritt. Formuliere eine realistische Rolle und schlage einen begrenzten Umsetzungsschritt vor, idealerweise ein 90-Tage-Testfeld, eine Pilotphase oder ein Validierungsprozess.]
+[Absatz 5: Rolle von ZIRP und nächster Schritt. Formuliere eine realistische Rolle und schlage einen begrenzten Umsetzungsschritt vor, der aus Kontext plus SCIP-Karten folgt: idealerweise ein 90-Tage-Testfeld, eine Pilotphase oder ein Validierungsprozess.]
 
 [Letzter Satz: klare, merkfähige Verdichtung.]
 
@@ -5256,7 +5304,7 @@ Die Leitthese beantwortet direkt, warum das Thema relevant ist.
 Der Engpass benennt eine konkrete Umsetzungs-, Koordinations-, Kapazitäts-, Rollen- oder Validierungsfrage.
 Die systemische Einordnung erklärt, warum ein einzelner Akteur das Thema nicht allein lösen kann.
 Die vorhandene Ausgangsbasis nennt konkrete Akteure oder Ressourcen aus den übergebenen Signalen und SCIP-Karten.
-Der strategische Hebel beschreibt, welche Bündelung, Priorisierung, Rollenklärung oder Pilotierung Wirkung erzeugen kann.
+Der strategische Hebel beschreibt, welche Bündelung, Priorisierung, Rollenklärung oder Pilotierung Wirkung erzeugen kann, und muss an mindestens einer SCIP-Karte sichtbar werden.
 Die Rolle von ZIRP ist realistisch: ZIRP löst das Problem nicht allein, sondern bringt Akteure, Bedarfe und Umsetzung in eine entscheidungsfähige Konstellation.
 Der nächste Schritt ist begrenzt: ein kuratiertes Sondierungsgespräch, eine 90-Tage-Pilotphase oder ein Validierungsprozess mit klarer Leitfrage.
 
@@ -5291,6 +5339,8 @@ Ist der Titel eine Frage?
 Ist die Leitthese konkret?
 Wird ein Engpass benannt?
 Werden vorhandene Potenziale aus den Daten genutzt?
+Tragen Kontext/Crawler-Funde und SCIP-kuratierte Karten jeweils sichtbar zur Geschichte bei?
+Werden mindestens zwei SCIP-Karten als Akteurs- oder Umsetzungslinien genutzt?
 Ist die ZIRP-Rolle realistisch und umsetzungsnah?
 Endet der Text mit einem konkreten begrenzten Schritt?
 
@@ -5308,15 +5358,16 @@ INPUT:
         return (
             "Du bist Redakteur:in fÃ¼r eine strategische Wochenanalyse der ZIRP. "
             "Gib valides JSON zurueck, aber das Feld narrative_analysis muss wie ein fertiger deutscher Redaktionstext klingen. "
-            "Die Crawler-Funde sind die Hauptgrundlage der Analyse. "
-            "Der SCIP-Convening-Radar ist eine zusaetzliche Linse fuer moegliche Projekt- oder Sondierungsmuster, nicht automatisch das Rueckgrat des Berichts.\n\n"
+            "Crawler-Funde und SCIP-Convening-Radar tragen die Analyse gleichgewichtig. "
+            "Die Crawler-Funde erklaeren Kontext, Evidenz und Wochenbild; die SCIP-Karten liefern die kuratierten Akteurslinien, Rollen und naechsten Schritte.\n\n"
             "In narrative_analysis steht keine Beratungsfolie, kein Action Plan und keine Liste von SCIP Cards. "
             "Schreibe keine englischen Ueberschriften wie High-Priority, Why This Matters, Next Best Action, Outcome Goal oder Key Takeaways. "
             "Schreibe keine nummerierte Prioritaetenliste und keine Markdown-Trennlinien. "
             "Der fertige Text darf die Labels DO:, WATCH:, MAYBE:, Wozu: oder Zusammenfassung nicht enthalten.\n\n"
             "Aufbau von narrative_analysis:\n"
             "Titel als Frage. Danach Fliesstext mit klaren Absaetzen: Leitthese, konkreter Engpass, systemische Einordnung, vorhandene Ausgangsbasis, strategischer Hebel, Rolle von ZIRP und naechster begrenzter Schritt.\n"
-            "Eine SCIP-Verbindung darf nur dann die Klammer bilden, wenn mehrere starke Crawler-Signale sie tragen. Bei nur einem duennen Pattern bleibt SCIP ein Nebenhinweis.\n\n"
+            "Mindestens zwei SCIP-Karten muessen sichtbar als Akteurs- oder Umsetzungslinien verarbeitet werden. "
+            "Wenn eine Karte nur schwache Evidenz hat, formuliere sie als Validierungslinie, nicht als gesicherte Projektbehauptung.\n\n"
             "Stil: strategisch, nÃ¼chtern, redaktionell, menschlich. Nicht werblich, nicht Ã¼berzogen, nicht mechanisch. "
             "Verwende konkrete Begriffe wie Initiativen, Kompetenzen, Bedarfe, Pilotvorhaben, Rollen, Nutzen, Ressourcen und Umsetzung. "
             "Schreibe normale deutsche Umlaute. Arbeite ausschliesslich mit dem Input; erfinde keine Fakten, Akteure, Termine oder Kausalitaeten. "
@@ -5338,12 +5389,12 @@ INPUT:
         return (
             "Du bist Redakteur:in fÃ¼r eine strategische Wochenanalyse der ZIRP. "
             "Du schreibst einen fertigen deutschen Redaktionstext, keinen Plan, keine Auswertung der Aufgabe und keine Methodennotiz. "
-            "Die Crawler-Funde sind die Hauptgrundlage. Der SCIP-Convening-Radar ist nur eine zusaetzliche Linse fÃ¼r mÃ¶gliche Convening-Muster. "
-            "Er darf den Bericht nicht verengen, wenn nur ein duennes oder einzelnes Pattern vorliegt.\n\n"
+            "Crawler-Funde und SCIP-Convening-Radar tragen den Text jeweils zur Haelfte. "
+            "Die Crawler-Funde liefern Kontext und Evidenz; die SCIP-Karten liefern Akteurslogik, Rollen und naechste Umsetzungsschritte.\n\n"
             "Arbeitsweise vor dem Schreiben:\n"
             "Bestimme zuerst die tragende Entwicklung aus den Crawler-Funden: Welche Themen, Mitglieder und regionalen Fragen treten insgesamt hervor? "
-            "PrÃ¼fe danach, ob SCIP ein belastbares Convening-Muster dazu liefert. Nutze SCIP nur als Klammer, wenn mehrere starke Crawler-Signale dieselbe Verbindung tragen. "
-            "Wenn SCIP nur ein schmales Pattern findet, erwaehne es hoechstens als Anschlussoption und schreibe den Bericht breiter aus den Funden.\n\n"
+            "Bestimme danach die zwei bis drei wichtigsten SCIP-Karten: Welche Akteurskonstellationen koennen daraus eine pruefbare Umsetzungslinie machen? "
+            "Verwebe beide Ebenen gleichgewichtig. Bei schwacher Evidenz bleibt die SCIP-Karte eine Validierungslinie, aber sie verschwindet nicht aus der Analyse.\n\n"
             "So muss der fertige Text aussehen:\n"
             "Titel als Frage. Danach fuenf kurze, gut lesbare Absaetze: "
             "1. klare Leitthese; "
@@ -5417,7 +5468,8 @@ INPUT:
                 "supporting_context": [fact_item(event) for event in supporting_events],
                 "watchlist": [fact_item(event) for event in watch_events],
             },
-            "scip_als_zusatzlinse": scip,
+            "gewichtung": "Kontext/Crawler-Funde und SCIP-kuratierte Karten tragen jeweils etwa 50 Prozent der Geschichte.",
+            "scip_kuratierte_karten": scip,
         }
         return self.strategic_opportunity_briefing_prompt(payload)
 
@@ -5430,7 +5482,11 @@ INPUT:
                 "role": event.get("evidence_role", self.evidence_role_for_event(event)),
                 "snippet": self.clean_narrative_snippet(event.get("snippet", ""), max_chars=120),
             })
-        return self.strategic_opportunity_briefing_prompt({"fakten": facts})
+        return self.strategic_opportunity_briefing_prompt({
+            "gewichtung": "Kontext/Crawler-Funde und SCIP-kuratierte Karten tragen jeweils etwa 50 Prozent der Geschichte.",
+            "fakten": facts,
+            "scip_kuratierte_karten": self.scip_convening_radar_for_prompt(),
+        })
 
     def build_polish_report_prompt(self, *, draft: str, events: list[dict[str, Any]]) -> str:
         facts = []
@@ -5444,6 +5500,8 @@ INPUT:
         payload = {
             "draft_to_polish": self.clean_narrative_snippet(draft, max_chars=2600),
             "fact_check_anchor": facts,
+            "gewichtung": "Beim Polieren die SCIP-kuratierten Karten nicht herauswaschen: Kontext und SCIP tragen jeweils etwa 50 Prozent der Geschichte.",
+            "scip_kuratierte_karten": self.scip_convening_radar_for_prompt(),
         }
         return self.strategic_opportunity_briefing_prompt(payload)
 
@@ -6159,13 +6217,17 @@ INPUT:
             REPORT_SECTIONS.get(section, {}).get("title", section)
             for section in sorted({event.get("hauptsektion", "beobachtung") for event in selected})
         ])
+        scip_cards = self.scip_cards_for_briefing(limit=3)
+        primary_scip = scip_cards[0] if scip_cards else {}
+        primary_theme = self.scip_card_theme_text(primary_scip) if primary_scip else section_titles
+        primary_members = self.scip_card_members_text(primary_scip) if primary_scip else self.join_german_list(sorted({event["mitglied"] for event in anchors[:3]}))
 
-        title = "Können aktuelle Signale in ein konkretes ZIRP-Testfeld übersetzt werden?"
+        title = f"Kann {primary_theme} in eine konkrete Umsetzungslinie übersetzt werden?"
         opportunity_line = (
             f"# {title}\n\n"
-            f"Die aktuellen Funde bei {member_count} Mitgliedern legen nahe, dass {section_titles} als gemeinsame Projektfrage gelesen werden können. "
-            f"Die Region verfügt bereits über sichtbare Akteure, Programme und Kooperationsanlässe. "
-            "Der Nutzen entsteht, wenn diese Hinweise nicht als Einzelmeldungen behandelt werden, sondern in eine prüfbare Umsetzungskonstellation führen."
+            f"Die aktuellen Funde bei {member_count} Mitgliedern zeigen den Kontext: {section_titles} sind in dieser Woche keine isolierten Einzelmeldungen. "
+            f"Die SCIP-Kuratierung verdichtet diese Lage zu konkreten Akteurslinien, vor allem rund um {primary_members}. "
+            "Der Nutzen entsteht, wenn Kontextsignale und kuratierte Rollenlogik gemeinsam in eine prüfbare Umsetzungskonstellation führen."
         )
 
         anchor_sentences = []
@@ -6175,20 +6237,22 @@ INPUT:
                 f"{prefix}: {self.compact_event_reference(event)}. "
                 f"Relevant ist der Fund, weil er auf {self.event_implication_phrase(event)} verweist."
             )
-        actor_anchors = " ".join(anchor_sentences)
+        context_anchors = " ".join(anchor_sentences)
+        scip_anchors = " ".join(self.scip_anchor_sentence(card) for card in scip_cards[:3])
+        actor_anchors = " ".join(part for part in [context_anchors, scip_anchors] if part)
 
         zirp_relevance = (
-            "Für ZIRP liegt der Wert in der Anschlussfähigkeit dieser Funde. "
-            "Wenn mehrere Funde auf institutionelle Entscheidungen, Programme, Partnerschaften oder regionale Umsetzungspraxis zeigen, "
-            "kann daraus eine konkrete Convening- oder Transferfrage entstehen. "
-            "Der Engpass liegt in der Rollenklärung: Welche Akteure bringen Bedarf, Kompetenz, Legitimation und Umsetzungskapazität in eine gemeinsame Prüfung ein?"
+            "Für ZIRP liegt der Wert genau in der Verbindung beider Ebenen. "
+            "Die Crawler-Funde zeigen, warum das Thema jetzt relevant ist; die SCIP-Karten zeigen, welche Akteure die Rollen für Bedarf, Kompetenz, Legitimation und Umsetzung übernehmen könnten. "
+            "Der Engpass liegt deshalb weniger in zusätzlicher Aufmerksamkeit als in der Rollenklärung: Welche der kuratierten Linien hat einen konkreten Bedarf, einen belastbaren Ansprechpartner und einen realistischen nächsten Schritt?"
         )
 
-        action_target = self.join_german_list(sorted({event["mitglied"] for event in anchors[:3]}))
+        action_target = primary_members or self.join_german_list(sorted({event["mitglied"] for event in anchors[:3]}))
+        scip_next = self.scip_card_next_step_text(primary_scip) if primary_scip else "eine konkrete Transfer-, Umsetzungs- oder Gesprächschance ableiten"
         next_step = (
             f"Ein pragmatischer nächster Schritt wäre ein kuratiertes Sondierungsformat mit {action_target}. "
             "Dieses Format sollte in einem begrenzten 90-Tage-Rahmen genau eine Frage klären: "
-            "welche konkrete Transfer-, Umsetzungs- oder Gesprächschance lässt sich aus den aktuellen Signalen realistisch ableiten? "
+            f"welcher konkrete Bedarf hinter der Linie steht und wie sich als nächster Schritt {scip_next} lässt. "
             "Damit wird aus Beobachtung eine belastbare Projektprüfung."
         )
 
